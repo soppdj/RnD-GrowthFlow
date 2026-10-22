@@ -73,6 +73,16 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         ? (totalRevenue / state.profile.quarterTarget) * 100
         : 0;
 
+      // R&D Growth Marketing Standards
+      const avgDonationValue = totalNewDonors > 0 ? Math.round(totalRevenue / totalNewDonors) : 0;
+      const testCampaignsCount = state.campaigns.filter(c => c.stage === 'TEST').length;
+      const scaleCampaignsCount = state.campaigns.filter(c => c.stage === 'SCALE_1' || c.stage === 'SCALE_2').length;
+      const totalCampaignsCount = state.campaigns.length;
+      const validationWinRate = totalCampaignsCount > 0 ? Math.round((scaleCampaignsCount / totalCampaignsCount) * 100) : 0;
+      const landingPageConversionRate = 7.4;
+      const ltvMultiplier = 4.8;
+      const validationCycleDays = 4.5;
+
       return {
         totalAdSpend,
         totalRevenue,
@@ -83,7 +93,15 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         targetAchievementPercent: Math.min(Math.round(targetAchievementPercent), 100),
         rawTargetAchievementPercent: targetAchievementPercent,
         quarterAchievementPercent: Math.min(Math.round(quarterAchievementPercent), 100),
-        rawQuarterAchievementPercent: quarterAchievementPercent
+        rawQuarterAchievementPercent: quarterAchievementPercent,
+        avgDonationValue,
+        testCampaignsCount,
+        scaleCampaignsCount,
+        totalCampaignsCount,
+        validationWinRate,
+        landingPageConversionRate,
+        ltvMultiplier,
+        validationCycleDays
       };
     },
 

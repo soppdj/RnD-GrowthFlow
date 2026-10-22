@@ -133,6 +133,30 @@
             </span>
           </div>
         </div>
+
+        <!-- Tolok Ukur Baku Riset & Inovasi R&D -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2 text-xs">
+          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
+            <span class="text-[9px] text-slate-500 font-medium block">Creative Win Rate</span>
+            <span class="text-xs font-black text-teal-900 block mt-0.5">{{ store.kpiSummary.validationWinRate }}% Valid</span>
+            <span class="text-[9px] text-teal-700">Standard baku > 50%</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
+            <span class="text-[9px] text-slate-500 font-medium block">Nilai Donasi Rata-rata</span>
+            <span class="text-xs font-black text-teal-900 block mt-0.5">{{ formatCurrency(store.kpiSummary.avgDonationValue) }}</span>
+            <span class="text-[9px] text-teal-700">Rata-rata gift size/jiwa</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
+            <span class="text-[9px] text-slate-500 font-medium block">Conversion Rate Web</span>
+            <span class="text-xs font-black text-teal-900 block mt-0.5">{{ store.kpiSummary.landingPageConversionRate }}%</span>
+            <span class="text-[9px] text-emerald-700">Fast checkout QRIS</span>
+          </div>
+          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
+            <span class="text-[9px] text-slate-500 font-medium block">LTV / CPR Ratio</span>
+            <span class="text-xs font-black text-indigo-900 block mt-0.5">{{ store.kpiSummary.ltvMultiplier }}x</span>
+            <span class="text-[9px] text-indigo-700">Kesehatan donasi rutin</span>
+          </div>
+        </div>
       </div>
 
       <!-- II. CAPAIAN MATRIKS LOGFRAME -->
