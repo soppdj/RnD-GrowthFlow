@@ -3,17 +3,10 @@
 -- Supabase Schema & Real-Time Sync for Yayasan Khoirur Rooziqiin
 -- Target Organization: Yayasan Khoirur Rooziqiin (Cimareme, Kab. Bandung Barat)
 -- PIC / Lead: Sopianto Djahar (R&D Digital Marketing)
+-- Catatan: Skrip ini 100% Idempotent (Dapat dijalankan berulang kali tanpa error)
 -- ==============================================================================
 
--- 1. DROP EXISTING TABLES (OPTIONAL / SAFE RE-RUN)
--- drop table if exists public.tasks cascade;
--- drop table if exists public.journal_logs cascade;
--- drop table if exists public.milestones cascade;
--- drop table if exists public.campaigns cascade;
--- drop table if exists public.donation_programs cascade;
--- drop table if exists public.profiles cascade;
-
--- 2. CREATE PROFILES TABLE
+-- 1. CREATE PROFILES TABLE
 create table if not exists public.profiles (
   id text primary key default 'default-user',
   full_name text not null default 'Sopianto Djahar',
@@ -29,7 +22,7 @@ create table if not exists public.profiles (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 3. CREATE TASKS TABLE (LOGFRAME HIERARCHY & DAILY CHECKLIST)
+-- 2. CREATE TASKS TABLE (LOGFRAME HIERARCHY & DAILY CHECKLIST)
 create table if not exists public.tasks (
   id text primary key default ('task-' || replace(gen_random_uuid()::text, '-', '')),
   title text not null,
@@ -42,7 +35,7 @@ create table if not exists public.tasks (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 4. CREATE JOURNAL LOGS TABLE (GROWTH HACKING FINDINGS & EXPERIMENTS)
+-- 3. CREATE JOURNAL LOGS TABLE (GROWTH HACKING FINDINGS & EXPERIMENTS)
 create table if not exists public.journal_logs (
   id text primary key default ('log-' || replace(gen_random_uuid()::text, '-', '')),
   date date default current_date,
@@ -53,7 +46,7 @@ create table if not exists public.journal_logs (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 5. CREATE MILESTONES TABLE (ROADMAP & AGENDA DEADLINES)
+-- 4. CREATE MILESTONES TABLE (ROADMAP & AGENDA DEADLINES)
 create table if not exists public.milestones (
   id text primary key default ('m-' || replace(gen_random_uuid()::text, '-', '')),
   title text not null,
@@ -66,7 +59,7 @@ create table if not exists public.milestones (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 6. CREATE CAMPAIGNS TABLE (AD LAB: TEST -> SCALE 1 -> SCALE 2)
+-- 5. CREATE CAMPAIGNS TABLE (AD LAB: TEST -> SCALE 1 -> SCALE 2)
 create table if not exists public.campaigns (
   id text primary key default ('camp-' || replace(gen_random_uuid()::text, '-', '')),
   name text not null,
@@ -82,7 +75,7 @@ create table if not exists public.campaigns (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 7. CREATE DONATION PROGRAMS TABLE (DONASI & METRIK AKUISISI ZISWAF)
+-- 6. CREATE DONATION PROGRAMS TABLE (DONASI & METRIK AKUISISI ZISWAF)
 create table if not exists public.donation_programs (
   id text primary key default ('prog-' || replace(gen_random_uuid()::text, '-', '')),
   name text not null,
@@ -97,8 +90,7 @@ create table if not exists public.donation_programs (
 );
 
 -- ==============================================================================
--- 8. ROW LEVEL SECURITY (RLS) & ACCESS CONTROL
--- Configured for easy single-user PWA operations (Anon Key & Authenticated)
+-- 7. ROW LEVEL SECURITY (RLS) & ACCESS CONTROL (IDEMPOTENT)
 -- ==============================================================================
 alter table public.profiles enable row level security;
 alter table public.tasks enable row level security;
@@ -107,7 +99,15 @@ alter table public.milestones enable row level security;
 alter table public.campaigns enable row level security;
 alter table public.donation_programs enable row level security;
 
--- Permissive public policies for the single-user PWA client
+-- Hapus policy lama jika sudah ada (mencegah error 42710)
+drop policy if exists "Allow all operations on profiles" on public.profiles;
+drop policy if exists "Allow all operations on tasks" on public.tasks;
+drop policy if exists "Allow all operations on journal_logs" on public.journal_logs;
+drop policy if exists "Allow all operations on milestones" on public.milestones;
+drop policy if exists "Allow all operations on campaigns" on public.campaigns;
+drop policy if exists "Allow all operations on donation_programs" on public.donation_programs;
+
+-- Buat ulang policy dengan akses penuh untuk client aplikasi
 create policy "Allow all operations on profiles" on public.profiles for all using (true) with check (true);
 create policy "Allow all operations on tasks" on public.tasks for all using (true) with check (true);
 create policy "Allow all operations on journal_logs" on public.journal_logs for all using (true) with check (true);
@@ -116,23 +116,41 @@ create policy "Allow all operations on campaigns" on public.campaigns for all us
 create policy "Allow all operations on donation_programs" on public.donation_programs for all using (true) with check (true);
 
 -- ==============================================================================
--- 9. ENABLE REAL-TIME REPLICATION
--- Allows real-time synchronization between mobile, desktop & web instances
+-- 8. ENABLE REAL-TIME REPLICATION (SAFE & IDEMPOTENT)
 -- ==============================================================================
-begin;
-  drop publication if exists supabase_realtime;
-  create publication supabase_realtime;
-commit;
+do $$
+begin
+  if not exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    create publication supabase_realtime;
+  end if;
 
-alter publication supabase_realtime add table public.profiles;
-alter publication supabase_realtime add table public.tasks;
-alter publication supabase_realtime add table public.journal_logs;
-alter publication supabase_realtime add table public.milestones;
-alter publication supabase_realtime add table public.campaigns;
-alter publication supabase_realtime add table public.donation_programs;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'profiles') then
+    alter publication supabase_realtime add table public.profiles;
+  end if;
+
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'tasks') then
+    alter publication supabase_realtime add table public.tasks;
+  end if;
+
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'journal_logs') then
+    alter publication supabase_realtime add table public.journal_logs;
+  end if;
+
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'milestones') then
+    alter publication supabase_realtime add table public.milestones;
+  end if;
+
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'campaigns') then
+    alter publication supabase_realtime add table public.campaigns;
+  end if;
+
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'donation_programs') then
+    alter publication supabase_realtime add table public.donation_programs;
+  end if;
+end $$;
 
 -- ==============================================================================
--- 10. INITIAL SEED DATA FOR YAYASAN KHOIRUR ROOZIQIIN
+-- 9. INITIAL SEED DATA FOR YAYASAN KHOIRUR ROOZIQIIN (IDEMPOTENT)
 -- ==============================================================================
 
 -- Profile
