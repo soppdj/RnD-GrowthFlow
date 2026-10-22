@@ -71,23 +71,9 @@ Aplikasi ini mengintegrasikan prinsip-prinsip Growth Hacking Filantropi (ZISWAF)
 
 ---
 
-## 🚀 Cara Menjalankan Proyek
-
-```bash
-# Masuk ke direktori proyek
-cd "C:\Users\sopiekrai\.gemini\antigravity\scratch\rnd-growthflow"
-
-# Jalankan development server
-npm run dev
-```
-
-Server Vite lokal akan aktif di `http://localhost:5173`.
-
----
-
 ## 🗄️ Setup Database Supabase (Opsional)
 Jika ingin menghubungkan ke Supabase Cloud:
 1. Buka dashboard proyek Supabase Anda.
 2. Masuk ke menu **SQL Editor**.
-3. Buka file [`supabase_schema.sql`](file:///C:/Users/sopiekrai/.gemini/antigravity/scratch/rnd-growthflow/supabase_schema.sql) di root proyek ini, salin kodenya dan jalankan di SQL Editor.
+3. Buka file [`supabase_schema.sql`]di root proyek ini, salin kodenya dan jalankan di SQL Editor.
 4. Salin URL Proyek dan Public Anon Key ke menu **Profil & Pengaturan** di aplikasi.
