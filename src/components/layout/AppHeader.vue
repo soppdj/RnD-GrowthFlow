@@ -33,8 +33,8 @@
         </div>
       </div>
 
-      <!-- Center-Left Actions: Shifted to the Left (GESER) -->
-      <div class="hidden sm:flex items-center gap-2.5 flex-1 ml-4 sm:ml-8">
+      <!-- Right: Online Status, Tambah Task, & Profile Card (Pindah ke sini) -->
+      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
         <!-- Online / Offline Status -->
         <div
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors shadow-micro bg-white"
@@ -45,25 +45,13 @@
           <span>{{ isOnline ? 'Online' : 'Offline' }}</span>
         </div>
 
-        <!-- Tambah Task Button (Shifted Left) -->
+        <!-- Tambah Task Button (Moved Next to Profile) -->
         <button
           @click="$emit('quick-add-task')"
           class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all duration-200 active:scale-95"
         >
           <PlusCircle class="w-4 h-4" />
-          <span>Tambah Task</span>
-        </button>
-      </div>
-
-      <!-- Right: Profile Card Only -->
-      <div class="flex items-center gap-2 shrink-0">
-        <!-- Mobile-only quick task icon -->
-        <button
-          @click="$emit('quick-add-task')"
-          class="sm:hidden p-2 rounded-xl text-white bg-teal-600 active:scale-95"
-          title="Tambah Task"
-        >
-          <PlusCircle class="w-4 h-4" />
+          <span class="hidden sm:inline">Tambah Task</span>
         </button>
 
         <!-- Profile Avatar Button -->

@@ -4,13 +4,14 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   plugins: [
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'R&D GrowthFlow • Powered by FatherLab',
+        name: 'R&D GrowthFlow • Powered by FatherLab © 2026',
         short_name: 'GrowthFlow',
         description: 'Private Growth Hacking & R&D Digital Marketing PWA for Yayasan Khoirur Rooziqiin',
         theme_color: '#0d9488',
@@ -19,19 +20,9 @@ export default defineConfig({
         orientation: 'portrait-primary',
         icons: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
+            src: '/favicon.svg',
+            sizes: '192x192 512x512',
+            type: 'image/svg+xml',
             purpose: 'any maskable'
           }
         ]

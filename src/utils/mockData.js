@@ -15,9 +15,9 @@ export const initialProfile = {
   avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
   foundationAddress: "Cimareme, Kab. Bandung Barat",
   foundationContact: "admin@khoirurroziqiin.org | +62 812-9988-7766",
-  supabaseUrl: "",
-  supabaseAnonKey: "",
-  isSupabaseConnected: false
+  supabaseUrl: import.meta.env?.VITE_SUPABASE_URL || import.meta.env?.NEXT_PUBLIC_SUPABASE_URL || "https://rsnjmllhuucyophursng.supabase.co",
+  supabaseAnonKey: import.meta.env?.VITE_SUPABASE_ANON_KEY || import.meta.env?.NEXT_PUBLIC_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzbmptbGxodXVjeW9waHVyc25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzQ0MTAsImV4cCI6MjEwNzcxMDQxMH0.nVLriES26tvWFXLbkeD0irZs7AXZvsFq7Zdue7jKClI",
+  isSupabaseConnected: true
 };
 
 export const initialTasks = [
