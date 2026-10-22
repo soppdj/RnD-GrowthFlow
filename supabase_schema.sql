@@ -99,7 +99,7 @@ alter table public.milestones enable row level security;
 alter table public.campaigns enable row level security;
 alter table public.donation_programs enable row level security;
 
--- Hapus policy lama jika sudah ada (mencegah error 42710)
+-- Hapus policy lama terlebih dahulu jika sudah ada (mencegah error 42710)
 drop policy if exists "Allow all operations on profiles" on public.profiles;
 drop policy if exists "Allow all operations on tasks" on public.tasks;
 drop policy if exists "Allow all operations on journal_logs" on public.journal_logs;
