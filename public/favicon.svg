@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Background Gradient (Rich Modern Teal to Emerald) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#042f2e" />
+      <stop offset="40%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <!-- Trend Arrow Gradient (Vibrant Emerald to Amber Gold) -->
+    <linearGradient id="trendGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="50%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+
+    <!-- Bar Chart 1 Gradient -->
+    <linearGradient id="bar1" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#0d9488" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.9" />
+    </linearGradient>
+
+    <!-- Bar Chart 2 Gradient -->
+    <linearGradient id="bar2" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#0f766e" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#34d399" stop-opacity="0.95" />
+    </linearGradient>
+
+    <!-- Soft Ambient Glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#022c22" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Container with Deep Luxury Shadow -->
+  <rect width="512" height="512" rx="124" fill="url(#bgGrad)" filter="url(#cardShadow)" />
+
+  <!-- Subtle Islamic Geometric Octagram Watermark Pattern in Background -->
+  <g opacity="0.08" stroke="#ffffff" stroke-width="4" fill="none">
+    <rect x="156" y="156" width="200" height="200" rx="20" />
+    <rect x="156" y="156" width="200" height="200" rx="20" transform="rotate(45 256 256)" />
+    <circle cx="256" cy="256" r="140" />
+  </g>
+
+  <!-- Grid Baseline Guide -->
+  <line x1="88" y1="384" x2="424" y2="384" stroke="rgba(255,255,255,0.18)" stroke-width="6" stroke-linecap="round" />
+
+  <!-- Growth Column Bars (Representing Scaling & Acquisition) -->
+  <!-- Column 1 (TEST stage) -->
+  <rect x="116" y="296" width="56" height="88" rx="14" fill="url(#bar1)" />
+  
+  <!-- Column 2 (SCALE 1 stage) -->
+  <rect x="196" y="232" width="56" height="152" rx="14" fill="url(#bar2)" />
+
+  <!-- Column 3 (SCALE 2 stage) -->
+  <rect x="276" y="168" width="56" height="216" rx="14" fill="url(#trendGrad)" />
+
+  <!-- Dynamic Upward Growth Flow Curve -->
+  <path
+    d="M104 340 C 160 320, 210 270, 260 210 C 310 150, 360 120, 400 110"
+    stroke="url(#trendGrad)"
+    stroke-width="20"
+    stroke-linecap="round"
+    fill="none"
+    filter="url(#glow)"
+  />
+
+  <!-- Rocket / Growth Arrow Head -->
+  <path
+    d="M416 96 L416 160 L352 96 Z"
+    fill="#fbbf24"
+    filter="url(#glow)"
+  />
+
+  <!-- Floating Star Node of Barokah (Philanthropic Impact) -->
+  <g transform="translate(366, 170)">
+    <circle cx="0" cy="0" r="14" fill="#ffffff" filter="url(#glow)" />
+    <circle cx="0" cy="0" r="7" fill="#0d9488" />
+  </g>
+
+  <!-- Modern Foundation Pill Text Badge at Bottom -->
+  <rect x="146" y="420" width="220" height="34" rx="17" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" />
+  <text x="256" y="443" fill="#ffffff" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13" font-weight="800" letter-spacing="3.5" text-anchor="middle">
+    GROWTHFLOW
+  </text>
+</svg>
