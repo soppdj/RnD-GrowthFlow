@@ -5,7 +5,9 @@ import {
   initialJournalLogs,
   initialMilestones,
   initialCampaigns,
-  initialDonationPrograms
+  initialDonationPrograms,
+  initialRdProductPrice,
+  initialRdKpis
 } from '@/utils/mockData';
 import { calculateROI, calculateCPR } from '@/utils/formatters';
 import { createClient } from '@supabase/supabase-js';
@@ -32,6 +34,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           milestones: parsed.milestones || initialMilestones,
           campaigns: parsed.campaigns || initialCampaigns,
           donationPrograms: parsed.donationPrograms || initialDonationPrograms,
+          rdProductPrice: parsed.rdProductPrice !== undefined ? parsed.rdProductPrice : initialRdProductPrice,
+          rdKpis: parsed.rdKpis && parsed.rdKpis.length ? parsed.rdKpis : initialRdKpis,
           activeTab: 'dashboard',
           currentDate: new Date().toISOString(),
           filterPeriod: 'q4-2026',
@@ -50,6 +54,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       milestones: [...initialMilestones],
       campaigns: [...initialCampaigns],
       donationPrograms: [...initialDonationPrograms],
+      rdProductPrice: initialRdProductPrice,
+      rdKpis: [...initialRdKpis],
       activeTab: 'dashboard',
       currentDate: new Date().toISOString(),
       filterPeriod: 'q4-2026',
@@ -103,6 +109,44 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         ltvMultiplier,
         validationCycleDays
       };
+    },
+
+    // Standar Baku KPI R&D (Lembar Kerja SOP Gambar Acuan)
+    rdKpiList(state) {
+      const price = Number(state.rdProductPrice) || 123800;
+      return (state.rdKpis || []).map(kpi => {
+        let actualTarget = kpi.actualTarget;
+        let actualTargetFormatted = kpi.actualTargetFormatted;
+
+        // Auto-recalculate based on formulas if productPrice is set
+        if (kpi.id === 'cpc') {
+          actualTarget = 1200;
+          actualTargetFormatted = 'Rp1,200';
+        } else if (kpi.id === 'cost_lpv') {
+          actualTarget = 3714;
+          actualTargetFormatted = 'Rp3,714';
+        } else if (kpi.id === 'cpm') {
+          actualTarget = 32000;
+          actualTargetFormatted = 'Rp32,000';
+        } else if (kpi.id === 'ctr') {
+          actualTarget = 2.0;
+          actualTargetFormatted = 'diatas 2%';
+        } else if (kpi.id === 'cpr') {
+          actualTarget = 32000;
+          actualTargetFormatted = 'Rp32,000';
+        } else if (kpi.id === 'closing_rate') {
+          actualTarget = 82;
+          actualTargetFormatted = '82%';
+        }
+
+        return {
+          ...kpi,
+          productPriceFormatted: kpi.hasProductPrice ? `Rp${price.toLocaleString('id-ID')}` : '',
+          productPriceValue: kpi.hasProductPrice ? price : null,
+          actualTarget,
+          actualTargetFormatted
+        };
+      });
     },
 
     // Work Capacity Calculation (Kartu Kapasitas Kerja)
@@ -248,7 +292,9 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           journalLogs: this.journalLogs,
           milestones: this.milestones,
           campaigns: this.campaigns,
-          donationPrograms: this.donationPrograms
+          donationPrograms: this.donationPrograms,
+          rdProductPrice: this.rdProductPrice,
+          rdKpis: this.rdKpis
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       } catch (e) {
@@ -621,6 +667,20 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       this.saveToStorage();
     },
 
+    // R&D KPI Actions
+    setRdProductPrice(price) {
+      this.rdProductPrice = Number(price) || 0;
+      this.saveToStorage();
+    },
+
+    updateRdKpiAction(kpiId, updates) {
+      const idx = this.rdKpis.findIndex(k => k.id === kpiId);
+      if (idx !== -1) {
+        this.rdKpis[idx] = { ...this.rdKpis[idx], ...updates };
+        this.saveToStorage();
+      }
+    },
+
     // Reset to Mock Data
     resetToMockData() {
       this.profile = { ...initialProfile };
@@ -629,6 +689,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       this.milestones = [...initialMilestones];
       this.campaigns = [...initialCampaigns];
       this.donationPrograms = [...initialDonationPrograms];
+      this.rdProductPrice = initialRdProductPrice;
+      this.rdKpis = [...initialRdKpis];
       this.saveToStorage();
     },
 
@@ -641,6 +703,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         milestones: this.milestones,
         campaigns: this.campaigns,
         donationPrograms: this.donationPrograms,
+        rdProductPrice: this.rdProductPrice,
+        rdKpis: this.rdKpis,
         exportedAt: new Date().toISOString(),
         version: '1.0.0'
       };
@@ -656,6 +720,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         if (parsed.milestones) this.milestones = parsed.milestones;
         if (parsed.campaigns) this.campaigns = parsed.campaigns;
         if (parsed.donationPrograms) this.donationPrograms = parsed.donationPrograms;
+        if (parsed.rdProductPrice !== undefined) this.rdProductPrice = parsed.rdProductPrice;
+        if (parsed.rdKpis) this.rdKpis = parsed.rdKpis;
         this.saveToStorage();
         return { success: true };
       } catch (err) {

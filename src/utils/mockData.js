@@ -272,3 +272,122 @@ export const initialDonationPrograms = [
     description: "Biaya hidup, kitab, dan sertifikasi mutqin untuk santri berprestasi."
   }
 ];
+
+export const initialRdProductPrice = 123800;
+
+export const initialRdKpis = [
+  {
+    no: 1,
+    id: "cpc",
+    metric: "CPC (Cost Per Click)",
+    targetKpi: "1 % Harga Jual",
+    hasProductPrice: true,
+    actualTarget: 1200,
+    actualTargetFormatted: "Rp1,200",
+    currentValue: 1050,
+    currentValueFormatted: "Rp1,050",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "perbaiki konten",
+      "tambah konten baru"
+    ]
+  },
+  {
+    no: 2,
+    id: "cost_lpv",
+    metric: "cost Landing Page View",
+    targetKpi: "2 - 3% harga jual",
+    hasProductPrice: true,
+    actualTarget: 3714,
+    actualTargetFormatted: "Rp3,714",
+    currentValue: 3450,
+    currentValueFormatted: "Rp3,450",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "perbaiki kecepatan LP",
+      "pake lazyload, wesite boster"
+    ]
+  },
+  {
+    no: 3,
+    id: "cpm",
+    metric: "CPM",
+    targetKpi: "32 K OBJECTIVE SALES",
+    hasProductPrice: true,
+    actualTarget: 32000,
+    actualTargetFormatted: "Rp32,000",
+    currentValue: 28500,
+    currentValueFormatted: "Rp28,500",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "tunggu 2-3 hari / masih jelek kill"
+    ]
+  },
+  {
+    no: 4,
+    id: "ctr",
+    metric: "CTR (Click Through Ratio)",
+    targetKpi: "diatas 2%",
+    hasProductPrice: true,
+    actualTarget: 2.0,
+    actualTargetFormatted: "diatas 2%",
+    currentValue: 2.85,
+    currentValueFormatted: "2.85%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "bikin konten yang lebih menarik (komen,share,like)",
+      "ciri - ciri :",
+      "1. kualitas konten 4K",
+      "2. Konten Informatif",
+      "3. Konten Menarik",
+      "4. Konten Lucu/humor"
+    ]
+  },
+  {
+    no: 5,
+    id: "cpr",
+    metric: "CPR (Cost Per Result )",
+    targetKpi: "25% Harga jual",
+    hasProductPrice: true,
+    actualTarget: 32000,
+    actualTargetFormatted: "Rp32,000",
+    currentValue: 30450,
+    currentValueFormatted: "Rp30,450",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "Perbaiki Website :",
+      "1. design website (pro)",
+      "2. Offer (penawaran : bonus)",
+      "3. Harga (coba turunin klo masih kurang bagus dalm 1 pekan)",
+      "4. Persingkat tampilan web jangan terlalu panjang"
+    ]
+  },
+  {
+    no: 6,
+    id: "closing_rate",
+    metric: "Closing Rate CS",
+    targetKpi: "82%",
+    hasProductPrice: false,
+    actualTarget: 82,
+    actualTargetFormatted: "82%",
+    currentValue: 84.5,
+    currentValueFormatted: "84.5%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "1. edukasi CS ( IHT, WS)",
+      "2. Bonus Organik Perbesar nilai nya"
+    ]
+  }
+];

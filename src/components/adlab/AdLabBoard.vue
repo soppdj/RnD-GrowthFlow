@@ -35,6 +35,9 @@
       </div>
     </div>
 
+    <!-- Standar KPI R&D & SOP Eksperimen (Acuan Baku Playbook) -->
+    <AdLabKpiStandard />
+
     <!-- 3-Column Kanban Board -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <!-- COLUMN 1: TEST -->
@@ -169,6 +172,7 @@ import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { formatCompactCurrency } from '@/utils/formatters';
 import AdLabCard from './AdLabCard.vue';
 import AdLabModal from './AdLabModal.vue';
+import AdLabKpiStandard from './AdLabKpiStandard.vue';
 import { Plus } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();

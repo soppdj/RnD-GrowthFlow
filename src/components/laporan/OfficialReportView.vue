@@ -134,28 +134,46 @@
           </div>
         </div>
 
-        <!-- Tolok Ukur Baku Riset & Inovasi R&D -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2 text-xs">
-          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
-            <span class="text-[9px] text-slate-500 font-medium block">Creative Win Rate</span>
-            <span class="text-xs font-black text-teal-900 block mt-0.5">{{ store.kpiSummary.validationWinRate }}% Valid</span>
-            <span class="text-[9px] text-teal-700">Standard baku > 50%</span>
+        <!-- Tabel Baku Standar KPI R&D (Acuan Operasional & Aksi Mitigasi) -->
+        <div class="mt-4 border border-slate-300 rounded-lg overflow-hidden">
+          <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">
+              Tolok Ukur Standar KPI R&amp;D (Acuan Operasional &amp; Aksi Mitigasi)
+            </span>
+            <span class="text-[9px] font-semibold text-slate-600">
+              Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}
+            </span>
           </div>
-          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
-            <span class="text-[9px] text-slate-500 font-medium block">Nilai Donasi Rata-rata</span>
-            <span class="text-xs font-black text-teal-900 block mt-0.5">{{ formatCurrency(store.kpiSummary.avgDonationValue) }}</span>
-            <span class="text-[9px] text-teal-700">Rata-rata gift size/jiwa</span>
-          </div>
-          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
-            <span class="text-[9px] text-slate-500 font-medium block">Conversion Rate Web</span>
-            <span class="text-xs font-black text-teal-900 block mt-0.5">{{ store.kpiSummary.landingPageConversionRate }}%</span>
-            <span class="text-[9px] text-emerald-700">Fast checkout QRIS</span>
-          </div>
-          <div class="p-2.5 rounded-lg bg-teal-50/50 border border-teal-200">
-            <span class="text-[9px] text-slate-500 font-medium block">LTV / CPR Ratio</span>
-            <span class="text-xs font-black text-indigo-900 block mt-0.5">{{ store.kpiSummary.ltvMultiplier }}x</span>
-            <span class="text-[9px] text-indigo-700">Kesehatan donasi rutin</span>
-          </div>
+          <table class="w-full text-left text-[10px] text-slate-700 border-collapse">
+            <thead>
+              <tr class="bg-slate-50 font-bold border-b border-slate-300 text-slate-800">
+                <th class="py-1.5 px-2 w-8 text-center border-r border-slate-300">No</th>
+                <th class="py-1.5 px-2.5 w-36 border-r border-slate-300">KPI Metric</th>
+                <th class="py-1.5 px-2.5 w-32 border-r border-slate-300">Target KPI</th>
+                <th class="py-1.5 px-2.5 w-28 border-r border-slate-300">Harga Jual Product</th>
+                <th class="py-1.5 px-2.5 w-28 text-center bg-blue-50 font-extrabold text-blue-900 border-r border-slate-300">
+                  Actual Target KPI
+                </th>
+                <th class="py-1.5 px-2.5">AKSI BILA TIDAK TERCAPAI</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr v-for="item in store.rdKpiList" :key="item.no" class="hover:bg-slate-50">
+                <td class="py-1.5 px-2 text-center font-bold text-slate-500 border-r border-slate-200">{{ item.no }}</td>
+                <td class="py-1.5 px-2.5 font-bold text-slate-900 border-r border-slate-200">{{ item.metric }}</td>
+                <td class="py-1.5 px-2.5 border-r border-slate-200 font-medium">{{ item.targetKpi }}</td>
+                <td class="py-1.5 px-2.5 border-r border-slate-200 text-slate-600">{{ item.productPriceFormatted || '-' }}</td>
+                <td class="py-1.5 px-2.5 text-center font-black text-blue-900 bg-blue-50/50 border-r border-slate-200">{{ item.actualTargetFormatted }}</td>
+                <td class="py-1.5 px-2.5 text-[9px] text-slate-700">
+                  <div class="space-y-0.5">
+                    <p v-for="(act, idx) in item.actions" :key="idx" class="leading-tight">
+                      {{ act }}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
