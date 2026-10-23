@@ -26,6 +26,15 @@
         </select>
 
         <button
+          @click="isEvaluatorModalOpen = true"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-teal-50 border border-teal-200 text-teal-800 shadow-micro transition-all active:scale-95 shrink-0"
+          title="Import file laporan Meta Ads Manager (.xlsx, .csv) untuk evaluasi lanjut vs stop"
+        >
+          <FileSpreadsheet class="w-4 h-4 text-teal-600" />
+          <span>Import &amp; Evaluasi Meta Ads</span>
+        </button>
+
+        <button
           @click="openCreateModal"
           class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0"
         >
@@ -163,6 +172,12 @@
       @close="closeModal"
       @save="handleSaveCampaign"
     />
+
+    <!-- Meta Ads Evaluator Modal (Excel/CSV Parser & Decision Engine) -->
+    <MetaAdsEvaluatorModal
+      :is-open="isEvaluatorModalOpen"
+      @close="isEvaluatorModalOpen = false"
+    />
   </div>
 </template>
 
@@ -173,12 +188,14 @@ import { formatCompactCurrency } from '@/utils/formatters';
 import AdLabCard from './AdLabCard.vue';
 import AdLabModal from './AdLabModal.vue';
 import AdLabKpiStandard from './AdLabKpiStandard.vue';
-import { Plus } from 'lucide-vue-next';
+import MetaAdsEvaluatorModal from './MetaAdsEvaluatorModal.vue';
+import { Plus, FileSpreadsheet } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 
 const platformFilter = ref('ALL');
 const isModalOpen = ref(false);
+const isEvaluatorModalOpen = ref(false);
 const editingCampaign = ref(null);
 
 const filteredCampaigns = computed(() => {

@@ -37,6 +37,16 @@
             <Edit2 class="w-3 h-3 text-slate-400 hover:text-teal-700 ml-0.5" />
           </button>
 
+          <!-- Evaluator Meta Ads Quick Trigger -->
+          <button
+            @click="isEvaluatorModalOpen = true"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 shadow-micro transition-all"
+            title="Upload file spreadsheet Meta Ads untuk konversi otomatis dan penentuan lanjut vs stop"
+          >
+            <FileSpreadsheet class="w-3.5 h-3.5 text-emerald-600" />
+            <span>Evaluasi File Meta Ads</span>
+          </button>
+
           <!-- View Mode Toggle -->
           <div class="flex items-center p-0.5 rounded-xl bg-teal-100/70 border border-teal-200/80 text-xs font-bold">
             <button
@@ -360,6 +370,11 @@
         </form>
       </div>
     </div>
+    <!-- MODAL EVALUATOR META ADS -->
+    <MetaAdsEvaluatorModal
+      :is-open="isEvaluatorModalOpen"
+      @close="isEvaluatorModalOpen = false"
+    />
   </div>
 </template>
 
@@ -367,6 +382,7 @@
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { formatCurrency } from '@/utils/formatters';
+import MetaAdsEvaluatorModal from './MetaAdsEvaluatorModal.vue';
 import {
   FlaskConical,
   Tag,
@@ -376,6 +392,7 @@ import {
   ChevronDown,
   Edit2,
   CheckCircle,
+  FileSpreadsheet,
   X
 } from 'lucide-vue-next';
 
@@ -384,6 +401,7 @@ const store = useGrowthFlowStore();
 const viewMode = ref('table'); // 'table' | 'cards'
 const isCollapsed = ref(false);
 const isPriceModalOpen = ref(false);
+const isEvaluatorModalOpen = ref(false);
 const tempPrice = ref(store.rdProductPrice || 50000);
 
 const kpiList = computed(() => store.rdKpiList);

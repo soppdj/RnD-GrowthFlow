@@ -1,88 +1,133 @@
 <template>
-  <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-soft border border-teal-100">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-teal-100/70">
-      <div>
-        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-          <span>Komparasi Target vs Realisasi Donasi</span>
-          <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-            3D Isometric View
-          </span>
+  <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-soft border border-teal-100 bg-white/95">
+    <!-- Chart Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-2">
+      <!-- Title Badge -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-micro">
+          <BarChart2 class="w-4 h-4 text-teal-700" />
+        </div>
+        <h3 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight">
+          Grafik Progres Penghimpunan Donasi
         </h3>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Menyandingkan target penghimpunan vs dana aktual yang dihimpun per program
-        </p>
       </div>
 
-      <!-- Legend -->
-      <div class="flex items-center gap-4 text-xs">
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded bg-indigo-200 border border-indigo-400"></span>
-          <span class="text-slate-600 font-medium">Target Program</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded bg-gradient-to-r from-teal-500 to-emerald-500 shadow-sm"></span>
-          <span class="text-slate-800 font-bold">Realisasi Donasi</span>
+      <!-- Unit Info & Legend -->
+      <div class="flex flex-wrap items-center gap-4 text-xs">
+        <span class="text-slate-400 font-medium">Unit: Rupiah (IDR)</span>
+        
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded bg-slate-600 border border-slate-700 shadow-sm"></span>
+            <span class="text-xs font-bold text-slate-700">Target Donasi</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded bg-teal-600 border border-teal-700 shadow-sm"></span>
+            <span class="text-xs font-bold text-teal-800">Realisasi</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Isometric Visual Bars Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-2">
-      <div
-        v-for="prog in programs"
-        :key="prog.id"
-        class="p-4 rounded-2xl bg-white/80 border border-teal-100/80 shadow-micro hover:border-teal-300 transition-all group flex flex-col justify-between"
-      >
-        <div>
-          <!-- Program Badge -->
-          <div class="flex items-center justify-between text-xs mb-1">
-            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
-              {{ prog.category }}
-            </span>
-            <span class="font-extrabold text-xs" :class="getAchievementColor(prog)">
-              {{ Math.round((prog.realizedAmount / prog.targetAmount) * 100) }}%
-            </span>
-          </div>
-
-          <h4 class="text-xs font-bold text-slate-800 mt-1 line-clamp-1" :title="prog.name">
-            {{ prog.name }}
-          </h4>
-        </div>
-
-        <!-- 3D Isometric Bar Graphic Simulation -->
-        <div class="my-4 py-2 flex items-end justify-center gap-4 h-32 relative">
-          <!-- Target Column (Background Slate/Indigo 3D bar) -->
-          <div class="flex flex-col items-center">
-            <span class="text-[9px] font-semibold text-slate-400 mb-1">
-              {{ formatCompactCurrency(prog.targetAmount) }}
-            </span>
-            <div class="w-8 bg-indigo-100/80 border border-indigo-300/80 rounded-t-lg relative shadow-inner transition-all duration-500" style="height: 100px;">
-              <!-- 3D top facet -->
-              <div class="absolute -top-1 left-0 right-0 h-2 bg-indigo-200 rounded-t skew-x-12 opacity-80"></div>
-            </div>
-            <span class="text-[9px] font-bold text-slate-500 mt-1">Target</span>
-          </div>
-
-          <!-- Realization Column (Foreground Emerald Gradient 3D bar) -->
-          <div class="flex flex-col items-center">
-            <span class="text-[9px] font-bold text-emerald-700 mb-1">
-              {{ formatCompactCurrency(prog.realizedAmount) }}
-            </span>
+    <!-- 3D Isometric Chart Container -->
+    <div class="relative pt-6 pb-2 px-2 overflow-x-auto">
+      <div class="min-w-[650px]">
+        <!-- Chart Drawing Area -->
+        <div class="relative h-64 border-b border-teal-100/80">
+          <!-- Horizontal Grid Lines & Y-Axis Labels -->
+          <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
             <div
-              class="w-9 bg-gradient-to-t from-teal-700 via-teal-600 to-emerald-500 rounded-t-lg relative shadow-md transition-all duration-700"
-              :style="{ height: `${Math.max(15, Math.min(100, Math.round((prog.realizedAmount / prog.targetAmount) * 100)))}px` }"
+              v-for="line in yGridLines"
+              :key="line.value"
+              class="relative w-full border-b border-slate-100 flex items-center"
             >
-              <!-- 3D top facet -->
-              <div class="absolute -top-1 left-0 right-0 h-2 bg-emerald-300 rounded-t skew-x-12 opacity-90 shadow-sm"></div>
+              <span class="absolute -left-16 text-[11px] font-semibold text-slate-400 w-14 text-right">
+                {{ line.label }}
+              </span>
             </div>
-            <span class="text-[9px] font-extrabold text-teal-800 mt-1">Realisasi</span>
+            <!-- Zero Line -->
+            <div class="relative w-full border-b border-teal-200 flex items-center">
+              <span class="absolute -left-16 text-[11px] font-bold text-slate-500 w-14 text-right">
+                Rp 0
+              </span>
+            </div>
+          </div>
+
+          <!-- 3D Isometric Bars Columns Grid -->
+          <div class="absolute inset-0 pl-4 pr-6 flex items-end justify-around">
+            <div
+              v-for="prog in programData"
+              :key="prog.id"
+              class="flex items-end justify-center gap-2 sm:gap-3 group relative h-full"
+            >
+              <!-- TARGET 3D ISOMETRIC BAR (Slate/Grey) -->
+              <div class="relative flex flex-col items-center justify-end h-full w-8 sm:w-11">
+                <!-- Bar Column Body -->
+                <div
+                  class="w-full relative transition-all duration-700 ease-out cursor-pointer hover:brightness-110"
+                  :style="{ height: `${Math.max(4, (prog.targetAmount / maxVal) * 100)}%` }"
+                  :title="`${prog.name} - Target: ${formatCurrency(prog.targetAmount)}`"
+                >
+                  <!-- 3D Top Facet (Slanted parallelogram) -->
+                  <div
+                    class="absolute -top-2 left-0 w-full h-2.5 bg-slate-400 border-t border-l border-slate-300 transform -skew-x-[35deg] origin-bottom-left shadow-sm z-10"
+                  ></div>
+                  <!-- 3D Right Side Facet -->
+                  <div
+                    class="absolute top-0 -right-2 w-2 h-full bg-slate-700 border-r border-slate-800 transform -skew-y-[35deg] origin-top-left shadow-sm"
+                  ></div>
+                  <!-- Front Face -->
+                  <div class="w-full h-full bg-gradient-to-b from-slate-500 to-slate-600 border-l border-slate-400 shadow-md"></div>
+                </div>
+              </div>
+
+              <!-- REALISASI 3D ISOMETRIC BAR (Teal/Emerald) -->
+              <div class="relative flex flex-col items-center justify-end h-full w-8 sm:w-11">
+                <!-- Bar Column Body -->
+                <div
+                  class="w-full relative transition-all duration-700 ease-out cursor-pointer hover:brightness-110"
+                  :style="{ height: `${Math.max(4, (prog.realizedAmount / maxVal) * 100)}%` }"
+                  :title="`${prog.name} - Realisasi: ${formatCurrency(prog.realizedAmount)} (${prog.percent}%)`"
+                >
+                  <!-- 3D Top Facet -->
+                  <div
+                    class="absolute -top-2 left-0 w-full h-2.5 bg-emerald-300 border-t border-l border-emerald-200 transform -skew-x-[35deg] origin-bottom-left shadow-sm z-10"
+                  ></div>
+                  <!-- 3D Right Side Facet -->
+                  <div
+                    class="absolute top-0 -right-2 w-2 h-full bg-teal-800 border-r border-teal-900 transform -skew-y-[35deg] origin-top-left shadow-sm"
+                  ></div>
+                  <!-- Front Face -->
+                  <div class="w-full h-full bg-gradient-to-b from-teal-500 via-teal-600 to-emerald-600 border-l border-teal-400 shadow-lg"></div>
+                </div>
+              </div>
+
+              <!-- Tooltip on Hover -->
+              <div
+                class="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-[11px] py-1.5 px-2.5 rounded-xl shadow-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30"
+              >
+                <p class="font-extrabold text-teal-300">{{ prog.name }}</p>
+                <div class="flex items-center gap-2 mt-0.5 text-[10px]">
+                  <span>Target: {{ formatCompactCurrency(prog.targetAmount) }}</span>
+                  <span>•</span>
+                  <span class="text-emerald-400 font-bold">Real: {{ formatCompactCurrency(prog.realizedAmount) }} ({{ prog.percent }}%)</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Micro Financial Footer -->
-        <div class="pt-2 border-t border-teal-100/60 flex items-center justify-between text-[11px]">
-          <span class="text-slate-500">Ad Spend: <strong>{{ formatCompactCurrency(prog.adSpend) }}</strong></span>
-          <span class="font-extrabold text-emerald-700">ROI {{ formatPercent(calculateROI(prog.realizedAmount, prog.adSpend), 0) }}</span>
+        <!-- X-Axis Labels -->
+        <div class="pl-4 pr-6 flex justify-around mt-3">
+          <div
+            v-for="prog in programData"
+            :key="prog.id"
+            class="text-center w-28 sm:w-36 px-1"
+          >
+            <p class="text-xs font-bold text-slate-800 leading-tight truncate" :title="prog.name">
+              {{ prog.name }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -92,15 +137,30 @@
 <script setup>
 import { computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
-import { formatCompactCurrency, formatPercent, calculateROI } from '@/utils/formatters';
+import { formatCurrency, formatCompactCurrency } from '@/utils/formatters';
+import { BarChart2 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
-const programs = computed(() => store.donationPrograms);
 
-function getAchievementColor(prog) {
-  const pct = Math.round((prog.realizedAmount / prog.targetAmount) * 100);
-  if (pct >= 90) return 'text-emerald-700';
-  if (pct >= 60) return 'text-teal-700';
-  return 'text-amber-700';
-}
+// Max scale reference for Y-axis: 120 Jt (Rp 120.000.000)
+const maxVal = 120000000;
+
+const yGridLines = [
+  { value: 120000000, label: 'Rp 120 Jt' },
+  { value: 90000000, label: 'Rp 90 Jt' },
+  { value: 60000000, label: 'Rp 60 Jt' },
+  { value: 30000000, label: 'Rp 30 Jt' }
+];
+
+const programData = computed(() => {
+  return (store.donationPrograms || []).map(p => {
+    const target = Number(p.targetAmount) || 1;
+    const real = Number(p.realizedAmount) || 0;
+    const percent = ((real / target) * 100).toFixed(1);
+    return {
+      ...p,
+      percent
+    };
+  });
+});
 </script>

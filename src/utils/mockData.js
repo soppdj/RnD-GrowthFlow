@@ -229,47 +229,58 @@ export const initialCampaigns = [
 export const initialDonationPrograms = [
   {
     id: "prog-1",
-    name: "Wakaf Sumur Air Bersih Pelosok",
-    category: "Wakaf",
-    targetAmount: 150000000,
-    realizedAmount: 118450000,
-    adSpend: 16400000,
-    newDonors: 412,
+    name: "Zakat",
+    category: "Zakat",
+    targetAmount: 44100000,
+    realizedAmount: 12675646,
+    adSpend: 1850000,
+    newDonors: 98,
     status: "Active",
-    description: "Pembangunan sumur bor dan instalasi filter air untuk pesantren dan warga dhuafa."
+    description: "Program Zakat Penghasilan dan Maal terpadu 8 asnaf prioritas."
   },
   {
     id: "prog-2",
-    name: "Zakat Penghasilan & Maal Terpadu",
-    category: "Zakat",
-    targetAmount: 120000000,
-    realizedAmount: 94600000,
-    adSpend: 10200000,
-    newDonors: 185,
+    name: "Wakaf",
+    category: "Wakaf",
+    targetAmount: 35000000,
+    realizedAmount: 8500000,
+    adSpend: 1200000,
+    newDonors: 54,
     status: "Active",
-    description: "Penyaluran zakat 8 asnaf prioritas fakir, miskin, dan fi sabilillah."
+    description: "Wakaf sarana dakwah, sumur bor, dan fasilitas ibadah santri."
   },
   {
     id: "prog-3",
-    name: "Sedekah Beras & Nutrisi Santri Yatim",
+    name: "Infaq & Sedekah",
     category: "Sedekah",
-    targetAmount: 80000000,
-    realizedAmount: 62750000,
-    adSpend: 8100000,
-    newDonors: 310,
+    targetAmount: 111275000,
+    realizedAmount: 25385162,
+    adSpend: 3650000,
+    newDonors: 186,
     status: "Active",
-    description: "Pemberian beras premium dan vitamin berkala untuk 250 santri yatim dhuafa."
+    description: "Sedekah pangan, santunan dhuafa, dan operasional dakwah berkah."
   },
   {
     id: "prog-4",
-    name: "Beasiswa Kader Ulama & Tahfidz Quran",
+    name: "Wali Asuh",
     category: "Pendidikan",
-    targetAmount: 100000000,
-    realizedAmount: 36700000,
-    adSpend: 4750000,
-    newDonors: 82,
+    targetAmount: 10000000,
+    realizedAmount: 3870005,
+    adSpend: 550000,
+    newDonors: 24,
     status: "Active",
-    description: "Biaya hidup, kitab, dan sertifikasi mutqin untuk santri berprestasi."
+    description: "Program orang tua asuh santri tahfidz yatim & dhuafa berprestasi."
+  },
+  {
+    id: "prog-5",
+    name: "Program Khusus (Renovasi Wudhu)",
+    category: "Renovasi",
+    targetAmount: 15000000,
+    realizedAmount: 14038030,
+    adSpend: 1250000,
+    newDonors: 112,
+    status: "Active",
+    description: "Pembangunan dan renovasi tempat wudhu higienis masjid dan pesantren."
   }
 ];
 

@@ -27,13 +27,18 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           profile = { ...initialProfile, ...profile, fullName: 'Sopianto Djahar', foundationAddress: 'Cimareme, Kab. Bandung Barat' };
         }
 
+        let donationPrograms = parsed.donationPrograms;
+        if (!donationPrograms || donationPrograms.length < 5 || (donationPrograms[0] && donationPrograms[0].name === 'Wakaf Sumur Air Bersih Pelosok')) {
+          donationPrograms = [...initialDonationPrograms];
+        }
+
         return {
           profile: profile || initialProfile,
           tasks: parsed.tasks || initialTasks,
           journalLogs: parsed.journalLogs || initialJournalLogs,
           milestones: parsed.milestones || initialMilestones,
           campaigns: parsed.campaigns || initialCampaigns,
-          donationPrograms: parsed.donationPrograms || initialDonationPrograms,
+          donationPrograms: donationPrograms || initialDonationPrograms,
           rdProductPrice: parsed.rdProductPrice !== undefined ? parsed.rdProductPrice : initialRdProductPrice,
           rdKpis: parsed.rdKpis && parsed.rdKpis.length ? parsed.rdKpis : initialRdKpis,
           activeTab: 'dashboard',
