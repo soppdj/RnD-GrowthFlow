@@ -11,7 +11,7 @@
           <div>
             <div class="flex flex-wrap items-center gap-2">
               <h3 class="text-base font-extrabold text-slate-800 tracking-tight">
-                Standar KPI R&amp;D (Ads Lab)
+                Standar KPI Ads
               </h3>
               <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                 SOP Yayasan Khoirur Rooziqiin
@@ -29,7 +29,7 @@
           <button
             @click="openPriceModal"
             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-teal-200 text-teal-800 hover:bg-teal-50/80 shadow-micro transition-all"
-            title="Klik untuk ubah acuan harga produk"
+            title="Klik untuk ubah acuan harga jual"
           >
             <Tag class="w-3.5 h-3.5 text-teal-600" />
             <span>Harga Jual:</span>
@@ -61,7 +61,7 @@
           <button
             @click="isCollapsed = !isCollapsed"
             class="p-1.5 rounded-xl text-slate-500 hover:text-teal-800 hover:bg-teal-100/50 transition-colors"
-            :title="isCollapsed ? 'Buka Standar KPI R&D' : 'Sembunyikan/Kecilkan'"
+            :title="isCollapsed ? 'Buka Standar KPI Ads' : 'Sembunyikan/Kecilkan'"
           >
             <ChevronUp v-if="!isCollapsed" class="w-4 h-4" />
             <ChevronDown v-else class="w-4 h-4" />
@@ -74,11 +74,11 @@
         <div class="flex items-center gap-4 flex-wrap">
           <span class="inline-flex items-center gap-1">
             <span class="font-bold text-slate-700">Target CPC:</span>
-            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">Rp 1.200</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">{{ getMetricTarget('cpc') }}</span>
           </span>
           <span class="inline-flex items-center gap-1">
-            <span class="font-bold text-slate-700">Target Cost LP:</span>
-            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">Rp 3.714</span>
+            <span class="font-bold text-slate-700">Target Cost LPV:</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">{{ getMetricTarget('cost_lpv') }}</span>
           </span>
           <span class="inline-flex items-center gap-1">
             <span class="font-bold text-slate-700">Target CPM:</span>
@@ -86,11 +86,11 @@
           </span>
           <span class="inline-flex items-center gap-1">
             <span class="font-bold text-slate-700">Target CTR:</span>
-            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">&gt; 2%</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">diatas 2%</span>
           </span>
           <span class="inline-flex items-center gap-1">
             <span class="font-bold text-slate-700">Target CPR:</span>
-            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">Rp 32.000</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">{{ getMetricTarget('cpr') }}</span>
           </span>
           <span class="inline-flex items-center gap-1">
             <span class="font-bold text-slate-700">Target Closing CS:</span>
@@ -113,12 +113,12 @@
         <table class="w-full text-left text-xs text-slate-700 border-collapse">
           <thead>
             <tr class="bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-800 text-white font-extrabold text-[11px] uppercase tracking-wider">
-              <th scope="col" class="py-3 px-3 w-12 text-center border-r border-teal-600/50">No</th>
-              <th scope="col" class="py-3 px-4 w-48 border-r border-teal-600/50">KPI Metric</th>
-              <th scope="col" class="py-3 px-4 w-40 border-r border-teal-600/50">Target KPI</th>
-              <th scope="col" class="py-3 px-4 w-40 border-r border-teal-600/50">Harga Jual Product</th>
+              <th scope="col" class="py-3 px-3 w-12 text-center border-r border-teal-600/50">NO</th>
+              <th scope="col" class="py-3 px-4 w-44 border-r border-teal-600/50">KPI METRIC</th>
+              <th scope="col" class="py-3 px-4 w-40 border-r border-teal-600/50">TARGET KPI</th>
+              <th scope="col" class="py-3 px-4 w-40 border-r border-teal-600/50">HARGA JUAL</th>
               <th scope="col" class="py-3 px-4 w-36 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
-                Actual Target KPI
+                ACTUAL TARGET KPI
               </th>
               <th scope="col" class="py-3 px-4">AKSI BILA TIDAK TERCAPAI</th>
             </tr>
@@ -152,17 +152,25 @@
                 </span>
               </td>
 
-              <!-- 4. Harga Jual Product -->
-              <td class="py-3.5 px-4 text-slate-600 border-r border-slate-100">
-                <span v-if="item.hasProductPrice" class="font-semibold text-slate-700">
-                  {{ item.productPriceFormatted || formatCurrency(store.rdProductPrice) }}
-                </span>
+              <!-- 4. Harga Jual (Interactive click to edit) -->
+              <td
+                class="py-3.5 px-4 text-slate-600 border-r border-slate-100 transition-colors"
+                :class="item.hasProductPrice ? 'cursor-pointer hover:bg-teal-50/60 group' : ''"
+                @click="item.hasProductPrice ? openPriceModal() : null"
+                :title="item.hasProductPrice ? 'Klik untuk ubah Harga Jual' : ''"
+              >
+                <div v-if="item.hasProductPrice" class="flex items-center justify-between">
+                  <span class="font-semibold text-slate-700">
+                    {{ item.productPriceFormatted || formatCurrency(store.rdProductPrice) }}
+                  </span>
+                  <Edit2 class="w-3 h-3 text-teal-600 opacity-60 group-hover:opacity-100 transition-opacity ml-1" />
+                </div>
                 <span v-else class="text-slate-400 font-normal italic">-</span>
               </td>
 
-              <!-- 5. Actual Target KPI (Highlighted in blue like Excel image) -->
+              <!-- 5. Actual Target KPI (Highlighted in blue like Excel image, auto-calculated) -->
               <td class="py-3.5 px-4 text-center font-black border-r border-blue-100 bg-blue-50/70 text-blue-900 text-sm">
-                <span class="px-2.5 py-1 rounded-lg bg-blue-100/80 border border-blue-200 block shadow-micro">
+                <span class="px-2.5 py-1 rounded-lg bg-blue-100/90 border border-blue-200 block shadow-micro tracking-tight">
                   {{ item.actualTargetFormatted }}
                 </span>
               </td>
@@ -250,14 +258,14 @@
             </div>
 
             <div class="mt-2.5">
-              <h4 class="text-sm font-extrabold text-slate-800">{{ item.metric }}</h4>
+              <h4 class="text-base font-extrabold text-slate-800">{{ item.metric }}</h4>
               <div class="flex items-center justify-between mt-2 p-2.5 rounded-lg bg-blue-50/70 border border-blue-100">
                 <div>
                   <span class="text-[10px] text-slate-500 font-medium block">Actual Target KPI:</span>
                   <span class="text-base font-black text-blue-900">{{ item.actualTargetFormatted }}</span>
                 </div>
                 <div class="text-right">
-                  <span class="text-[10px] text-slate-500 font-medium block">Harga Acuan:</span>
+                  <span class="text-[10px] text-slate-500 font-medium block">Harga Jual:</span>
                   <span class="text-xs font-bold text-slate-700">
                     {{ item.hasProductPrice ? formatCurrency(store.rdProductPrice) : '-' }}
                   </span>
@@ -277,7 +285,7 @@
           </div>
 
           <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">SOP R&amp;D Digital Marketing</span>
+            <span class="text-slate-400">SOP Standar Ads</span>
             <span class="text-emerald-700 font-bold flex items-center gap-1">
               <CheckCircle class="w-3.5 h-3.5" />
               <span>Standar Aktif</span>
@@ -287,7 +295,7 @@
       </div>
     </div>
 
-    <!-- MODAL EDIT HARGA JUAL PRODUCT -->
+    <!-- MODAL EDIT HARGA JUAL -->
     <div
       v-if="isPriceModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in"
@@ -296,7 +304,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-teal-100">
           <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
             <Tag class="w-4 h-4 text-teal-600" />
-            <span>Ubah Acuan Harga Jual Product</span>
+            <span>Ubah Acuan Harga Jual</span>
           </h3>
           <button @click="isPriceModalOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
             <X class="w-5 h-5" />
@@ -306,7 +314,7 @@
         <form @submit.prevent="saveNewPrice" class="mt-4 space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">
-              Harga Jual Product / Paket Donasi (Rp)
+              Harga Jual (Rp)
             </label>
             <div class="relative">
               <span class="absolute left-3 top-2.5 text-xs font-bold text-slate-400">Rp</span>
@@ -320,16 +328,16 @@
               />
             </div>
             <p class="text-[11px] text-slate-500 mt-1.5 leading-relaxed">
-              Target aktual seperti CPC (1%), Cost LP View (2-3%), dan CPR (25%) akan dihitung ulang secara otomatis berdasarkan nilai ini.
+              Target aktual seperti CPC (1%), Cost LPV (3%), dan CPR (25%) akan dihitung ulang secara otomatis berdasarkan nilai Harga Jual ini.
             </p>
           </div>
 
           <div class="p-3 rounded-xl bg-teal-50 border border-teal-200/80 text-xs space-y-1">
-            <p class="font-bold text-teal-900">Simulasi Target Baru:</p>
+            <p class="font-bold text-teal-900">Hitungan Otomatis Target Baru:</p>
             <div class="grid grid-cols-2 gap-2 text-[11px] text-teal-800 mt-1">
               <span>• CPC (1%): <strong>{{ formatCurrency(Math.round(tempPrice * 0.01)) }}</strong></span>
-              <span>• Cost LP (3%): <strong>{{ formatCurrency(Math.round(tempPrice * 0.03)) }}</strong></span>
-              <span>• CPR (25%): <strong>{{ formatCurrency(32000) }}</strong></span>
+              <span>• Cost LPV (3%): <strong>{{ formatCurrency(Math.round(tempPrice * 0.03)) }}</strong></span>
+              <span>• CPR (25%): <strong>{{ formatCurrency(Math.round(tempPrice * 0.25)) }}</strong></span>
               <span>• CPM: <strong>Rp 32.000</strong></span>
             </div>
           </div>
@@ -376,12 +384,17 @@ const store = useGrowthFlowStore();
 const viewMode = ref('table'); // 'table' | 'cards'
 const isCollapsed = ref(false);
 const isPriceModalOpen = ref(false);
-const tempPrice = ref(store.rdProductPrice || 123800);
+const tempPrice = ref(store.rdProductPrice || 50000);
 
 const kpiList = computed(() => store.rdKpiList);
 
+function getMetricTarget(id) {
+  const item = (kpiList.value || []).find(k => k.id === id);
+  return item ? item.actualTargetFormatted : '';
+}
+
 function openPriceModal() {
-  tempPrice.value = store.rdProductPrice || 123800;
+  tempPrice.value = store.rdProductPrice || 50000;
   isPriceModalOpen.value = true;
 }
 

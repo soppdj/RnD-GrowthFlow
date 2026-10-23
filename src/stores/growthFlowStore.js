@@ -111,36 +111,51 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       };
     },
 
-    // Standar Baku KPI R&D (Lembar Kerja SOP Gambar Acuan)
+    // Standar Baku KPI Ads (Lembar Kerja SOP Gambar Acuan)
     rdKpiList(state) {
-      const price = Number(state.rdProductPrice) || 123800;
+      const price = Number(state.rdProductPrice) || 0;
       return (state.rdKpis || []).map(kpi => {
         let actualTarget = kpi.actualTarget;
         let actualTargetFormatted = kpi.actualTargetFormatted;
 
-        // Auto-recalculate based on formulas if productPrice is set
+        // Auto-recalculate dynamically based on formulas from Harga Jual
         if (kpi.id === 'cpc') {
-          actualTarget = 1200;
-          actualTargetFormatted = 'Rp1,200';
+          // 1% of Harga Jual
+          actualTarget = Math.round(price * 0.01);
+          actualTargetFormatted = `Rp${actualTarget.toLocaleString('id-ID')}`;
         } else if (kpi.id === 'cost_lpv') {
-          actualTarget = 3714;
-          actualTargetFormatted = 'Rp3,714';
+          // 2 - 3% of Harga Jual (menggunakan target 3%)
+          actualTarget = Math.round(price * 0.03);
+          actualTargetFormatted = `Rp${actualTarget.toLocaleString('id-ID')}`;
         } else if (kpi.id === 'cpm') {
+          // Fixed 32 K Objective Sales
           actualTarget = 32000;
-          actualTargetFormatted = 'Rp32,000';
+          actualTargetFormatted = 'Rp32.000';
         } else if (kpi.id === 'ctr') {
+          // Fixed diatas 2%
           actualTarget = 2.0;
           actualTargetFormatted = 'diatas 2%';
         } else if (kpi.id === 'cpr') {
-          actualTarget = 32000;
-          actualTargetFormatted = 'Rp32,000';
+          // 25% of Harga Jual
+          actualTarget = Math.round(price * 0.25);
+          actualTargetFormatted = `Rp${actualTarget.toLocaleString('id-ID')}`;
         } else if (kpi.id === 'closing_rate') {
+          // Fixed 82%
           actualTarget = 82;
           actualTargetFormatted = '82%';
         }
 
+        // Clean metric name matching user marking
+        let cleanMetric = kpi.metric;
+        if (kpi.id === 'cpc') cleanMetric = 'CPC';
+        else if (kpi.id === 'cost_lpv') cleanMetric = 'Cost LPV';
+        else if (kpi.id === 'ctr') cleanMetric = 'CTR';
+        else if (kpi.id === 'cpr') cleanMetric = 'CPR';
+        else if (kpi.id === 'closing_rate') cleanMetric = 'Closing Rate CS';
+
         return {
           ...kpi,
+          metric: cleanMetric,
           productPriceFormatted: kpi.hasProductPrice ? `Rp${price.toLocaleString('id-ID')}` : '',
           productPriceValue: kpi.hasProductPrice ? price : null,
           actualTarget,

@@ -273,19 +273,19 @@ export const initialDonationPrograms = [
   }
 ];
 
-export const initialRdProductPrice = 123800;
+export const initialRdProductPrice = 50000;
 
 export const initialRdKpis = [
   {
     no: 1,
     id: "cpc",
-    metric: "CPC (Cost Per Click)",
+    metric: "CPC",
     targetKpi: "1 % Harga Jual",
     hasProductPrice: true,
-    actualTarget: 1200,
-    actualTargetFormatted: "Rp1,200",
-    currentValue: 1050,
-    currentValueFormatted: "Rp1,050",
+    actualTarget: 500,
+    actualTargetFormatted: "Rp500",
+    currentValue: 450,
+    currentValueFormatted: "Rp450",
     unit: "currency",
     status: "optimal",
     statusLabel: "Optimal",
@@ -297,13 +297,13 @@ export const initialRdKpis = [
   {
     no: 2,
     id: "cost_lpv",
-    metric: "cost Landing Page View",
+    metric: "Cost LPV",
     targetKpi: "2 - 3% harga jual",
     hasProductPrice: true,
-    actualTarget: 3714,
-    actualTargetFormatted: "Rp3,714",
-    currentValue: 3450,
-    currentValueFormatted: "Rp3,450",
+    actualTarget: 1500,
+    actualTargetFormatted: "Rp1,500",
+    currentValue: 1350,
+    currentValueFormatted: "Rp1,350",
     unit: "currency",
     status: "optimal",
     statusLabel: "Optimal",
@@ -332,7 +332,7 @@ export const initialRdKpis = [
   {
     no: 4,
     id: "ctr",
-    metric: "CTR (Click Through Ratio)",
+    metric: "CTR",
     targetKpi: "diatas 2%",
     hasProductPrice: true,
     actualTarget: 2.0,
@@ -354,13 +354,13 @@ export const initialRdKpis = [
   {
     no: 5,
     id: "cpr",
-    metric: "CPR (Cost Per Result )",
+    metric: "CPR",
     targetKpi: "25% Harga jual",
     hasProductPrice: true,
-    actualTarget: 32000,
-    actualTargetFormatted: "Rp32,000",
-    currentValue: 30450,
-    currentValueFormatted: "Rp30,450",
+    actualTarget: 12500,
+    actualTargetFormatted: "Rp12,500",
+    currentValue: 11800,
+    currentValueFormatted: "Rp11,800",
     unit: "currency",
     status: "optimal",
     statusLabel: "Optimal",

@@ -134,25 +134,25 @@
           </div>
         </div>
 
-        <!-- Tabel Baku Standar KPI R&D (Acuan Operasional & Aksi Mitigasi) -->
+        <!-- Tabel Baku Standar KPI Ads (Acuan Operasional & Aksi Mitigasi) -->
         <div class="mt-4 border border-slate-300 rounded-lg overflow-hidden">
           <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between">
             <span class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">
-              Tolok Ukur Standar KPI R&amp;D (Acuan Operasional &amp; Aksi Mitigasi)
+              Tolok Ukur Standar KPI Ads (Acuan Operasional &amp; Aksi Mitigasi)
             </span>
             <span class="text-[9px] font-semibold text-slate-600">
-              Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}
+              Harga Jual Acuan: {{ formatCurrency(store.rdProductPrice) }}
             </span>
           </div>
           <table class="w-full text-left text-[10px] text-slate-700 border-collapse">
             <thead>
               <tr class="bg-slate-50 font-bold border-b border-slate-300 text-slate-800">
-                <th class="py-1.5 px-2 w-8 text-center border-r border-slate-300">No</th>
-                <th class="py-1.5 px-2.5 w-36 border-r border-slate-300">KPI Metric</th>
-                <th class="py-1.5 px-2.5 w-32 border-r border-slate-300">Target KPI</th>
-                <th class="py-1.5 px-2.5 w-28 border-r border-slate-300">Harga Jual Product</th>
+                <th class="py-1.5 px-2 w-8 text-center border-r border-slate-300">NO</th>
+                <th class="py-1.5 px-2.5 w-36 border-r border-slate-300">KPI METRIC</th>
+                <th class="py-1.5 px-2.5 w-32 border-r border-slate-300">TARGET KPI</th>
+                <th class="py-1.5 px-2.5 w-28 border-r border-slate-300">HARGA JUAL</th>
                 <th class="py-1.5 px-2.5 w-28 text-center bg-blue-50 font-extrabold text-blue-900 border-r border-slate-300">
-                  Actual Target KPI
+                  ACTUAL TARGET KPI
                 </th>
                 <th class="py-1.5 px-2.5">AKSI BILA TIDAK TERCAPAI</th>
               </tr>

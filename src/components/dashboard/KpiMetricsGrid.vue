@@ -94,13 +94,13 @@
         </div>
         <div>
           <h4 class="text-xs font-bold text-slate-800 flex flex-wrap items-center gap-2">
-            <span>Standar Operasional KPI R&amp;D (CPC, LP View, CPM, CTR, CPR, CS Rate)</span>
+            <span>Standar Operasional KPI Ads (CPC, Cost LPV, CPM, CTR, CPR, Closing CS)</span>
             <span class="text-[10px] font-bold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-200">
               Telah Dipindahkan ke Ad Lab
             </span>
           </h4>
           <p class="text-[11px] text-slate-500 mt-0.5">
-            Evaluasi eksperimen iklan, simulasi harga jual produk, dan SOP penanganan metrik kini terpusat langsung di Pipeline Ad Lab.
+            Evaluasi eksperimen iklan, simulasi harga jual, dan SOP penanganan metrik kini terpusat langsung di Pipeline Ad Lab.
           </p>
         </div>
       </div>
