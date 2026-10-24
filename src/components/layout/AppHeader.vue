@@ -57,16 +57,23 @@
         <!-- Profile Avatar Button -->
         <button
           @click="store.setActiveTab('profil')"
-          class="flex items-center gap-2 p-1.5 px-2.5 rounded-xl border border-teal-100 hover:border-teal-300 hover:bg-teal-50/50 transition-all text-left bg-white/70 shadow-micro"
+          class="flex items-center gap-2 p-1.5 px-2.5 rounded-xl border border-teal-100 hover:border-teal-300 hover:bg-teal-50/50 transition-all text-left bg-white/70 shadow-micro group"
+          title="Buka Profil & Pengaturan Foto"
         >
-          <img
-            :src="store.profile.avatarUrl"
-            :alt="store.profile.fullName"
-            class="w-8 h-8 rounded-lg object-cover ring-2 ring-teal-500/20"
-            @error="onAvatarError"
-          />
+          <div class="w-8 h-8 rounded-lg ring-2 ring-teal-500/20 overflow-hidden flex items-center justify-center shrink-0 bg-teal-100 relative">
+            <img
+              :src="store.profile.avatarUrl"
+              :alt="store.profile.fullName"
+              class="w-full h-full object-cover transition-transform duration-150"
+              :style="{
+                transform: `scale(${(store.profile.avatarZoom || 100) / 100})`,
+                objectPosition: `${store.profile.avatarX ?? 50}% ${store.profile.avatarY ?? 50}%`
+              }"
+              @error="onAvatarError"
+            />
+          </div>
           <div class="hidden md:block">
-            <p class="text-xs font-bold text-slate-800 leading-tight truncate max-w-[140px]">
+            <p class="text-xs font-bold text-slate-800 leading-tight truncate max-w-[140px] group-hover:text-teal-700 transition-colors">
               {{ store.profile.fullName }}
             </p>
             <p class="text-[10px] text-teal-600 font-medium truncate max-w-[140px]">

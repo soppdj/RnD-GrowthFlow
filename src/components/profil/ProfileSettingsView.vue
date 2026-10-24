@@ -20,7 +20,285 @@
         </h3>
       </div>
 
-      <form @submit.prevent="saveProfile" class="space-y-4">
+      <form @submit.prevent="saveProfile" class="space-y-5">
+        <!-- 0. FOTO PROFIL & ADJUSTMENT (ZOOM & POSISI) -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-50/70 via-white to-emerald-50/40 border border-teal-100 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-teal-100/80">
+            <div>
+              <h4 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
+                <Camera class="w-4 h-4 text-teal-600" />
+                <span>Foto Profil & Penyesuaian Tampilan (Adjust Foto)</span>
+              </h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">
+                Unggah foto dari perangkat, sesuaikan zoom & posisi crop secara visual, dan lihat live preview di header
+              </p>
+            </div>
+            
+            <button
+              type="button"
+              @click="resetAvatarAdjustments"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50 border border-slate-200 rounded-lg shadow-micro transition-colors self-start sm:self-auto"
+            >
+              <RotateCcw class="w-3.5 h-3.5" />
+              <span>Reset Posisi & Zoom</span>
+            </button>
+          </div>
+
+          <!-- Preview & Controls Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+            <!-- Left: Avatar Preview Frame & Header Chip Mockup (4 cols) -->
+            <div class="md:col-span-4 flex flex-col items-center justify-center p-3 bg-white/80 rounded-xl border border-teal-100 shadow-micro space-y-3">
+              <!-- Circular / Rounded Preview Box -->
+              <div class="relative group">
+                <div class="w-28 h-28 rounded-2xl ring-4 ring-teal-500/20 shadow-md overflow-hidden bg-slate-100 flex items-center justify-center relative">
+                  <img
+                    :src="profileForm.avatarUrl"
+                    :alt="profileForm.fullName"
+                    class="w-full h-full object-cover select-none pointer-events-none transition-transform duration-75"
+                    :style="{
+                      transform: `scale(${profileForm.avatarZoom / 100})`,
+                      objectPosition: `${profileForm.avatarX}% ${profileForm.avatarY}%`
+                    }"
+                    @error="onAvatarError"
+                  />
+                  <div class="absolute inset-0 border border-teal-500/30 rounded-2xl pointer-events-none"></div>
+                </div>
+
+                <button
+                  type="button"
+                  @click="triggerFileInput"
+                  class="absolute -bottom-2 -right-2 p-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-soft transition-all active:scale-95"
+                  title="Ganti Foto dari Perangkat"
+                >
+                  <UploadCloud class="w-4 h-4" />
+                </button>
+              </div>
+
+              <!-- Header Chip Live Preview Indicator -->
+              <div class="w-full text-center">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                  Tampilan di Header Atas:
+                </span>
+                <div class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl border border-teal-200 bg-white shadow-micro">
+                  <div class="w-7 h-7 rounded-lg ring-1 ring-teal-500/30 overflow-hidden flex items-center justify-center bg-teal-50 shrink-0">
+                    <img
+                      :src="profileForm.avatarUrl"
+                      :alt="profileForm.fullName"
+                      class="w-full h-full object-cover"
+                      :style="{
+                        transform: `scale(${profileForm.avatarZoom / 100})`,
+                        objectPosition: `${profileForm.avatarX}% ${profileForm.avatarY}%`
+                      }"
+                      @error="onAvatarError"
+                    />
+                  </div>
+                  <div class="text-left">
+                    <p class="text-[11px] font-bold text-slate-800 leading-tight truncate max-w-[110px]">
+                      {{ profileForm.fullName || 'Nama Anda' }}
+                    </p>
+                    <p class="text-[9px] text-teal-600 font-medium truncate max-w-[110px]">
+                      {{ profileForm.organization || 'Yayasan' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Adjustments Sliders, Upload Buttons & Presets (8 cols) -->
+            <div class="md:col-span-8 space-y-3.5">
+              <!-- Upload & URL Source Buttons -->
+              <div class="flex flex-wrap items-center gap-2">
+                <input
+                  ref="fileInputRef"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleFileUpload"
+                />
+                <button
+                  type="button"
+                  @click="triggerFileInput"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-micro transition-colors"
+                >
+                  <Upload class="w-3.5 h-3.5" />
+                  <span>Unggah dari File</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="showUrlInput = !showUrlInput"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition-colors shadow-micro"
+                >
+                  <Link2 class="w-3.5 h-3.5 text-teal-600" />
+                  <span>{{ showUrlInput ? 'Tutup URL' : 'Gunakan URL Foto' }}</span>
+                </button>
+
+                <div class="flex items-center gap-1 ml-auto">
+                  <span class="text-[10px] text-slate-400 font-medium">Contoh:</span>
+                  <button
+                    type="button"
+                    @click="applyPresetAvatar('sopianto')"
+                    class="px-2 py-1 rounded text-[10px] font-bold bg-teal-100 text-teal-800 hover:bg-teal-200 transition-colors"
+                  >
+                    Foto Formal
+                  </button>
+                  <button
+                    type="button"
+                    @click="applyPresetAvatar('ui-avatar')"
+                    class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors"
+                  >
+                    Inisial Nama
+                  </button>
+                </div>
+              </div>
+
+              <!-- URL Input Box (collapsible) -->
+              <div v-if="showUrlInput" class="animate-fade-in p-2.5 bg-white rounded-xl border border-teal-200">
+                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Direct Image URL</label>
+                <div class="flex gap-2">
+                  <input
+                    v-model="profileForm.avatarUrl"
+                    type="url"
+                    placeholder="https://example.com/foto.jpg"
+                    class="flex-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 outline-none focus:border-teal-500 font-mono"
+                    @input="onAdjustmentChange"
+                  />
+                  <button
+                    type="button"
+                    @click="showUrlInput = false"
+                    class="px-3 py-1.5 text-xs font-bold bg-teal-50 text-teal-700 rounded-lg"
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+
+              <!-- SLIDERS -->
+              <div class="space-y-3 pt-1">
+                <!-- 1. Zoom Slider -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                      <ZoomIn class="w-3.5 h-3.5 text-teal-600" />
+                      <span>Zoom / Skala Foto</span>
+                    </span>
+                    <span class="font-mono font-bold text-teal-700 text-[11px] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                      {{ profileForm.avatarZoom }}%
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      @click="adjustZoom(-10)"
+                      class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center font-bold text-xs"
+                      title="Perkecil"
+                    >
+                      -
+                    </button>
+                    <input
+                      v-model.number="profileForm.avatarZoom"
+                      type="range"
+                      min="80"
+                      max="220"
+                      step="5"
+                      class="flex-1 accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                      @input="onAdjustmentChange"
+                    />
+                    <button
+                      type="button"
+                      @click="adjustZoom(10)"
+                      class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center font-bold text-xs"
+                      title="Perbesar"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. Posisi Vertikal (Y) Slider -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                      <MoveVertical class="w-3.5 h-3.5 text-teal-600" />
+                      <span>Posisi Vertikal (Atas - Bawah)</span>
+                    </span>
+                    <span class="font-mono font-bold text-slate-600 text-[11px] bg-slate-100 px-2 py-0.5 rounded">
+                      {{ profileForm.avatarY }}%
+                    </span>
+                  </div>
+                  <input
+                    v-model.number="profileForm.avatarY"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    class="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                    @input="onAdjustmentChange"
+                  />
+                  <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+                    <span>Atas (Fokus Wajah)</span>
+                    <span>Tengah</span>
+                    <span>Bawah</span>
+                  </div>
+                </div>
+
+                <!-- 3. Posisi Horisontal (X) Slider -->
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                      <MoveHorizontal class="w-3.5 h-3.5 text-teal-600" />
+                      <span>Posisi Horisontal (Kiri - Kanan)</span>
+                    </span>
+                    <span class="font-mono font-bold text-slate-600 text-[11px] bg-slate-100 px-2 py-0.5 rounded">
+                      {{ profileForm.avatarX }}%
+                    </span>
+                  </div>
+                  <input
+                    v-model.number="profileForm.avatarX"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    class="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
+                    @input="onAdjustmentChange"
+                  />
+                  <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+                    <span>Kiri</span>
+                    <span>Tengah</span>
+                    <span>Kanan</span>
+                  </div>
+                </div>
+
+                <!-- Quick Focus Presets Buttons -->
+                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span class="text-[10px] font-bold text-slate-500 uppercase mr-1">Fokus Cepat:</span>
+                  <button
+                    type="button"
+                    @click="setQuickFocus(50, 20)"
+                    class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
+                  >
+                    👤 Wajah / Kepala
+                  </button>
+                  <button
+                    type="button"
+                    @click="setQuickFocus(50, 50)"
+                    class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
+                  >
+                    ⚖️ Tengah (Center)
+                  </button>
+                  <button
+                    type="button"
+                    @click="setQuickFocus(50, 80)"
+                    class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
+                  >
+                    🔻 Badan / Bawah
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Nama Lengkap -->
           <div>
@@ -252,21 +530,106 @@ import {
   HardDrive,
   Download,
   Upload,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  UploadCloud,
+  Link2,
+  RotateCcw,
+  ZoomIn,
+  MoveVertical,
+  MoveHorizontal
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 const { testConnection, initClient } = useSupabase();
 
-const profileForm = ref({ ...store.profile });
+const profileForm = ref({
+  ...store.profile,
+  avatarZoom: store.profile.avatarZoom || 100,
+  avatarX: store.profile.avatarX ?? 50,
+  avatarY: store.profile.avatarY ?? 50
+});
+
 const profileSavedToast = ref(false);
 const isTestingConnection = ref(false);
 const connectionStatusMessage = ref('');
 const connectionStatusSuccess = ref(false);
 
+const fileInputRef = ref(null);
+const showUrlInput = ref(false);
+
 const isSupabaseActive = computed(() => {
   return Boolean(store.profile.supabaseUrl && store.profile.supabaseAnonKey && store.profile.isSupabaseConnected);
 });
+
+// Photo Adjustment Handlers
+function triggerFileInput() {
+  fileInputRef.value?.click();
+}
+
+function handleFileUpload(event) {
+  const file = event.target?.files?.[0];
+  if (!file) return;
+
+  // Max 5MB check
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Ukuran foto terlalu besar. Harap pilih foto maksimal 5 MB.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    if (e.target?.result) {
+      profileForm.value.avatarUrl = e.target.result;
+      onAdjustmentChange();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function onAdjustmentChange() {
+  // Live sync with store so header immediately reflects the changes
+  store.updateProfile({
+    avatarUrl: profileForm.value.avatarUrl,
+    avatarZoom: profileForm.value.avatarZoom,
+    avatarX: profileForm.value.avatarX,
+    avatarY: profileForm.value.avatarY
+  });
+}
+
+function adjustZoom(delta) {
+  const current = Number(profileForm.value.avatarZoom) || 100;
+  profileForm.value.avatarZoom = Math.min(220, Math.max(80, current + delta));
+  onAdjustmentChange();
+}
+
+function setQuickFocus(x, y) {
+  profileForm.value.avatarX = x;
+  profileForm.value.avatarY = y;
+  onAdjustmentChange();
+}
+
+function resetAvatarAdjustments() {
+  profileForm.value.avatarZoom = 100;
+  profileForm.value.avatarX = 50;
+  profileForm.value.avatarY = 50;
+  onAdjustmentChange();
+}
+
+function applyPresetAvatar(type) {
+  if (type === 'sopianto') {
+    profileForm.value.avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250';
+  } else if (type === 'ui-avatar') {
+    const encodedName = encodeURIComponent(profileForm.value.fullName || 'Sopianto Djahar');
+    profileForm.value.avatarUrl = `https://ui-avatars.com/api/?name=${encodedName}&background=0d9488&color=fff&bold=true`;
+  }
+  resetAvatarAdjustments();
+}
+
+function onAvatarError(e) {
+  const encodedName = encodeURIComponent(profileForm.value.fullName || 'Sopianto Djahar');
+  e.target.src = `https://ui-avatars.com/api/?name=${encodedName}&background=0d9488&color=fff&bold=true`;
+}
 
 function saveProfile() {
   store.updateProfile({ ...profileForm.value });

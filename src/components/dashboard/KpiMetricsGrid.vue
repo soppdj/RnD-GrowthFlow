@@ -85,33 +85,6 @@
         </div>
       </div>
     </div>
-
-    <!-- SECTION 2: PANDUAN STANDAR KPI R&D TERPUSAT DI AD LAB -->
-    <div class="glass-card rounded-2xl p-4 sm:p-5 border border-teal-100/90 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-teal-50/60 via-white to-emerald-50/40">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-micro">
-          <FlaskConical class="w-4 h-4 text-teal-700" />
-        </div>
-        <div>
-          <h4 class="text-xs font-bold text-slate-800 flex flex-wrap items-center gap-2">
-            <span>Standar Operasional KPI Ads (CPC, Cost LPV, CPM, CTR, CPR, Closing CS)</span>
-            <span class="text-[10px] font-bold text-teal-800 bg-teal-100/80 px-2 py-0.5 rounded-full border border-teal-200">
-              Telah Dipindahkan ke Ad Lab
-            </span>
-          </h4>
-          <p class="text-[11px] text-slate-500 mt-0.5">
-            Evaluasi eksperimen iklan, simulasi harga jual, dan SOP penanganan metrik kini terpusat langsung di Pipeline Ad Lab.
-          </p>
-        </div>
-      </div>
-      <button
-        @click="store.setActiveTab('adlab')"
-        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-700 hover:bg-teal-800 text-white shadow-soft transition-all active:scale-95 self-start sm:self-auto shrink-0"
-      >
-        <span>Buka Ad Lab</span>
-        <ArrowRight class="w-3.5 h-3.5" />
-      </button>
-    </div>
   </div>
 </template>
 
@@ -128,9 +101,7 @@ import {
   BadgePercent,
   TrendingUp,
   Users,
-  Wallet,
-  FlaskConical,
-  ArrowRight
+  Wallet
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();

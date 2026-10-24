@@ -30,55 +30,6 @@
 
           <!-- 4. Reactive LogFrame Progress Bars -->
           <LogFrameProgress />
-
-          <!-- 5. Quick Highlight: Top 3 Scale-Up Recommendations from Ad Lab -->
-          <div class="glass-card rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-soft">
-            <div class="flex items-center justify-between mb-4">
-              <div>
-                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span>Top Winning Experiments (Ad Lab Preview)</span>
-                </h3>
-                <p class="text-[11px] text-slate-500">Kampanye dengan return investasi (ROI) tertinggi siap injeksi</p>
-              </div>
-
-              <button
-                @click="store.setActiveTab('adlab')"
-                class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1"
-              >
-                <span>Lihat Semua ({{ store.campaigns.length }})</span>
-                <ChevronRight class="w-4 h-4" />
-              </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div
-                v-for="camp in topThreeCampaigns"
-                :key="camp.id"
-                class="p-4 rounded-xl bg-white/90 border border-teal-100/90 shadow-micro hover:border-teal-300 transition-all"
-              >
-                <div class="flex items-center justify-between text-[10px] mb-1.5">
-                  <span class="font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                    {{ camp.platform }}
-                  </span>
-                  <span class="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                    Stage {{ camp.stage }}
-                  </span>
-                </div>
-                <h4 class="text-xs font-bold text-slate-800 truncate" :title="camp.name">{{ camp.name }}</h4>
-                <div class="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 text-xs">
-                  <div>
-                    <span class="text-[10px] text-slate-400 block">CPR:</span>
-                    <strong class="text-slate-700">{{ formatCurrency(camp.calculatedCPR) }}</strong>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-[10px] text-slate-400 block">ROI:</span>
-                    <strong class="text-emerald-700 font-extrabold">{{ formatPercent(camp.calculatedROI) }}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- JURNAL & AGENDA TAB -->
@@ -185,9 +136,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
-import { formatCurrency, formatPercent } from '@/utils/formatters';
 
 // Layout Components
 import AppHeader from '@/components/layout/AppHeader.vue';
@@ -212,7 +162,6 @@ import ProfileSettingsView from '@/components/profil/ProfileSettingsView.vue';
 
 // Icons
 import {
-  ChevronRight,
   X,
   LayoutDashboard,
   BookOpenCheck,
@@ -227,10 +176,6 @@ const store = useGrowthFlowStore();
 const isMobileDrawerOpen = ref(false);
 const isGlobalTaskModalOpen = ref(false);
 const jurnalSubTab = ref('daily');
-
-const topThreeCampaigns = computed(() => {
-  return store.scaleUpRecommendations.slice(0, 3);
-});
 
 const mobileNavList = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },

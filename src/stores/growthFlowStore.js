@@ -21,8 +21,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // If profile was previous default Ustadz Rizky, migrate to Sopianto Djahar
-        let profile = parsed.profile || initialProfile;
+        // Load profile with backwards-compatible defaults for avatar adjustments
+        let profile = { ...initialProfile, ...(parsed.profile || {}) };
         if (profile.fullName === 'Ustadz Rizky Syahputra') {
           profile = { ...initialProfile, ...profile, fullName: 'Sopianto Djahar', foundationAddress: 'Cimareme, Kab. Bandung Barat' };
         }

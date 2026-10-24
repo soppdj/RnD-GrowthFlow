@@ -9,8 +9,15 @@
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           <span class="text-[10px] tracking-wider uppercase font-bold text-teal-200">Growth Engine</span>
         </div>
-        <h2 class="text-base font-extrabold leading-tight">Yayasan Khoirur Rooziqiin</h2>
-        <p class="text-[11px] text-teal-200/90 mt-0.5">R&D Digital Marketing Hub</p>
+        <h2 class="text-[13px] font-extrabold leading-tight whitespace-nowrap tracking-tight text-white" title="Yayasan Khoirur Rooziqiin">
+          Yayasan Khoirur Rooziqiin
+        </h2>
+        <p class="text-xs font-bold text-emerald-300 mt-0.5 tracking-wide">
+          Bandung
+        </p>
+        <p class="text-[10px] text-teal-200/90 mt-0.5">
+          R&D Digital Marketing Hub
+        </p>
       </div>
     </div>
 
