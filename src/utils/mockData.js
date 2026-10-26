@@ -20,7 +20,9 @@ export const initialProfile = {
   foundationContact: "admin@khoirurroziqiin.org | +62 812-9988-7766",
   supabaseUrl: import.meta.env?.VITE_SUPABASE_URL || import.meta.env?.NEXT_PUBLIC_SUPABASE_URL || "https://rsnjmllhuucyophursng.supabase.co",
   supabaseAnonKey: import.meta.env?.VITE_SUPABASE_ANON_KEY || import.meta.env?.NEXT_PUBLIC_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzbmptbGxodXVjeW9waHVyc25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzQ0MTAsImV4cCI6MjEwNzcxMDQxMH0.nVLriES26tvWFXLbkeD0irZs7AXZvsFq7Zdue7jKClI",
-  isSupabaseConnected: true
+  isSupabaseConnected: true,
+  telegramBotToken: "",
+  telegramAdminChatId: ""
 };
 
 export const initialTasks = [

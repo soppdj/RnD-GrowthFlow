@@ -21,280 +21,124 @@
       </div>
 
       <form @submit.prevent="saveProfile" class="space-y-5">
-        <!-- 0. FOTO PROFIL & ADJUSTMENT (ZOOM & POSISI) -->
-        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-50/70 via-white to-emerald-50/40 border border-teal-100 shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-teal-100/80">
-            <div>
-              <h4 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
-                <Camera class="w-4 h-4 text-teal-600" />
-                <span>Foto Profil & Penyesuaian Tampilan (Adjust Foto)</span>
-              </h4>
-              <p class="text-[11px] text-slate-500 mt-0.5">
-                Unggah foto dari perangkat, sesuaikan zoom & posisi crop secara visual, dan lihat live preview di header
-              </p>
-            </div>
-            
-            <button
-              type="button"
-              @click="resetAvatarAdjustments"
-              class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-slate-600 hover:text-teal-700 bg-white hover:bg-teal-50 border border-slate-200 rounded-lg shadow-micro transition-colors self-start sm:self-auto"
+        <!-- 0. FOTO PROFIL (LANGSUNG ADJUST DI KOTAK FOTO) -->
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-4 rounded-2xl bg-teal-50/40 border border-teal-100">
+          <!-- Kotak Foto Interaktif -->
+          <div class="flex flex-col items-center gap-2 shrink-0">
+            <div
+              ref="photoBoxRef"
+              @mousedown="onPhotoMouseDown"
+              @touchstart.passive="onPhotoTouchStart"
+              @touchmove.prevent="onPhotoTouchMove"
+              @touchend="onPhotoTouchEnd"
+              @wheel.prevent="onPhotoWheel"
+              @dblclick="resetAvatarAdjustments"
+              class="w-36 h-36 rounded-2xl ring-4 ring-teal-500/20 shadow-md overflow-hidden bg-slate-100 relative cursor-grab active:cursor-grabbing select-none group border border-teal-200"
+              title="Klik & geser untuk atur posisi • Scroll mouse untuk zoom • Dobel-klik untuk reset"
             >
-              <RotateCcw class="w-3.5 h-3.5" />
-              <span>Reset Posisi & Zoom</span>
-            </button>
+              <img
+                :src="profileForm.avatarUrl"
+                :alt="profileForm.fullName"
+                class="w-full h-full object-cover select-none pointer-events-none transition-transform duration-75"
+                :style="{
+                  transform: `scale(${(profileForm.avatarZoom || 100) / 100})`,
+                  objectPosition: `${profileForm.avatarX ?? 50}% ${profileForm.avatarY ?? 50}%`
+                }"
+                @error="onAvatarError"
+              />
+
+              <!-- Hover hint overlay -->
+              <div class="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                <span class="text-[10px] font-bold text-white bg-slate-900/75 px-2 py-0.5 rounded shadow">
+                  Geser / Drag Foto
+                </span>
+              </div>
+
+              <!-- Floating upload button on avatar -->
+              <button
+                type="button"
+                @click.stop="triggerFileInput"
+                class="absolute bottom-2 right-2 p-1.5 rounded-lg bg-teal-700/90 hover:bg-teal-700 text-white shadow-soft transition-all active:scale-95 z-10"
+                title="Ganti Foto"
+              >
+                <Camera class="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleFileUpload"
+            />
+
+            <!-- Minimal Zoom Control right below photo box -->
+            <div class="flex items-center gap-1.5 w-36 px-1">
+              <button
+                type="button"
+                @click="adjustZoom(-10)"
+                class="w-6 h-6 rounded-md bg-white border border-slate-200 hover:bg-teal-50 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0"
+                title="Perkecil Zoom"
+              >
+                -
+              </button>
+              <input
+                v-model.number="profileForm.avatarZoom"
+                type="range"
+                min="80"
+                max="220"
+                step="5"
+                class="flex-1 accent-teal-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg"
+                @input="onAdjustmentChange"
+                title="Zoom Foto"
+              />
+              <button
+                type="button"
+                @click="adjustZoom(10)"
+                class="w-6 h-6 rounded-md bg-white border border-slate-200 hover:bg-teal-50 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0"
+                title="Perbesar Zoom"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                @click="resetAvatarAdjustments"
+                class="w-6 h-6 rounded-md bg-white border border-slate-200 hover:bg-teal-50 text-slate-400 hover:text-teal-700 flex items-center justify-center shrink-0 text-[11px]"
+                title="Reset Posisi & Zoom"
+              >
+                <RotateCcw class="w-3 h-3" />
+              </button>
+            </div>
+            <span class="text-[10px] text-slate-400 text-center">
+              Geser langsung di foto untuk atur posisi
+            </span>
           </div>
 
-          <!-- Preview & Controls Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
-            <!-- Left: Avatar Preview Frame & Header Chip Mockup (4 cols) -->
-            <div class="md:col-span-4 flex flex-col items-center justify-center p-3 bg-white/80 rounded-xl border border-teal-100 shadow-micro space-y-3">
-              <!-- Circular / Rounded Preview Box -->
-              <div class="relative group">
-                <div class="w-28 h-28 rounded-2xl ring-4 ring-teal-500/20 shadow-md overflow-hidden bg-slate-100 flex items-center justify-center relative">
-                  <img
-                    :src="profileForm.avatarUrl"
-                    :alt="profileForm.fullName"
-                    class="w-full h-full object-cover select-none pointer-events-none transition-transform duration-75"
-                    :style="{
-                      transform: `scale(${profileForm.avatarZoom / 100})`,
-                      objectPosition: `${profileForm.avatarX}% ${profileForm.avatarY}%`
-                    }"
-                    @error="onAvatarError"
-                  />
-                  <div class="absolute inset-0 border border-teal-500/30 rounded-2xl pointer-events-none"></div>
-                </div>
-
-                <button
-                  type="button"
-                  @click="triggerFileInput"
-                  class="absolute -bottom-2 -right-2 p-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-soft transition-all active:scale-95"
-                  title="Ganti Foto dari Perangkat"
-                >
-                  <UploadCloud class="w-4 h-4" />
-                </button>
-              </div>
-
-              <!-- Header Chip Live Preview Indicator -->
-              <div class="w-full text-center">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                  Tampilan di Header Atas:
-                </span>
-                <div class="inline-flex items-center gap-2 p-1.5 px-2.5 rounded-xl border border-teal-200 bg-white shadow-micro">
-                  <div class="w-7 h-7 rounded-lg ring-1 ring-teal-500/30 overflow-hidden flex items-center justify-center bg-teal-50 shrink-0">
-                    <img
-                      :src="profileForm.avatarUrl"
-                      :alt="profileForm.fullName"
-                      class="w-full h-full object-cover"
-                      :style="{
-                        transform: `scale(${profileForm.avatarZoom / 100})`,
-                        objectPosition: `${profileForm.avatarX}% ${profileForm.avatarY}%`
-                      }"
-                      @error="onAvatarError"
-                    />
-                  </div>
-                  <div class="text-left">
-                    <p class="text-[11px] font-bold text-slate-800 leading-tight truncate max-w-[110px]">
-                      {{ profileForm.fullName || 'Nama Anda' }}
-                    </p>
-                    <p class="text-[9px] text-teal-600 font-medium truncate max-w-[110px]">
-                      {{ profileForm.organization || 'Yayasan' }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right: Adjustments Sliders, Upload Buttons & Presets (8 cols) -->
-            <div class="md:col-span-8 space-y-3.5">
-              <!-- Upload & URL Source Buttons -->
-              <div class="flex flex-wrap items-center gap-2">
-                <input
-                  ref="fileInputRef"
-                  type="file"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleFileUpload"
-                />
-                <button
-                  type="button"
-                  @click="triggerFileInput"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-micro transition-colors"
-                >
-                  <Upload class="w-3.5 h-3.5" />
-                  <span>Unggah dari File</span>
-                </button>
-
-                <button
-                  type="button"
-                  @click="showUrlInput = !showUrlInput"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition-colors shadow-micro"
-                >
-                  <Link2 class="w-3.5 h-3.5 text-teal-600" />
-                  <span>{{ showUrlInput ? 'Tutup URL' : 'Gunakan URL Foto' }}</span>
-                </button>
-
-                <div class="flex items-center gap-1 ml-auto">
-                  <span class="text-[10px] text-slate-400 font-medium">Contoh:</span>
-                  <button
-                    type="button"
-                    @click="applyPresetAvatar('sopianto')"
-                    class="px-2 py-1 rounded text-[10px] font-bold bg-teal-100 text-teal-800 hover:bg-teal-200 transition-colors"
-                  >
-                    Foto Formal
-                  </button>
-                  <button
-                    type="button"
-                    @click="applyPresetAvatar('ui-avatar')"
-                    class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors"
-                  >
-                    Inisial Nama
-                  </button>
-                </div>
-              </div>
-
-              <!-- URL Input Box (collapsible) -->
-              <div v-if="showUrlInput" class="animate-fade-in p-2.5 bg-white rounded-xl border border-teal-200">
-                <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Direct Image URL</label>
-                <div class="flex gap-2">
-                  <input
-                    v-model="profileForm.avatarUrl"
-                    type="url"
-                    placeholder="https://example.com/foto.jpg"
-                    class="flex-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 outline-none focus:border-teal-500 font-mono"
-                    @input="onAdjustmentChange"
-                  />
-                  <button
-                    type="button"
-                    @click="showUrlInput = false"
-                    class="px-3 py-1.5 text-xs font-bold bg-teal-50 text-teal-700 rounded-lg"
-                  >
-                    OK
-                  </button>
-                </div>
-              </div>
-
-              <!-- SLIDERS -->
-              <div class="space-y-3 pt-1">
-                <!-- 1. Zoom Slider -->
-                <div class="space-y-1">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                      <ZoomIn class="w-3.5 h-3.5 text-teal-600" />
-                      <span>Zoom / Skala Foto</span>
-                    </span>
-                    <span class="font-mono font-bold text-teal-700 text-[11px] bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                      {{ profileForm.avatarZoom }}%
-                    </span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button
-                      type="button"
-                      @click="adjustZoom(-10)"
-                      class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center font-bold text-xs"
-                      title="Perkecil"
-                    >
-                      -
-                    </button>
-                    <input
-                      v-model.number="profileForm.avatarZoom"
-                      type="range"
-                      min="80"
-                      max="220"
-                      step="5"
-                      class="flex-1 accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-                      @input="onAdjustmentChange"
-                    />
-                    <button
-                      type="button"
-                      @click="adjustZoom(10)"
-                      class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center font-bold text-xs"
-                      title="Perbesar"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <!-- 2. Posisi Vertikal (Y) Slider -->
-                <div class="space-y-1">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                      <MoveVertical class="w-3.5 h-3.5 text-teal-600" />
-                      <span>Posisi Vertikal (Atas - Bawah)</span>
-                    </span>
-                    <span class="font-mono font-bold text-slate-600 text-[11px] bg-slate-100 px-2 py-0.5 rounded">
-                      {{ profileForm.avatarY }}%
-                    </span>
-                  </div>
-                  <input
-                    v-model.number="profileForm.avatarY"
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    class="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-                    @input="onAdjustmentChange"
-                  />
-                  <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-                    <span>Atas (Fokus Wajah)</span>
-                    <span>Tengah</span>
-                    <span>Bawah</span>
-                  </div>
-                </div>
-
-                <!-- 3. Posisi Horisontal (X) Slider -->
-                <div class="space-y-1">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                      <MoveHorizontal class="w-3.5 h-3.5 text-teal-600" />
-                      <span>Posisi Horisontal (Kiri - Kanan)</span>
-                    </span>
-                    <span class="font-mono font-bold text-slate-600 text-[11px] bg-slate-100 px-2 py-0.5 rounded">
-                      {{ profileForm.avatarX }}%
-                    </span>
-                  </div>
-                  <input
-                    v-model.number="profileForm.avatarX"
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    class="w-full accent-teal-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-                    @input="onAdjustmentChange"
-                  />
-                  <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-                    <span>Kiri</span>
-                    <span>Tengah</span>
-                    <span>Kanan</span>
-                  </div>
-                </div>
-
-                <!-- Quick Focus Presets Buttons -->
-                <div class="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase mr-1">Fokus Cepat:</span>
-                  <button
-                    type="button"
-                    @click="setQuickFocus(50, 20)"
-                    class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
-                  >
-                    👤 Wajah / Kepala
-                  </button>
-                  <button
-                    type="button"
-                    @click="setQuickFocus(50, 50)"
-                    class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
-                  >
-                    ⚖️ Tengah (Center)
-                  </button>
-                  <button
-                    type="button"
-                    @click="setQuickFocus(50, 80)"
-                    class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
-                  >
-                    🔻 Badan / Bawah
-                  </button>
-                </div>
-              </div>
+          <!-- Keterangan & Aksi Cepat -->
+          <div class="flex-1 space-y-2 text-center sm:text-left pt-1">
+            <h4 class="text-sm font-bold text-slate-800">
+              Foto Profil Pengguna
+            </h4>
+            <p class="text-xs text-slate-500">
+              Foto ini tampil di header atas aplikasi. Cukup klik & geser langsung di dalam kotak foto untuk mengatur posisi crop yang pas.
+            </p>
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+              <button
+                type="button"
+                @click="triggerFileInput"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-micro transition-colors active:scale-95"
+              >
+                <Upload class="w-3.5 h-3.5" />
+                <span>Unggah Foto dari Perangkat</span>
+              </button>
+              <button
+                type="button"
+                @click="applyPresetAvatar('ui-avatar')"
+                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-teal-50 border border-slate-200 text-slate-700 transition-colors"
+              >
+                <span>Pakai Inisial Nama</span>
+              </button>
             </div>
           </div>
         </div>
@@ -471,6 +315,155 @@
       </div>
     </div>
 
+    <!-- 3. Integrasi Bot Telegram (Input & Edit Donasi Real-time) -->
+    <div class="glass-card rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-soft space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-teal-100 gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-sm shrink-0 shadow-micro">
+            <Send class="w-4 h-4" />
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-800">
+              Integrasi Bot Telegram (Input & Edit Donasi)
+            </h3>
+            <p class="text-[11px] text-slate-500">
+              Tambah atau perbarui donasi langsung lewat chat Telegram yang tersinkronisasi live ke web
+            </p>
+          </div>
+        </div>
+
+        <span
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border self-start sm:self-auto"
+          :class="profileForm.telegramBotToken ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-slate-100 text-slate-500 border-slate-200'"
+        >
+          <span class="w-2 h-2 rounded-full" :class="profileForm.telegramBotToken ? 'bg-sky-500 animate-pulse' : 'bg-slate-400'"></span>
+          {{ profileForm.telegramBotToken ? 'Bot Dikonfigurasi' : 'Belum Dikonfigurasi' }}
+        </span>
+      </div>
+
+      <!-- Panduan Setup -->
+      <div class="p-3.5 rounded-xl bg-sky-50/60 border border-sky-100 text-xs text-slate-600 space-y-1.5">
+        <p class="font-bold text-sky-900 flex items-center gap-1">
+          <span>Cara Menghubungkan Bot Telegram ke R&D GrowthFlow:</span>
+        </p>
+        <ol class="list-decimal list-inside space-y-1 text-[11px] text-slate-600">
+          <li>Buka aplikasi Telegram, cari akun <strong class="text-sky-800">@BotFather</strong> lalu kirim perintah <code class="bg-white px-1.5 py-0.5 rounded border border-sky-200 font-mono">/newbot</code>.</li>
+          <li>Ikuti petunjuk untuk memberi nama bot dan salin <strong>HTTP API Token</strong> yang diberikan.</li>
+          <li>Untuk membatasi akses (agar hanya Anda yang bisa menginput), cari bot <strong class="text-sky-800">@userinfobot</strong> di Telegram untuk mendapatkan <strong>Chat ID</strong> Anda.</li>
+          <li>Masukkan Token dan Chat ID di bawah, klik <strong>Simpan Pengaturan</strong>, lalu klik <strong>Aktifkan Webhook</strong>.</li>
+        </ol>
+      </div>
+
+      <!-- Form Inputs Token & Chat ID -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+            Telegram Bot Token
+          </label>
+          <input
+            v-model="profileForm.telegramBotToken"
+            type="password"
+            placeholder="Contoh: 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 text-xs font-mono outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">
+            Admin Telegram Chat ID (ID Akun Anda)
+          </label>
+          <input
+            v-model="profileForm.telegramAdminChatId"
+            type="text"
+            placeholder="Contoh: 123456789 (dari @userinfobot)"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 text-xs font-mono outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Webhook URL Display & Action Buttons -->
+      <div class="p-3.5 bg-slate-50/90 rounded-xl border border-slate-200 space-y-2.5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+              URL Endpoint Webhook Vercel:
+            </span>
+            <code class="text-xs text-teal-800 font-mono font-semibold select-all break-all">
+              {{ currentWebhookUrl }}
+            </code>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button
+              type="button"
+              @click="setupTelegramWebhook"
+              :disabled="!profileForm.telegramBotToken || isSettingWebhook"
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 disabled:bg-slate-200 disabled:text-slate-400 text-white shadow-micro transition-all active:scale-95 flex items-center gap-1.5"
+            >
+              <Send class="w-3.5 h-3.5" />
+              <span>{{ isSettingWebhook ? 'Menghubungkan...' : 'Aktifkan Webhook' }}</span>
+            </button>
+
+            <button
+              type="button"
+              @click="testTelegramBotMessage"
+              :disabled="!profileForm.telegramBotToken || !profileForm.telegramAdminChatId || isSendingTest"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 text-slate-700 border border-slate-200 transition-colors shadow-micro flex items-center gap-1.5"
+            >
+              <Activity class="w-3.5 h-3.5 text-teal-600" />
+              <span>{{ isSendingTest ? 'Mengirim...' : 'Uji Kirim Pesan' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="telegramStatusMessage" class="p-2.5 rounded-lg text-xs font-medium border" :class="telegramStatusSuccess ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-rose-50 text-rose-800 border-rose-200'">
+          {{ telegramStatusMessage }}
+        </div>
+      </div>
+
+      <!-- Format Perintah Bot Telegram -->
+      <div class="pt-1">
+        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+          Panduan Perintah Pesan Telegram:
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div class="p-3 rounded-xl bg-white border border-slate-200 shadow-micro">
+            <code class="font-bold text-teal-800 block mb-1">/tambah Nama | Target | Realisasi | AdSpend | Donatur</code>
+            <p class="text-[11px] text-slate-500">
+              Menambah program baru. Bisa pakai singkatan angka: <em>50jt</em>, <em>2.5jt</em>, <em>500rb</em>.
+            </p>
+            <p class="text-[10px] text-slate-400 mt-1 font-mono">
+              Contoh: /tambah Wakaf Ambulans | 150jt | 30jt | 4jt | 150
+            </p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-white border border-slate-200 shadow-micro">
+            <code class="font-bold text-teal-800 block mb-1">/edit Nama/ID | Realisasi | AdSpend | Donatur</code>
+            <p class="text-[11px] text-slate-500">
+              Mengupdate capaian donasi dan belanja iklan secara langsung.
+            </p>
+            <p class="text-[10px] text-slate-400 mt-1 font-mono">
+              Contoh: /edit Wakaf Sumur | 45jt | 6jt | 250
+            </p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-white border border-slate-200 shadow-micro">
+            <code class="font-bold text-teal-800 block mb-1">/donasi atau /list</code>
+            <p class="text-[11px] text-slate-500">
+              Menampilkan seluruh program donasi aktif, persentase capaian target, CPR, dan ROI.
+            </p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-white border border-slate-200 shadow-micro">
+            <code class="font-bold text-teal-800 block mb-1">/kpi</code>
+            <p class="text-[11px] text-slate-500">
+              Ringkasan performa agregat ZISWAF dan capaian target kuartal Yayasan Khoirur Rooziqiin.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 3. Backup, Export, Import & Reset -->
     <div class="glass-card rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-soft">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-teal-100">
@@ -532,12 +525,8 @@ import {
   Upload,
   RefreshCw,
   Camera,
-  UploadCloud,
-  Link2,
   RotateCcw,
-  ZoomIn,
-  MoveVertical,
-  MoveHorizontal
+  Send
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
@@ -547,7 +536,9 @@ const profileForm = ref({
   ...store.profile,
   avatarZoom: store.profile.avatarZoom || 100,
   avatarX: store.profile.avatarX ?? 50,
-  avatarY: store.profile.avatarY ?? 50
+  avatarY: store.profile.avatarY ?? 50,
+  telegramBotToken: store.profile.telegramBotToken || '',
+  telegramAdminChatId: store.profile.telegramAdminChatId || ''
 });
 
 const profileSavedToast = ref(false);
@@ -556,13 +547,109 @@ const connectionStatusMessage = ref('');
 const connectionStatusSuccess = ref(false);
 
 const fileInputRef = ref(null);
-const showUrlInput = ref(false);
+const photoBoxRef = ref(null);
+
+// Telegram Webhook state
+const isSettingWebhook = ref(false);
+const isSendingTest = ref(false);
+const telegramStatusMessage = ref('');
+const telegramStatusSuccess = ref(false);
+
+const currentWebhookUrl = computed(() => {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return `${window.location.origin}/api/telegram-webhook`;
+  }
+  return 'https://rnd-growthflow.vercel.app/api/telegram-webhook';
+});
 
 const isSupabaseActive = computed(() => {
   return Boolean(store.profile.supabaseUrl && store.profile.supabaseAnonKey && store.profile.isSupabaseConnected);
 });
 
-// Photo Adjustment Handlers
+// Photo Adjustment Handlers - Direct Drag / Pan on Photo Box
+const isDraggingPhoto = ref(false);
+let dragStartX = 0;
+let dragStartY = 0;
+let initialAvatarX = 50;
+let initialAvatarY = 50;
+
+function onPhotoMouseDown(e) {
+  isDraggingPhoto.value = true;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  initialAvatarX = profileForm.value.avatarX ?? 50;
+  initialAvatarY = profileForm.value.avatarY ?? 50;
+
+  window.addEventListener('mousemove', onPhotoMouseMove);
+  window.addEventListener('mouseup', onPhotoMouseUp);
+}
+
+function onPhotoMouseMove(e) {
+  if (!isDraggingPhoto.value) return;
+  const boxWidth = photoBoxRef.value?.clientWidth || 144;
+  const boxHeight = photoBoxRef.value?.clientHeight || 144;
+
+  const deltaX = e.clientX - dragStartX;
+  const deltaY = e.clientY - dragStartY;
+
+  // Dragging right reveals left portion -> decrease X; dragging left reveals right -> increase X
+  const deltaPercentX = (deltaX / boxWidth) * 100;
+  const deltaPercentY = (deltaY / boxHeight) * 100;
+
+  const newX = Math.min(100, Math.max(0, Math.round(initialAvatarX - deltaPercentX)));
+  const newY = Math.min(100, Math.max(0, Math.round(initialAvatarY - deltaPercentY)));
+
+  profileForm.value.avatarX = newX;
+  profileForm.value.avatarY = newY;
+  onAdjustmentChange();
+}
+
+function onPhotoMouseUp() {
+  if (isDraggingPhoto.value) {
+    isDraggingPhoto.value = false;
+    window.removeEventListener('mousemove', onPhotoMouseMove);
+    window.removeEventListener('mouseup', onPhotoMouseUp);
+  }
+}
+
+function onPhotoTouchStart(e) {
+  if (e.touches && e.touches[0]) {
+    isDraggingPhoto.value = true;
+    dragStartX = e.touches[0].clientX;
+    dragStartY = e.touches[0].clientY;
+    initialAvatarX = profileForm.value.avatarX ?? 50;
+    initialAvatarY = profileForm.value.avatarY ?? 50;
+  }
+}
+
+function onPhotoTouchMove(e) {
+  if (!isDraggingPhoto.value || !e.touches || !e.touches[0]) return;
+  const boxWidth = photoBoxRef.value?.clientWidth || 144;
+  const boxHeight = photoBoxRef.value?.clientHeight || 144;
+
+  const deltaX = e.touches[0].clientX - dragStartX;
+  const deltaY = e.touches[0].clientY - dragStartY;
+
+  const deltaPercentX = (deltaX / boxWidth) * 100;
+  const deltaPercentY = (deltaY / boxHeight) * 100;
+
+  const newX = Math.min(100, Math.max(0, Math.round(initialAvatarX - deltaPercentX)));
+  const newY = Math.min(100, Math.max(0, Math.round(initialAvatarY - deltaPercentY)));
+
+  profileForm.value.avatarX = newX;
+  profileForm.value.avatarY = newY;
+  onAdjustmentChange();
+}
+
+function onPhotoTouchEnd() {
+  isDraggingPhoto.value = false;
+}
+
+function onPhotoWheel(e) {
+  const delta = e.deltaY < 0 ? 5 : -5;
+  adjustZoom(delta);
+}
+
 function triggerFileInput() {
   fileInputRef.value?.click();
 }
@@ -603,12 +690,6 @@ function adjustZoom(delta) {
   onAdjustmentChange();
 }
 
-function setQuickFocus(x, y) {
-  profileForm.value.avatarX = x;
-  profileForm.value.avatarY = y;
-  onAdjustmentChange();
-}
-
 function resetAvatarAdjustments() {
   profileForm.value.avatarZoom = 100;
   profileForm.value.avatarX = 50;
@@ -640,6 +721,77 @@ function saveProfile() {
   setTimeout(() => {
     profileSavedToast.value = false;
   }, 3000);
+}
+
+// Telegram Webhook Activation & Testing
+async function setupTelegramWebhook() {
+  if (!profileForm.value.telegramBotToken) {
+    telegramStatusSuccess.value = false;
+    telegramStatusMessage.value = 'Silakan masukkan Telegram Bot Token terlebih dahulu.';
+    return;
+  }
+
+  isSettingWebhook.value = true;
+  telegramStatusMessage.value = '';
+
+  try {
+    const url = `https://api.telegram.org/bot${profileForm.value.telegramBotToken.trim()}/setWebhook?url=${encodeURIComponent(currentWebhookUrl.value)}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    isSettingWebhook.value = false;
+    if (data.ok) {
+      telegramStatusSuccess.value = true;
+      telegramStatusMessage.value = `✅ Webhook berhasil diaktifkan ke: ${currentWebhookUrl.value}. Bot siap menerima perintah!`;
+      saveProfile();
+    } else {
+      telegramStatusSuccess.value = false;
+      telegramStatusMessage.value = `❌ Gagal mengaktifkan webhook: ${data.description || 'Token tidak valid'}`;
+    }
+  } catch (err) {
+    isSettingWebhook.value = false;
+    telegramStatusSuccess.value = false;
+    telegramStatusMessage.value = `❌ Terjadi kesalahan jaringan: ${err.message}`;
+  }
+}
+
+async function testTelegramBotMessage() {
+  if (!profileForm.value.telegramBotToken || !profileForm.value.telegramAdminChatId) {
+    telegramStatusSuccess.value = false;
+    telegramStatusMessage.value = 'Harap isi Bot Token dan Admin Chat ID untuk uji coba pengiriman pesan.';
+    return;
+  }
+
+  isSendingTest.value = true;
+  telegramStatusMessage.value = '';
+
+  try {
+    const text = `🤖 *Uji Coba Notifikasi R&D GrowthFlow*\n\nAlhamdulillah, bot Telegram Anda telah terhubung sempurna dengan sistem R&D GrowthFlow!\n\nAnda sekarang dapat menambah atau mengedit donasi dengan perintah seperti:\n\`/donasi\`\n\`/tambah Wakaf Ambulans | 150jt | 35jt | 5jt | 180\``;
+    const url = `https://api.telegram.org/bot${profileForm.value.telegramBotToken.trim()}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: profileForm.value.telegramAdminChatId.trim(),
+        text: text,
+        parse_mode: 'Markdown'
+      })
+    });
+    const data = await response.json();
+
+    isSendingTest.value = false;
+    if (data.ok) {
+      telegramStatusSuccess.value = true;
+      telegramStatusMessage.value = '✅ Pesan uji coba berhasil dikirim ke akun Telegram Anda! Periksa aplikasi Telegram Anda.';
+    } else {
+      telegramStatusSuccess.value = false;
+      telegramStatusMessage.value = `❌ Gagal mengirim pesan: ${data.description || 'Periksa token dan chat ID'}`;
+    }
+  } catch (err) {
+    isSendingTest.value = false;
+    telegramStatusSuccess.value = false;
+    telegramStatusMessage.value = `❌ Kesalahan jaringan: ${err.message}`;
+  }
 }
 
 async function testSupabase() {
