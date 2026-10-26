@@ -32,7 +32,12 @@ export const initialTasks = [
     estimatedHours: 2.0,
     priority: "HIGH",
     date: "2026-10-22",
-    notes: "Hook 1 (Problem-Agitate-Solve) menghasilkan CTR 3.8% vs Hook 2 yang hanya 1.2%."
+    notes: "Hook 1 (Problem-Agitate-Solve) menghasilkan CTR 3.8% vs Hook 2 yang hanya 1.2%.",
+    workResultUrl: "https://drive.google.com/drive/folders/santri-video-draft",
+    workResultTitle: "📁 Drive: 3 Video Draft & Script",
+    attachments: [
+      { title: "📁 Drive: 3 Video Draft & Script", url: "https://drive.google.com/drive/folders/santri-video-draft" }
+    ]
   },
   {
     id: "task-2",
@@ -42,7 +47,12 @@ export const initialTasks = [
     estimatedHours: 2.5,
     priority: "HIGH",
     date: "2026-10-22",
-    notes: "Conversion rate landing page melonjak dari 4.1% ke 8.9% setelah payment direct QRIS."
+    notes: "Conversion rate landing page melonjak dari 4.1% ke 8.9% setelah payment direct QRIS.",
+    workResultUrl: "https://wakaf.khoirurroziqiin.org/sumur-air",
+    workResultTitle: "🌐 Live LP: Fast Checkout QRIS",
+    attachments: [
+      { title: "🌐 Live LP: Fast Checkout QRIS", url: "https://wakaf.khoirurroziqiin.org/sumur-air" }
+    ]
   },
   {
     id: "task-3",
@@ -72,7 +82,12 @@ export const initialTasks = [
     estimatedHours: 1.0,
     priority: "LOW",
     date: "2026-10-21",
-    notes: "Sudut pandang amal jariyah sangat resonan pada segmen usia 35-54 tahun."
+    notes: "Sudut pandang amal jariyah sangat resonan pada segmen usia 35-54 tahun.",
+    workResultUrl: "https://docs.google.com/document/d/copywriting-pahala-jariyah",
+    workResultTitle: "📝 Docs: Naskah Copywriting Resonan",
+    attachments: [
+      { title: "📝 Docs: Naskah Copywriting Resonan", url: "https://docs.google.com/document/d/copywriting-pahala-jariyah" }
+    ]
   },
   {
     id: "task-6",
@@ -114,7 +129,12 @@ export const initialMilestones = [
     category: "OUTCOME",
     targetMetric: "Target 500 Donatur Rutin",
     progressPercent: 78,
-    status: "In Progress"
+    status: "In Progress",
+    workResultUrl: "https://wakaf.khoirurroziqiin.org/autodebit",
+    workResultTitle: "🌐 Flow & Sistem Autodebit",
+    attachments: [
+      { title: "🌐 Flow & Sistem Autodebit", url: "https://wakaf.khoirurroziqiin.org/autodebit" }
+    ]
   },
   {
     id: "m-2",
@@ -134,7 +154,12 @@ export const initialMilestones = [
     category: "OUTPUT",
     targetMetric: "CPR < Rp 25.000 & ROI > 300%",
     progressPercent: 90,
-    status: "In Progress"
+    status: "In Progress",
+    workResultUrl: "https://docs.google.com/spreadsheets/d/winning-creatives-subuh",
+    workResultTitle: "📊 Sheet: Rekap CPR & Winning Ads",
+    attachments: [
+      { title: "📊 Sheet: Rekap CPR & Winning Ads", url: "https://docs.google.com/spreadsheets/d/winning-creatives-subuh" }
+    ]
   },
   {
     id: "m-4",

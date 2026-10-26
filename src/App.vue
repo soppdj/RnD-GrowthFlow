@@ -165,10 +165,7 @@ import {
   X,
   LayoutDashboard,
   BookOpenCheck,
-  FlaskConical,
-  Coins,
-  FileText,
-  Settings
+  Coins
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
@@ -180,10 +177,7 @@ const jurnalSubTab = ref('daily');
 const mobileNavList = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'jurnal', label: 'Jurnal & Agenda', icon: BookOpenCheck },
-  { id: 'adlab', label: 'Ad Lab (Eksperimen)', icon: FlaskConical },
-  { id: 'donasi', label: 'Donasi & Metrik', icon: Coins },
-  { id: 'laporan', label: 'Laporan Resmi (PDF)', icon: FileText },
-  { id: 'profil', label: 'Profil & Pengaturan', icon: Settings }
+  { id: 'donasi', label: 'Donasi & Metrik', icon: Coins }
 ];
 
 function handleSelectMobileTab(tab) {

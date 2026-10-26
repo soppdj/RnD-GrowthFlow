@@ -103,11 +103,41 @@
             <p v-if="task.notes" class="text-xs text-slate-500 italic">
               "{{ task.notes }}"
             </p>
+
+            <!-- Attachments / Link Hasil Kerja -->
+            <div v-if="getTaskLinks(task).length > 0" class="flex flex-wrap items-center gap-1.5 pt-1">
+              <a
+                v-for="(link, idx) in getTaskLinks(task)"
+                :key="idx"
+                :href="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200/90 transition-all shadow-micro hover:shadow-soft group"
+                :title="link.url"
+              >
+                <LinkIcon class="w-3.5 h-3.5 text-teal-600 group-hover:scale-110 transition-transform" />
+                <span class="max-w-[200px] truncate">{{ link.title || 'Hasil Kerja' }}</span>
+                <ExternalLink class="w-3 h-3 text-teal-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+              </a>
+            </div>
           </div>
         </div>
 
         <!-- Right: Actions -->
-        <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+        <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+          <!-- Quick Attach Link Button -->
+          <button
+            @click="openAttachModal(task)"
+            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border"
+            :class="getTaskLinks(task).length > 0
+              ? 'text-teal-700 bg-teal-50 border-teal-200 hover:bg-teal-100'
+              : 'text-slate-500 hover:text-teal-700 hover:bg-teal-50 border-slate-200'"
+            title="Lampirkan Link Hasil Kerja"
+          >
+            <Paperclip class="w-3.5 h-3.5" />
+            <span class="hidden sm:inline">{{ getTaskLinks(task).length > 0 ? `${getTaskLinks(task).length} Link` : 'Attach Link' }}</span>
+          </button>
+
           <button
             @click="editTask(task)"
             class="p-1.5 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors"
@@ -248,6 +278,15 @@
       @close="closeTaskModal"
       @save="handleSaveTask"
     />
+
+    <!-- Quick Attach Link Modal -->
+    <AttachLinkModal
+      :is-open="isAttachModalOpen"
+      :item="targetAttachTask"
+      item-type="task"
+      @close="closeAttachModal"
+      @save="handleSaveAttachment"
+    />
   </div>
 </template>
 
@@ -257,6 +296,7 @@ import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { useConfetti } from '@/composables/useConfetti';
 import { formatDate, LOGFRAME_TYPES } from '@/utils/formatters';
 import TaskModal from './TaskModal.vue';
+import AttachLinkModal from './AttachLinkModal.vue';
 import {
   Check,
   Plus,
@@ -266,7 +306,10 @@ import {
   BookOpen,
   ChevronDown,
   Save,
-  CheckSquare
+  CheckSquare,
+  Paperclip,
+  Link as LinkIcon,
+  ExternalLink
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
@@ -278,6 +321,9 @@ const logSavedToast = ref(false);
 
 const isTaskModalOpen = ref(false);
 const editingTask = ref(null);
+
+const isAttachModalOpen = ref(false);
+const targetAttachTask = ref(null);
 
 const newLog = ref({
   focus: '',
@@ -324,6 +370,39 @@ function editTask(task) {
 function closeTaskModal() {
   isTaskModalOpen.value = false;
   editingTask.value = null;
+}
+
+function getTaskLinks(task) {
+  const links = [];
+  if (Array.isArray(task.attachments)) {
+    task.attachments.forEach(att => {
+      if (att && att.url) {
+        links.push({ title: att.title || 'Hasil Kerja', url: att.url });
+      }
+    });
+  }
+  if (task.workResultUrl && !links.some(l => l.url === task.workResultUrl)) {
+    links.unshift({
+      title: task.workResultTitle || 'Hasil Kerja',
+      url: task.workResultUrl
+    });
+  }
+  return links;
+}
+
+function openAttachModal(task) {
+  targetAttachTask.value = { ...task };
+  isAttachModalOpen.value = true;
+}
+
+function closeAttachModal() {
+  isAttachModalOpen.value = false;
+  targetAttachTask.value = null;
+}
+
+function handleSaveAttachment({ id, payload }) {
+  store.updateTask(id, payload);
+  closeAttachModal();
 }
 
 function handleSaveTask(taskData) {

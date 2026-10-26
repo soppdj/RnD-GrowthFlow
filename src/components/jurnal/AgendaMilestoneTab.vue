@@ -64,6 +64,23 @@
             <Target class="w-3.5 h-3.5 text-teal-600" />
             <span>Target: {{ item.targetMetric }}</span>
           </p>
+
+          <!-- Attachments / Link Hasil Kerja Milestone -->
+          <div v-if="getMilestoneLinks(item).length > 0" class="flex flex-wrap items-center gap-1.5 mt-2.5">
+            <a
+              v-for="(link, idx) in getMilestoneLinks(item)"
+              :key="idx"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200/90 transition-all shadow-micro hover:shadow-soft group"
+              :title="link.url"
+            >
+              <LinkIcon class="w-3.5 h-3.5 text-teal-600 group-hover:scale-110 transition-transform" />
+              <span class="max-w-[180px] truncate">{{ link.title || 'Hasil Kerja' }}</span>
+              <ExternalLink class="w-3 h-3 text-teal-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+            </a>
+          </div>
         </div>
 
         <!-- Progress Slider / Bar -->
@@ -100,13 +117,26 @@
               {{ item.status === 'Done' ? '✅ Selesai' : '⏳ In Progress' }}
             </button>
 
-            <button
-              @click="deleteMilestone(item.id)"
-              class="text-slate-400 hover:text-rose-600 transition-colors"
-              title="Hapus Milestone"
-            >
-              <Trash2 class="w-3.5 h-3.5" />
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button
+                @click="openAttachModal(item)"
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border"
+                :class="getMilestoneLinks(item).length > 0
+                  ? 'text-teal-700 bg-teal-50 border-teal-200 hover:bg-teal-100'
+                  : 'text-slate-500 hover:text-teal-700 hover:bg-teal-50 border-slate-200'"
+                title="Lampirkan Link Hasil Kerja"
+              >
+                <Paperclip class="w-3 h-3" />
+                <span>{{ getMilestoneLinks(item).length > 0 ? `${getMilestoneLinks(item).length} Link` : 'Attach Link' }}</span>
+              </button>
+              <button
+                @click="deleteMilestone(item.id)"
+                class="p-1 text-slate-400 hover:text-rose-600 transition-colors"
+                title="Hapus Milestone"
+              >
+                <Trash2 class="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -176,6 +206,34 @@
             />
           </div>
 
+          <!-- Attach Deliverable Link (Optional) -->
+          <div class="p-3 rounded-xl bg-teal-50/60 border border-teal-100 space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+                <Paperclip class="w-3.5 h-3.5 text-teal-600" />
+                <span>Link Deliverable / Hasil Kerja</span>
+              </label>
+              <span class="text-[10px] text-teal-700 font-semibold bg-teal-100/80 px-2 py-0.5 rounded">
+                Opsional
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              <input
+                v-model="newMilestone.workResultTitle"
+                type="text"
+                placeholder="Judul Link (misal: Live URL / Dokumen Integrasi CRM)"
+                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 text-xs outline-none"
+              />
+              <input
+                v-model="newMilestone.workResultUrl"
+                type="url"
+                placeholder="https://drive.google.com/... atau https://..."
+                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 text-xs font-mono outline-none"
+              />
+            </div>
+          </div>
+
           <div class="flex items-center justify-end gap-2 pt-3 border-t border-teal-100">
             <button
               type="button"
@@ -194,6 +252,15 @@
         </form>
       </div>
     </div>
+
+    <!-- Quick Attach Link Modal for Milestones -->
+    <AttachLinkModal
+      :is-open="isAttachModalOpen"
+      :item="targetAttachMilestone"
+      item-type="milestone"
+      @close="closeAttachModal"
+      @save="handleSaveAttachment"
+    />
   </div>
 </template>
 
@@ -201,16 +268,23 @@
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { formatDate, LOGFRAME_TYPES } from '@/utils/formatters';
+import AttachLinkModal from './AttachLinkModal.vue';
 import {
   Calendar,
   Target,
   Plus,
   Trash2,
-  X
+  X,
+  Paperclip,
+  Link as LinkIcon,
+  ExternalLink
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 const isModalOpen = ref(false);
+
+const isAttachModalOpen = ref(false);
+const targetAttachMilestone = ref(null);
 
 const newMilestone = ref({
   title: '',
@@ -219,8 +293,44 @@ const newMilestone = ref({
   targetMetric: '',
   deadline: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
   progressPercent: 0,
-  status: 'In Progress'
+  status: 'In Progress',
+  workResultTitle: '',
+  workResultUrl: '',
+  attachments: []
 });
+
+function getMilestoneLinks(item) {
+  const links = [];
+  if (Array.isArray(item.attachments)) {
+    item.attachments.forEach(att => {
+      if (att && att.url) {
+        links.push({ title: att.title || 'Hasil Kerja', url: att.url });
+      }
+    });
+  }
+  if (item.workResultUrl && !links.some(l => l.url === item.workResultUrl)) {
+    links.unshift({
+      title: item.workResultTitle || 'Hasil Kerja',
+      url: item.workResultUrl
+    });
+  }
+  return links;
+}
+
+function openAttachModal(item) {
+  targetAttachMilestone.value = { ...item };
+  isAttachModalOpen.value = true;
+}
+
+function closeAttachModal() {
+  isAttachModalOpen.value = false;
+  targetAttachMilestone.value = null;
+}
+
+function handleSaveAttachment({ id, payload }) {
+  store.updateMilestone(id, payload);
+  closeAttachModal();
+}
 
 // Sort strictly by nearest deadline first
 const sortedMilestones = computed(() => {
@@ -273,7 +383,21 @@ function openModal() {
 
 function handleCreateMilestone() {
   if (!newMilestone.value.title) return;
-  store.addMilestone({ ...newMilestone.value });
+
+  let url = (newMilestone.value.workResultUrl || '').trim();
+  if (url && !/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+  const title = (newMilestone.value.workResultTitle || '').trim();
+  const attachments = url ? [{ title: title || 'Hasil Kerja', url }] : [];
+
+  store.addMilestone({
+    ...newMilestone.value,
+    workResultUrl: url,
+    workResultTitle: title,
+    attachments
+  });
+
   isModalOpen.value = false;
   newMilestone.value = {
     title: '',
@@ -282,7 +406,10 @@ function handleCreateMilestone() {
     targetMetric: '',
     deadline: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
     progressPercent: 0,
-    status: 'In Progress'
+    status: 'In Progress',
+    workResultTitle: '',
+    workResultUrl: '',
+    attachments: []
   };
 }
 </script>

@@ -89,10 +89,81 @@
           </label>
           <textarea
             v-model="form.notes"
-            rows="3"
+            rows="2"
             placeholder="Tuliskan metrik yang ingin diuji, target CPR, atau catatan teknis..."
             class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-xs transition-all"
           ></textarea>
+        </div>
+
+        <!-- Attach Link Hasil Kerja (Deliverables) -->
+        <div class="p-3.5 rounded-xl bg-teal-50/60 border border-teal-100/90 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <Paperclip class="w-3.5 h-3.5 text-teal-600" />
+              <span>Lampirkan Link Hasil Kerja (Deliverable)</span>
+            </label>
+            <span class="text-[10px] text-teal-700 font-semibold bg-teal-100/80 px-2 py-0.5 rounded">
+              Opsional
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
+                Keterangan / Judul Link
+              </label>
+              <input
+                v-model="form.workResultTitle"
+                type="text"
+                placeholder="Contoh: Draft Video 3 Hook Santri"
+                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 text-xs outline-none"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
+                URL / Link Hasil Kerja
+              </label>
+              <input
+                v-model="form.workResultUrl"
+                type="url"
+                placeholder="https://drive.google.com/... atau https://canva.com/..."
+                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 text-xs font-mono outline-none"
+              />
+            </div>
+          </div>
+
+          <!-- Quick presets -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <span class="text-[10px] text-slate-400 font-medium mr-1">Preset:</span>
+            <button
+              type="button"
+              @click="applyPreset('📁 Google Drive', 'https://drive.google.com/drive/folders/')"
+              class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white border border-slate-200 text-slate-600 hover:text-teal-700 hover:border-teal-300 transition-colors"
+            >
+              📁 Google Drive
+            </button>
+            <button
+              type="button"
+              @click="applyPreset('📊 Spreadsheet CPR', 'https://docs.google.com/spreadsheets/')"
+              class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white border border-slate-200 text-slate-600 hover:text-teal-700 hover:border-teal-300 transition-colors"
+            >
+              📊 Spreadsheet
+            </button>
+            <button
+              type="button"
+              @click="applyPreset('🎨 Desain Canva', 'https://www.canva.com/design/')"
+              class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white border border-slate-200 text-slate-600 hover:text-teal-700 hover:border-teal-300 transition-colors"
+            >
+              🎨 Canva
+            </button>
+            <button
+              type="button"
+              @click="applyPreset('🌐 Landing Page', 'https://')"
+              class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white border border-slate-200 text-slate-600 hover:text-teal-700 hover:border-teal-300 transition-colors"
+            >
+              🌐 Landing Page
+            </button>
+          </div>
         </div>
 
         <!-- Actions -->
@@ -119,7 +190,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { LOGFRAME_TYPES } from '@/utils/formatters';
-import { CheckSquare, X } from 'lucide-vue-next';
+import { CheckSquare, X, Paperclip } from 'lucide-vue-next';
 
 const props = defineProps({
   isOpen: Boolean,
@@ -135,6 +206,9 @@ const form = ref({
   priority: 'MEDIUM',
   estimatedHours: 1.5,
   notes: '',
+  workResultUrl: '',
+  workResultTitle: '',
+  attachments: [],
   completed: false
 });
 
@@ -142,7 +216,17 @@ watch(
   () => props.initialData,
   (val) => {
     if (val) {
-      form.value = { ...val };
+      form.value = {
+        title: val.title || '',
+        category: val.category || 'OUTPUT',
+        priority: val.priority || 'MEDIUM',
+        estimatedHours: val.estimatedHours || 1.5,
+        notes: val.notes || '',
+        workResultUrl: val.workResultUrl || '',
+        workResultTitle: val.workResultTitle || '',
+        attachments: val.attachments ? [...val.attachments] : [],
+        completed: Boolean(val.completed)
+      };
     } else {
       form.value = {
         title: '',
@@ -150,6 +234,9 @@ watch(
         priority: 'MEDIUM',
         estimatedHours: 1.5,
         notes: '',
+        workResultUrl: '',
+        workResultTitle: '',
+        attachments: [],
         completed: false
       };
     }
@@ -157,8 +244,39 @@ watch(
   { immediate: true }
 );
 
+function applyPreset(presetTitle, presetUrlPrefix) {
+  if (!form.value.workResultTitle) {
+    form.value.workResultTitle = presetTitle;
+  }
+  if (!form.value.workResultUrl || form.value.workResultUrl === 'https://') {
+    form.value.workResultUrl = presetUrlPrefix;
+  }
+}
+
 function handleSubmit() {
   if (!form.value.title.trim()) return;
-  emit('save', { ...form.value });
+
+  // Auto ensure https:// if url is filled
+  let url = form.value.workResultUrl.trim();
+  if (url && !/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+    form.value.workResultUrl = url;
+  }
+
+  // Sync attachments array if workResultUrl is given
+  const attachments = form.value.attachments ? [...form.value.attachments] : [];
+  if (url && !attachments.some(a => a.url === url)) {
+    attachments.unshift({
+      title: form.value.workResultTitle.trim() || 'Hasil Kerja',
+      url
+    });
+  }
+
+  emit('save', {
+    ...form.value,
+    workResultUrl: url,
+    workResultTitle: form.value.workResultTitle.trim(),
+    attachments
+  });
 }
 </script>

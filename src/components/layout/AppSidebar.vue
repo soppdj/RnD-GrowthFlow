@@ -89,10 +89,7 @@ import { formatCompactCurrency } from '@/utils/formatters';
 import {
   LayoutDashboard,
   BookOpenCheck,
-  FlaskConical,
-  Coins,
-  FileText,
-  Settings
+  Coins
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
@@ -110,25 +107,9 @@ const navItems = computed(() => [
     badge: store.tasks.filter(t => !t.completed).length || null
   },
   {
-    id: 'adlab',
-    label: 'Ad Lab (Eksperimen)',
-    icon: FlaskConical,
-    badge: store.campaigns.length || null
-  },
-  {
     id: 'donasi',
     label: 'Donasi & Metrik',
     icon: Coins
-  },
-  {
-    id: 'laporan',
-    label: 'Laporan Resmi',
-    icon: FileText
-  },
-  {
-    id: 'profil',
-    label: 'Profil & Pengaturan',
-    icon: Settings
   }
 ]);
 </script>

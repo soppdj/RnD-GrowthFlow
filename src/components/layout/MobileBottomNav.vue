@@ -1,6 +1,6 @@
 <template>
   <nav class="no-print lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-teal-100/90 px-2 py-1.5 shadow-lg">
-    <div class="grid grid-cols-5 gap-1 items-center">
+    <div class="grid grid-cols-3 gap-1 items-center">
       <button
         v-for="item in mobileItems"
         :key="item.id"
@@ -33,18 +33,14 @@ import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import {
   LayoutDashboard,
   BookOpenCheck,
-  FlaskConical,
-  Coins,
-  FileText
+  Coins
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 
 const mobileItems = computed(() => [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'jurnal', label: 'Jurnal', icon: BookOpenCheck, badge: store.tasks.filter(t => !t.completed).length || null },
-  { id: 'adlab', label: 'Ad Lab', icon: FlaskConical },
-  { id: 'donasi', label: 'Donasi', icon: Coins },
-  { id: 'laporan', label: 'Laporan', icon: FileText }
+  { id: 'jurnal', label: 'Jurnal & Agenda', icon: BookOpenCheck, badge: store.tasks.filter(t => !t.completed).length || null },
+  { id: 'donasi', label: 'Donasi & Metrik', icon: Coins }
 ]);
 </script>

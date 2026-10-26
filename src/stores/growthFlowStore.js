@@ -32,11 +32,34 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           donationPrograms = [...initialDonationPrograms];
         }
 
+        // Backward compatibility: merge sample workResultUrl if missing
+        let tasks = parsed.tasks || initialTasks;
+        if (Array.isArray(tasks) && tasks.length && !tasks[0].workResultUrl) {
+          tasks = tasks.map(t => {
+            const init = initialTasks.find(it => it.id === t.id);
+            if (init && init.workResultUrl && !t.workResultUrl) {
+              return { ...t, workResultUrl: init.workResultUrl, workResultTitle: init.workResultTitle, attachments: init.attachments };
+            }
+            return t;
+          });
+        }
+
+        let milestones = parsed.milestones || initialMilestones;
+        if (Array.isArray(milestones) && milestones.length && !milestones[0].workResultUrl) {
+          milestones = milestones.map(m => {
+            const init = initialMilestones.find(im => im.id === m.id);
+            if (init && init.workResultUrl && !m.workResultUrl) {
+              return { ...m, workResultUrl: init.workResultUrl, workResultTitle: init.workResultTitle, attachments: init.attachments };
+            }
+            return m;
+          });
+        }
+
         return {
           profile: profile || initialProfile,
-          tasks: parsed.tasks || initialTasks,
+          tasks: tasks || initialTasks,
           journalLogs: parsed.journalLogs || initialJournalLogs,
-          milestones: parsed.milestones || initialMilestones,
+          milestones: milestones || initialMilestones,
           campaigns: parsed.campaigns || initialCampaigns,
           donationPrograms: donationPrograms || initialDonationPrograms,
           rdProductPrice: parsed.rdProductPrice !== undefined ? parsed.rdProductPrice : initialRdProductPrice,
