@@ -4,7 +4,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-sm animate-fade-in"
   >
     <div
-      class="glass-panel rounded-2xl w-full max-w-6xl max-h-[92vh] flex flex-col shadow-2xl border border-teal-200 overflow-hidden bg-white"
+      class="glass-panel rounded-2xl w-full max-w-7xl max-h-[94vh] flex flex-col shadow-2xl border border-teal-200 overflow-hidden bg-white"
     >
       <!-- Modal Header -->
       <div class="p-4 sm:p-5 bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-800 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
@@ -18,11 +18,11 @@
                 Evaluator &amp; Converter Meta Ads
               </h3>
               <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">
-                Decision Engine (Lanjut vs Stop)
+                Decision Engine (Lanjut vs Pantau vs Stop)
               </span>
             </div>
             <p class="text-xs text-teal-100/80 mt-0.5">
-              Upload ekspor Excel/CSV Meta Ads Manager untuk hitung 6 KPI otomatis dan peroleh rekomendasi keputusan SOP
+              Upload ekspor Excel/CSV Meta Ads Manager untuk evaluasi otomatis seluruh corong konversi (CTR, CPC, Cost LPV, LC to LPV, LPV to ATC, ATC to IC, CPM, CPR) sesuai SOP
             </p>
           </div>
         </div>
@@ -96,22 +96,22 @@
               <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shadow-micro">
                 <UploadCloud class="w-6 h-6" />
               </div>
-              <p class="text-xs sm:text-sm font-bold text-slate-800">
-                Klik atau seret file laporan Meta Ads (.xlsx, .xls, .csv) ke sini
+              <p class="text-xs sm:text-sm font-bold text-slate-700">
+                Klik untuk memilih file Excel/CSV atau drag &amp; drop ke sini
               </p>
-              <p class="text-[11px] text-slate-400 max-w-md">
-                Mendukung ekspor langsung dari Ads Manager dengan kolom Spend, Impressions, Clicks, LP Views, Results, dan Revenue
+              <p class="text-[11px] text-slate-400">
+                Mendukung file ekspor resmi Ads Manager (.xlsx, .xls, .csv). Sistem otomatis mendeteksi kolom Spend, Impressions, Clicks, Landing Page Views, Adds to Cart, Checkouts, dan Results.
               </p>
             </div>
           </div>
 
           <!-- Tab Content 2: Copy-Paste -->
-          <div v-else class="space-y-2">
+          <div v-else class="space-y-3">
             <textarea
               v-model="pastedText"
-              rows="4"
-              placeholder="Paste data tabel dari Excel/Google Sheets di sini (dengan baris header)..."
-              class="w-full p-3 rounded-xl border border-teal-200 text-xs font-mono text-slate-700 bg-white focus:ring-2 focus:ring-teal-500 outline-none"
+              rows="5"
+              placeholder="Paste data tabel Meta Ads di sini (termasuk baris header kolom)...&#10;Contoh format tab-separated atau comma-separated:&#10;Campaign Name&#9;Amount Spent&#9;Impressions&#9;Link Clicks&#9;Landing Page Views&#9;Adds to Cart&#9;Checkouts Initiated&#9;Results"
+              class="w-full text-xs font-mono p-3 rounded-xl border border-teal-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none resize-y"
             ></textarea>
             <div class="flex justify-end">
               <button
@@ -127,7 +127,7 @@
           <!-- Quick Action: Load Sample Demo Data -->
           <div class="mt-3 pt-3 border-t border-teal-100 flex flex-wrap items-center justify-between text-xs gap-2">
             <span class="text-slate-500 text-[11px]">
-              Belum punya file ekspor? Coba dengan data simulasi:
+              Belum punya file ekspor? Coba dengan data simulasi corong konversi lengkap:
             </span>
             <button
               @click="loadSampleMetaAdsData"
@@ -141,6 +141,40 @@
 
         <!-- Step 2: Evaluation Dashboard & Results -->
         <div v-if="evaluatedAds.length > 0" class="space-y-5 animate-fade-in">
+          <!-- Standar KPI Benchmark Reference Strip -->
+          <div class="p-3 rounded-xl bg-slate-50 border border-teal-200/80 shadow-micro flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-1.5 font-bold text-slate-700">
+              <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+              <span class="text-[11px] uppercase tracking-wider text-teal-900">Standar Acuan KPI:</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5 text-[11px]">
+              <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                CPC (1%): <strong>≤ {{ formatCurrency(targetCPC) }}</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                Cost LPV (2-3%): <strong>≤ {{ formatCurrency(targetCostLPV) }}</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                CTR: <strong>&gt; 2.0%</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
+                LC to LPV: <strong>≥ 80%</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
+                LPV to ATC: <strong>≥ 40%</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
+                ATC to IC: <strong>≥ 30%</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                CPM: <strong>≤ Rp 32.000</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-300 text-blue-900 font-bold">
+                CPR (25%): <strong>≤ {{ formatCurrency(targetCPR) }}</strong>
+              </span>
+            </div>
+          </div>
+
           <!-- Summary Cards -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-micro">
@@ -152,19 +186,19 @@
             <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 shadow-micro">
               <span class="text-[10px] font-bold text-emerald-800 uppercase block">🟢 Lanjut / Scale</span>
               <span class="text-xl font-black text-emerald-700 mt-0.5 block">{{ scaleCount }} Iklan</span>
-              <span class="text-[10px] text-emerald-600 font-bold">Winning (CPR aman)</span>
+              <span class="text-[10px] text-emerald-600 font-bold">Lolos CPR &amp; Seluruh Corong KPI</span>
             </div>
 
             <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 shadow-micro">
-              <span class="text-[10px] font-bold text-amber-800 uppercase block">🟡 Pantau 2-3 Hari</span>
+              <span class="text-[10px] font-bold text-amber-800 uppercase block">🟡 Pantau / Perbaiki</span>
               <span class="text-xl font-black text-amber-700 mt-0.5 block">{{ watchCount }} Iklan</span>
-              <span class="text-[10px] text-amber-600">Marginal / Optimasi</span>
+              <span class="text-[10px] text-amber-600 font-bold">Optimasi LP / Konten / Penawaran</span>
             </div>
 
             <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 shadow-micro">
               <span class="text-[10px] font-bold text-rose-800 uppercase block">🔴 Stop / Kill</span>
               <span class="text-xl font-black text-rose-700 mt-0.5 block">{{ stopCount }} Iklan</span>
-              <span class="text-[10px] text-rose-600 font-bold">CPR boncos / CTR drop</span>
+              <span class="text-[10px] text-rose-600 font-bold">CPR boncos / 0 konversi</span>
             </div>
           </div>
 
@@ -225,15 +259,18 @@
                       title="Pilih semua iklan yang dilanjut"
                     />
                   </th>
-                  <th scope="col" class="py-3 px-3 w-48">NAMA KAMPANYE / IKLAN</th>
-                  <th scope="col" class="py-3 px-3 w-28 text-center bg-teal-950/40">KEPUTUSAN</th>
+                  <th scope="col" class="py-3 px-3 min-w-[180px]">NAMA KAMPANYE / IKLAN</th>
+                  <th scope="col" class="py-3 px-3 w-32 text-center bg-teal-950/40">KEPUTUSAN</th>
                   <th scope="col" class="py-3 px-3 w-24">SPEND</th>
                   <th scope="col" class="py-3 px-3 w-24">CPR (HASIL)</th>
                   <th scope="col" class="py-3 px-3 w-20">CTR</th>
                   <th scope="col" class="py-3 px-3 w-20">CPC</th>
                   <th scope="col" class="py-3 px-3 w-20">COST LPV</th>
+                  <th scope="col" class="py-3 px-3 w-24 bg-emerald-950/30">LC to LPV (80%)</th>
+                  <th scope="col" class="py-3 px-3 w-24 bg-emerald-950/30">LPV to ATC (40%)</th>
+                  <th scope="col" class="py-3 px-3 w-24 bg-emerald-950/30">ATC to IC (30%)</th>
                   <th scope="col" class="py-3 px-3 w-20">CPM</th>
-                  <th scope="col" class="py-3 px-4">DIAGNOSA &amp; AKSI SOP</th>
+                  <th scope="col" class="py-3 px-4 min-w-[280px]">DIAGNOSA &amp; AKSI SOP</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 font-medium">
@@ -259,14 +296,14 @@
                       {{ ad.name }}
                     </span>
                     <span class="text-[10px] text-slate-400 mt-0.5 block">
-                      {{ ad.results }} Donatur Baru • Impresi: {{ formatNumber(ad.impressions) }}
+                      {{ ad.results }} Donatur Baru • Impresi: {{ formatNumber(ad.impressions) }} • Klik: {{ formatNumber(ad.clicks) }}
                     </span>
                   </td>
 
                   <!-- Decision Badge -->
-                  <td class="py-3.5 px-3 text-center">
+                  <td class="py-3.5 px-3 text-center whitespace-nowrap">
                     <span
-                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black border shadow-micro uppercase"
+                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black border shadow-micro uppercase"
                       :class="getDecisionBadgeClass(ad.decision)"
                     >
                       <span>{{ ad.decisionIcon }}</span>
@@ -283,9 +320,9 @@
                   <td class="py-3.5 px-3 whitespace-nowrap">
                     <span
                       class="font-black px-1.5 py-0.5 rounded text-xs"
-                      :class="ad.cpr <= targetCPR ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'"
+                      :class="ad.results > 0 && ad.cpr <= targetCPR ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'"
                     >
-                      {{ formatCurrency(ad.cpr) }}
+                      {{ ad.results > 0 ? formatCurrency(ad.cpr) : 'Rp 0' }}
                     </span>
                     <span class="text-[9px] text-slate-400 block mt-0.5">
                       Max: {{ formatCurrency(targetCPR) }}
@@ -311,16 +348,69 @@
                     >
                       {{ formatCurrency(ad.cpc) }}
                     </span>
+                    <span class="text-[9px] text-slate-400 block">Target: {{ formatCurrency(targetCPC) }}</span>
                   </td>
 
                   <!-- Cost LPV -->
                   <td class="py-3.5 px-3 whitespace-nowrap">
-                    <span
-                      class="font-semibold text-xs"
-                      :class="ad.costLpv <= targetCostLPV ? 'text-emerald-700' : 'text-slate-700'"
-                    >
-                      {{ formatCurrency(ad.costLpv) }}
-                    </span>
+                    <template v-if="ad.costLpv > 0">
+                      <span
+                        class="font-semibold text-xs"
+                        :class="ad.costLpv <= targetCostLPV ? 'text-emerald-700 font-bold' : (ad.costLpv <= targetCostLPV * 1.5 ? 'text-slate-700' : 'text-rose-700 font-bold')"
+                      >
+                        {{ formatCurrency(ad.costLpv) }}
+                      </span>
+                      <span class="text-[9px] text-slate-400 block">Max: {{ formatCurrency(targetCostLPV) }}</span>
+                    </template>
+                    <span v-else class="text-slate-400 text-center block">-</span>
+                  </td>
+
+                  <!-- LC to LPV (Funnel KPI 1: Target >= 80%) -->
+                  <td class="py-3.5 px-3 whitespace-nowrap">
+                    <template v-if="ad.clicks > 0">
+                      <span
+                        class="font-black text-xs px-2 py-0.5 rounded inline-block"
+                        :class="ad.lcToLpv >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.lcToLpv.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">
+                        {{ formatNumber(ad.lpViews) }} LPV / Target ≥ 80%
+                      </span>
+                    </template>
+                    <span v-else class="text-slate-400">-</span>
+                  </td>
+
+                  <!-- LPV to ATC (Funnel KPI 2: Target >= 40%) -->
+                  <td class="py-3.5 px-3 whitespace-nowrap">
+                    <template v-if="ad.lpvToAtc !== null">
+                      <span
+                        class="font-black text-xs px-2 py-0.5 rounded inline-block"
+                        :class="ad.lpvToAtc >= 40 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.lpvToAtc.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">
+                        {{ formatNumber(ad.atc) }} ATC / Target ≥ 40%
+                      </span>
+                    </template>
+                    <span v-else class="text-slate-300 text-center block" title="Data ATC tidak ditemukan">-</span>
+                  </td>
+
+                  <!-- ATC to IC (Funnel KPI 3: Target >= 30%) -->
+                  <td class="py-3.5 px-3 whitespace-nowrap">
+                    <template v-if="ad.atcToIc !== null">
+                      <span
+                        class="font-black text-xs px-2 py-0.5 rounded inline-block"
+                        :class="ad.atcToIc >= 30 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.atcToIc.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">
+                        {{ formatNumber(ad.ic) }} IC / Target ≥ 30%
+                      </span>
+                    </template>
+                    <span v-else class="text-slate-300 text-center block" title="Data IC tidak ditemukan">-</span>
                   </td>
 
                   <!-- CPM -->
@@ -331,6 +421,7 @@
                     >
                       {{ formatCurrency(ad.cpm) }}
                     </span>
+                    <span class="text-[9px] text-slate-400 block">Target: ≤ 32rb</span>
                   </td>
 
                   <!-- Diagnosis & SOP Action -->
@@ -338,9 +429,21 @@
                     <p class="font-bold text-slate-800 leading-tight">
                       {{ ad.reason }}
                     </p>
-                    <p class="text-[11px] text-slate-600 mt-1 leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-200">
-                      <strong>Aksi SOP:</strong> {{ ad.actionSOP }}
-                    </p>
+                    <div class="mt-1.5 p-2 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                      <p class="text-[11px] text-slate-700 leading-relaxed">
+                        <strong class="text-teal-900 font-extrabold">Aksi SOP:</strong> {{ ad.actionSOP }}
+                      </p>
+                      <!-- Specific Funnel Warning Pills -->
+                      <div v-if="ad.funnelAlerts && ad.funnelAlerts.length > 0" class="pt-1 flex flex-wrap gap-1">
+                        <span
+                          v-for="(alert, aIdx) in ad.funnelAlerts"
+                          :key="aIdx"
+                          class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300"
+                        >
+                          ⚠️ {{ alert }}
+                        </span>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -350,13 +453,13 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 text-xs">
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 text-xs">
         <span class="text-slate-500">
-          Kriteria evaluasi mengacu pada Standar KPI Ads Yayasan Khoirur Rooziqiin (Harga: {{ formatCurrency(store.rdProductPrice) }}).
+          Kriteria evaluasi mengacu pada 9 Standar KPI Ads Yayasan Khoirur Rooziqiin (Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}).
         </span>
         <button
           @click="closeModal"
-          class="px-5 py-2 rounded-xl text-xs font-bold bg-slate-700 hover:bg-slate-800 text-white shadow-soft transition-all"
+          class="px-5 py-2 rounded-xl text-xs font-bold bg-slate-700 hover:bg-slate-800 text-white shadow-soft transition-all self-end sm:self-auto"
         >
           Tutup Evaluator
         </button>
@@ -403,6 +506,9 @@ const selectAllScale = ref(false);
 // CPR = 25% Harga Jual
 // CPM = Rp 32.000
 // CTR = > 2%
+// LC to LPV = >= 80% (Aksi: Jika kurang, optimasi landing page agar lebih cepat)
+// LPV to ATC = >= 40% (Aksi: Gunakan hypno writing di landingpage)
+// ATC to IC = >= 30% (Aksi: Beri penawaran menarik)
 const targetCPC = computed(() => Math.round((store.rdProductPrice || 50000) * 0.01));
 const targetCostLPV = computed(() => Math.round((store.rdProductPrice || 50000) * 0.03));
 const targetCPR = computed(() => Math.round((store.rdProductPrice || 50000) * 0.25));
@@ -483,13 +589,21 @@ function cleanNum(val) {
   return isNaN(n) ? 0 : n;
 }
 
-function getField(row, keywords) {
+function getField(row, keywords, excludeKeywords = []) {
   const keys = Object.keys(row);
   for (const k of keys) {
     const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    // Check if key contains any excluded substring
+    const isExcluded = excludeKeywords.some(ex => {
+      const cleanEx = ex.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return cleanK.includes(cleanEx);
+    });
+    if (isExcluded) continue;
+
     for (const kw of keywords) {
       const cleanKw = kw.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanK.includes(cleanKw) || cleanKw.includes(cleanK)) {
+      if (cleanK === cleanKw || cleanK.includes(cleanKw) || (cleanK.length >= 4 && cleanKw.includes(cleanK))) {
         return row[k];
       }
     }
@@ -504,21 +618,70 @@ function processRawRows(rows) {
   }
 
   const results = rows.map((r, i) => {
-    const name = getField(r, ['campaign name', 'nama kampanye', 'ad name', 'ad set name', 'nama', 'campaign']) || `Kampanye #${i + 1}`;
-    const spend = cleanNum(getField(r, ['amount spent', 'jumlah yang dibelanjakan', 'spend', 'biaya', 'cost', 'anggaran']));
-    const impressions = cleanNum(getField(r, ['impressions', 'penayangan', 'tayangan', 'impresi'])) || 1;
-    const clicks = cleanNum(getField(r, ['link clicks', 'clicks (all)', 'klik tautan', 'klik', 'clicks'])) || 0;
-    const lpViews = cleanNum(getField(r, ['landing page views', 'tampilan halaman arahan', 'lp views', 'lpv'])) || Math.round(clicks * 0.85);
-    const resultsCount = cleanNum(getField(r, ['results', 'purchases', 'hasil', 'donatur', 'leads', 'konversi'])) || 0;
+    const name = getField(r, ['campaign name', 'nama kampanye', 'ad name', 'nama iklan', 'adset name', 'ad set name', 'nama set iklan', 'nama', 'campaign']) || `Kampanye #${i + 1}`;
+    const spend = cleanNum(getField(r, ['amount spent', 'jumlah yang dibelanjakan', 'spend', 'biaya', 'cost', 'anggaran'], ['cpc', 'cpr', 'ctr', 'roas', 'per']));
+    const impressions = cleanNum(getField(r, ['impressions', 'penayangan', 'tayangan', 'impresi'], ['cost', 'biaya', 'cpm', 'per', 'rate'])) || 1;
+    const clicks = cleanNum(getField(r, ['link clicks', 'clicks (all)', 'klik tautan', 'klik unik', 'klik', 'clicks'], ['cost', 'biaya', 'cpc', 'cpr', 'per', 'rate', 'tampilan']));
+    
+    // Landing page views (counts)
+    let lpViews = cleanNum(getField(r, ['landing page views', 'landing page view', 'tampilan halaman arahan', 'tampilan laman landas', 'kunjungan halaman arahan', 'lp views', 'lp view', 'halaman arahan', 'laman landas', 'lpv'], ['cost', 'biaya', 'per', 'cpc', 'rate', 'harga']));
+    
+    // Check if export provided 'Cost per landing page view' but not count
+    const exportedCostLpv = cleanNum(getField(r, ['cost per landing page view', 'biaya per tampilan halaman arahan', 'cost per lpv', 'biaya per lpv']));
+    if (lpViews === 0 && exportedCostLpv > 0 && spend > 0) {
+      lpViews = Math.round(spend / exportedCostLpv);
+    }
+
+    // Add to cart count
+    const atc = cleanNum(getField(r, ['adds to cart', 'add to cart', 'penambahan ke keranjang', 'tambah ke keranjang', 'keranjang', 'atc', 'cart'], ['cost', 'biaya', 'per', 'rate', 'harga', 'value', 'nilai', 'roas']));
+
+    // Initiate checkout count
+    const ic = cleanNum(getField(r, ['checkouts initiated', 'checkout initiated', 'initiate checkout', 'pembayaran dimulai', 'memulai pembayaran', 'checkout', 'ic'], ['cost', 'biaya', 'per', 'rate', 'harga', 'value', 'nilai', 'roas']));
+
+    // Results (Conversions / Donatur)
+    const resultsCount = cleanNum(getField(r, ['results', 'purchases', 'pembelian', 'hasil', 'donatur', 'leads', 'konversi'], ['cost', 'biaya', 'cpr', 'per', 'rate', 'harga', 'value', 'nilai', 'roas'])) || 0;
     const revenue = cleanNum(getField(r, ['conversion value', 'nilai konversi', 'revenue', 'nilai'])) || (resultsCount * (store.rdProductPrice || 50000));
 
-    // Calculate the 6 KPIs
-    const cpc = clicks > 0 ? Math.round(spend / clicks) : spend;
-    const costLpv = lpViews > 0 ? Math.round(spend / lpViews) : spend;
+    // Calculate funnel metrics
+    const cpc = clicks > 0 ? Math.round(spend / clicks) : 0;
+    const costLpv = lpViews > 0 ? Math.round(spend / lpViews) : (exportedCostLpv > 0 ? exportedCostLpv : 0);
     const cpm = impressions > 0 ? Math.round((spend / impressions) * 1000) : 0;
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
-    const cpr = resultsCount > 0 ? Math.round(spend / resultsCount) : spend;
-    const lcToLpv = clicks > 0 ? ((lpViews / clicks) * 100) : 0;
+    const cpr = resultsCount > 0 ? Math.round(spend / resultsCount) : 0;
+    
+    // Funnel conversion percentages
+    const lcToLpv = clicks > 0 && lpViews > 0 ? Math.round((lpViews / clicks) * 100) : 0;
+    const lpvToAtc = lpViews > 0 && atc > 0 ? Math.round((atc / lpViews) * 100) : (atc > 0 && clicks > 0 ? Math.round((atc / clicks) * 100) : null);
+    const atcToIc = atc > 0 && ic > 0 ? Math.round((ic / atc) * 100) : null;
+
+    // Benchmarks
+    const maxSafeCPR = targetCPR.value; // 25% of Harga Jual
+    const maxSafeCostLpv = targetCostLPV.value; // 3% of Harga Jual
+    const isCPRGood = resultsCount > 0 && cpr <= maxSafeCPR;
+    const isCPRAcceptable = resultsCount > 0 && cpr <= (maxSafeCPR * 1.35);
+    const isCTRGood = ctr >= 2.0;
+    const isCostLpvAcceptable = costLpv === 0 || costLpv <= (maxSafeCostLpv * 1.5);
+
+    // Funnel evaluation
+    // LC to LPV: Target >= 80%
+    const isLcLpvGood = (clicks === 0) ? true : (lpViews > 0 && lcToLpv >= 80);
+    // LPV to ATC: Target >= 40% (only if ATC tracked)
+    const isLpvAtcGood = (lpvToAtc === null) ? true : (lpvToAtc >= 40);
+    // ATC to IC: Target >= 30% (only if IC tracked)
+    const isAtcIcGood = (atcToIc === null) ? true : (atcToIc >= 30);
+    const isFunnelGood = isLcLpvGood && isLpvAtcGood && isAtcIcGood;
+
+    // Collect specific SOP alerts
+    const funnelAlerts = [];
+    if (clicks > 0 && lcToLpv < 80) {
+      funnelAlerts.push(`LC to LPV ${lcToLpv}% (< 80%): Jika kurang, optimasi landing page agar lebih cepat`);
+    }
+    if (lpvToAtc !== null && lpvToAtc < 40) {
+      funnelAlerts.push(`LPV to ATC ${lpvToAtc}% (< 40%): Gunakan hypno writing di landingpage`);
+    }
+    if (atcToIc !== null && atcToIc < 30) {
+      funnelAlerts.push(`ATC to IC ${atcToIc}% (< 30%): Beri penawaran menarik`);
+    }
 
     // Decision Engine Logic based on user SOP
     let decision = 'STOP';
@@ -527,49 +690,86 @@ function processRawRows(rows) {
     let reason = '';
     let actionSOP = '';
 
-    const maxSafeCPR = targetCPR.value; // 25% of Harga Jual
-    const isCPRGood = resultsCount > 0 && cpr <= maxSafeCPR;
-    const isCPRAcceptable = resultsCount > 0 && cpr <= (maxSafeCPR * 1.35);
-    const isCTRGood = ctr >= 2.0;
-
-    if (isCPRGood && isCTRGood) {
-      decision = 'SCALE';
-      decisionIcon = '🟢';
-      decisionLabel = 'LANJUT / SCALE';
-      reason = `CPR sangat efisien (${formatCurrency(cpr)} <= ${formatCurrency(maxSafeCPR)}) dan CTR tinggi (${ctr.toFixed(2)}% > 2%).`;
-      actionSOP = 'SOP: Pindahkan ke SCALE 1 / SCALE 2. Naikkan budget bertahap 20% per hari untuk maksimalkan perolehan donatur.';
-    } else if (isCPRGood && !isCTRGood) {
-      decision = 'WATCH';
-      decisionIcon = '🟡';
-      decisionLabel = 'PANTAU 2-3 HARI';
-      reason = `CPR efisien (${formatCurrency(cpr)}), namun CTR agak rendah (${ctr.toFixed(2)}% < 2%).`;
-      actionSOP = 'SOP: Bikin konten yang lebih menarik (ciri-ciri: kualitas 4K, informatif, menarik, lucu) agar CTR naik diatas 2%.';
-    } else if (isCPRAcceptable && isCTRGood) {
-      decision = 'WATCH';
-      decisionIcon = '🟡';
-      decisionLabel = 'PANTAU 2-3 HARI';
-      reason = `CTR bagus (${ctr.toFixed(2)}%), namun CPR sedikit di atas target toleransi.`;
-      actionSOP = 'SOP: Perbaiki website (desain pro, tambahkan bonus/offer, persingkat alur checkout jangan terlalu panjang).';
-    } else if (cpm > 32000 && resultsCount > 0) {
-      decision = 'WATCH';
-      decisionIcon = '🟡';
-      decisionLabel = 'PANTAU 2-3 HARI';
-      reason = `CPM mahal (${formatCurrency(cpm)} > Rp 32.000), audiens sedang kompetitif.`;
-      actionSOP = 'SOP: Tunggu 2-3 hari untuk evaluasi stabilisasi algoritma. Jika CPR tetap jelek, segera kill!';
-    } else {
+    // CASE 1: Zero conversions
+    if (resultsCount === 0) {
+      if (spend >= maxSafeCPR || clicks >= 50) {
+        decision = 'STOP';
+        decisionIcon = '🔴';
+        decisionLabel = 'STOP / KILL';
+        reason = `Sudah belanja ${formatCurrency(spend)} tanpa hasil donatur (Boncos).`;
+        actionSOP = 'SOP: Segera matikan kampanye! Jangan buang anggaran pada audiens/materi yang tidak menghasilkan konversi.';
+      } else {
+        decision = 'WATCH';
+        decisionIcon = '🟡';
+        decisionLabel = 'PANTAU (TESTING)';
+        reason = `Spend baru ${formatCurrency(spend)} (< batas 1x target CPR ${formatCurrency(maxSafeCPR)}). Belum ada konversi.`;
+        actionSOP = 'SOP: Biarkan berjalan 1-2 hari lagi hingga mencapai batas target CPR untuk melihat kestabilan data.';
+      }
+    }
+    // CASE 2: CPR too high (Boncos)
+    else if (cpr > (maxSafeCPR * 1.35)) {
       decision = 'STOP';
       decisionIcon = '🔴';
       decisionLabel = 'STOP / KILL';
-      if (resultsCount === 0) {
-        reason = `Sudah belanja ${formatCurrency(spend)} tanpa hasil donatur (Boncos).`;
-      } else {
-        reason = `CPR bengkak (${formatCurrency(cpr)} jauh melebihi batas 25% harga jual: ${formatCurrency(maxSafeCPR)}).`;
-      }
+      reason = `CPR bengkak (${formatCurrency(cpr)} jauh melebihi batas 25% harga acuan: ${formatCurrency(maxSafeCPR)}).`;
       actionSOP = 'SOP: Segera matikan kampanye! Evaluasi ulang materi video 4K atau perbaiki alur landing page donasi.';
     }
-
-    if (clicks > 0 && lcToLpv < 80) {
-      actionSOP += ` | LC to LPV ${lcToLpv.toFixed(0)}% (< 80%): optimasi landing page agar lebih cepat.`;
+    // CASE 3: CPR Good & CTR Good & Whole Funnel Passes! (WINNING SCALE)
+    else if (isCPRGood && isCTRGood && isFunnelGood && isCostLpvAcceptable) {
+      decision = 'SCALE';
+      decisionIcon = '🟢';
+      decisionLabel = 'LANJUT / SCALE';
+      reason = `CPR sangat efisien (${formatCurrency(cpr)} ≤ ${formatCurrency(maxSafeCPR)}), CTR tinggi (${ctr.toFixed(2)}%), dan seluruh KPI corong (LC-LPV-ATC-IC) memenuhi standar SOP.`;
+      actionSOP = 'SOP: Pindahkan ke SCALE 1 / SCALE 2. Naikkan budget bertahap 20% per hari untuk maksimalkan perolehan donatur.';
+    }
+    // CASE 4: CPR Good/Acceptable, but Funnel has Leaks (LC to LPV / LPV to ATC / ATC to IC)
+    else if ((isCPRGood || isCPRAcceptable) && !isFunnelGood) {
+      decision = 'WATCH';
+      decisionIcon = '🟡';
+      decisionLabel = 'PANTAU (PERBAIKI CORONG)';
+      
+      if (!isLcLpvGood) {
+        reason = `CPR efisien (${formatCurrency(cpr)}) & CTR tinggi (${ctr.toFixed(2)}%), namun LC to LPV jebol (${lcToLpv}% < 80%). Banyak pengunjung mental sebelum web termuat!`;
+        actionSOP = 'SOP: Tahan scale! Jika kurang, optimasi landing page agar lebih cepat (kompres gambar, perbaiki kecepatan server, pasang lazyload).';
+      } else if (!isLpvAtcGood) {
+        reason = `CPR & CTR bagus, namun LPV to ATC rendah (${lpvToAtc}% < 40%). Pengunjung membaca tapi tidak menekan tombol donasi.`;
+        actionSOP = 'SOP: Gunakan hypno writing di landingpage (headline emosional, bukti sosial nyata, call-to-action tegas) untuk mendongkrak konversi ke keranjang.';
+      } else {
+        reason = `Pengunjung sudah menekan tombol donasi, tapi banyak batal saat proses pembayaran (ATC to IC ${atcToIc}% < 30%).`;
+        actionSOP = 'SOP: Beri penawaran menarik (bonus sertifikat/doa khusus) dan sederhanakan proses formulir checkout.';
+      }
+    }
+    // CASE 5: CPR Good, but CTR is low (< 2%)
+    else if (isCPRGood && !isCTRGood) {
+      decision = 'WATCH';
+      decisionIcon = '🟡';
+      decisionLabel = 'PANTAU (GANTI KREATIF)';
+      reason = `CPR efisien (${formatCurrency(cpr)}), namun CTR iklan rendah (${ctr.toFixed(2)}% < 2%). Materi kreatif kurang memikat klik audiens.`;
+      actionSOP = 'SOP: Bikin konten yang lebih menarik (ciri-ciri: kualitas 4K, informatif, menarik, lucu) agar CTR naik di atas 2%.';
+    }
+    // CASE 6: CPR in marginal tolerance (1.0x - 1.35x maxSafeCPR) & CTR Good
+    else if (isCPRAcceptable && isCTRGood) {
+      decision = 'WATCH';
+      decisionIcon = '🟡';
+      decisionLabel = 'PANTAU 2-3 HARI';
+      reason = `CTR bagus (${ctr.toFixed(2)}%), namun CPR sedikit di atas target toleransi (${formatCurrency(cpr)} vs target ${formatCurrency(maxSafeCPR)}).`;
+      actionSOP = 'SOP: Perbaiki alur landing page, berikan penawaran menarik, dan pantau 2-3 hari sebelum kill.';
+    }
+    // CASE 7: High CPM
+    else if (cpm > 32000 && resultsCount > 0) {
+      decision = 'WATCH';
+      decisionIcon = '🟡';
+      decisionLabel = 'PANTAU (CPM MAHAL)';
+      reason = `CPM mahal (${formatCurrency(cpm)} > Rp 32.000), audiens sedang kompetitif.`;
+      actionSOP = 'SOP: Tunggu 2-3 hari untuk evaluasi stabilisasi algoritma. Jika CPR tetap jelek, segera kill!';
+    }
+    // Fallback STOP
+    else {
+      decision = 'STOP';
+      decisionIcon = '🔴';
+      decisionLabel = 'STOP / KILL';
+      reason = `Performa di bawah standar KPI (CPR ${formatCurrency(cpr)}, CTR ${ctr.toFixed(2)}%).`;
+      actionSOP = 'SOP: Segera matikan kampanye! Jangan lanjutkan spending pada audiens/iklan yang tidak menguntungkan.';
     }
 
     return {
@@ -578,6 +778,8 @@ function processRawRows(rows) {
       impressions,
       clicks,
       lpViews,
+      atc,
+      ic,
       results: resultsCount,
       revenue,
       cpc,
@@ -586,11 +788,14 @@ function processRawRows(rows) {
       ctr,
       cpr,
       lcToLpv,
+      lpvToAtc,
+      atcToIc,
       decision,
       decisionIcon,
       decisionLabel,
       reason,
       actionSOP,
+      funnelAlerts,
       selectedForImport: decision === 'SCALE'
     };
   });
@@ -599,7 +804,6 @@ function processRawRows(rows) {
 }
 
 function loadSampleMetaAdsData() {
-  const price = store.rdProductPrice || 50000;
   const sampleRows = [
     {
       'Nama Kampanye': 'Wakaf Sumur Santri - Video Dokumentasi Air 4K',
@@ -607,6 +811,8 @@ function loadSampleMetaAdsData() {
       'Impressions': 92500,
       'Link Clicks': 2450,
       'Landing Page Views': 2080,
+      'Adds to Cart': 940,
+      'Checkouts Initiated': 330,
       'Results': 162,
       'Purchases Conversion Value': 12500000
     },
@@ -616,35 +822,54 @@ function loadSampleMetaAdsData() {
       'Impressions': 55000,
       'Link Clicks': 1650,
       'Landing Page Views': 1420,
+      'Adds to Cart': 610,
+      'Checkouts Initiated': 210,
       'Results': 118,
       'Purchases Conversion Value': 8850000
     },
     {
       'Nama Kampanye': 'Zakat Maal Akhir Tahun - Kalkulator Web Interaktif',
-      'Amount Spent (IDR)': 2100000,
-      'Impressions': 56000,
-      'Link Clicks': 1320,
-      'Landing Page Views': 1100,
-      'Results': 75,
-      'Purchases Conversion Value': 15000000
+      'Amount Spent (IDR)': 1500000,
+      'Impressions': 48000,
+      'Link Clicks': 1200,
+      'Landing Page Views': 720, // LC to LPV: 60% (< 80%) -> Optimasi LP Speed
+      'Adds to Cart': 320,
+      'Checkouts Initiated': 110,
+      'Results': 60,
+      'Purchases Conversion Value': 9000000
     },
     {
       'Nama Kampanye': 'Beasiswa Tahfidz Quran - Carousel Foto Santri',
       'Amount Spent (IDR)': 950000,
       'Impressions': 42000,
-      'Link Clicks': 920,
-      'Landing Page Views': 750,
-      'Results': 42,
-      'Purchases Conversion Value': 3800000
+      'Link Clicks': 950,
+      'Landing Page Views': 810,
+      'Adds to Cart': 195, // LPV to ATC: 24% (< 40%) -> Hypno Writing
+      'Checkouts Initiated': 80,
+      'Results': 45,
+      'Purchases Conversion Value': 4200000
+    },
+    {
+      'Nama Kampanye': 'Sedekah Mushaf Quran - Paket Santri Pelosok',
+      'Amount Spent (IDR)': 850000,
+      'Impressions': 36000,
+      'Link Clicks': 820,
+      'Landing Page Views': 700,
+      'Adds to Cart': 310,
+      'Checkouts Initiated': 62, // ATC to IC: 20% (< 30%) -> Penawaran Menarik
+      'Results': 35,
+      'Purchases Conversion Value': 3150000
     },
     {
       'Nama Kampanye': 'Tanggap Bencana - Video Tanpa Hook 3 Detik',
       'Amount Spent (IDR)': 1500000,
-      'Impressions': 32000,
-      'Link Clicks': 380,
-      'Landing Page Views': 240,
-      'Results': 12,
-      'Purchases Conversion Value': 950000
+      'Impressions': 85000,
+      'Link Clicks': 980, // CTR 1.15% (< 2%) -> Buat konten 4K menarik
+      'Landing Page Views': 830,
+      'Adds to Cart': 340,
+      'Checkouts Initiated': 120,
+      'Results': 120,
+      'Purchases Conversion Value': 6000000
     },
     {
       'Nama Kampanye': 'Sedekah Yatim - Angle Teks Statis Tanpa Video',
@@ -652,7 +877,9 @@ function loadSampleMetaAdsData() {
       'Impressions': 21000,
       'Link Clicks': 210,
       'Landing Page Views': 130,
-      'Results': 7,
+      'Adds to Cart': 20,
+      'Checkouts Initiated': 8,
+      'Results': 7, // CPR Rp 121.428 (Boncos) -> STOP / KILL
       'Purchases Conversion Value': 400000
     }
   ];
@@ -682,7 +909,7 @@ function importSelectedToAdLab() {
       revenue: ad.revenue,
       hookType: 'Imported Winning Meta Ads',
       status: 'Active',
-      notes: `Lolos evaluasi SOP: CPR ${formatCurrency(ad.cpr)}, CTR ${ad.ctr.toFixed(2)}%.`
+      notes: `Lolos evaluasi SOP: CPR ${formatCurrency(ad.cpr)}, CTR ${ad.ctr.toFixed(2)}%, LC to LPV ${ad.lcToLpv}%.`
     });
   });
 
