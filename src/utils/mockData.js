@@ -426,9 +426,64 @@ export const initialRdKpis = [
     unit: "percent",
     status: "optimal",
     statusLabel: "Optimal",
+    funnelPhase: "Closing CS",
     actions: [
       "1. edukasi CS ( IHT, WS)",
       "2. Bonus Organik Perbesar nilai nya"
+    ]
+  },
+  {
+    no: 7,
+    id: "lc_to_lpv",
+    metric: "LC to LPV",
+    targetKpi: "80%",
+    hasProductPrice: false,
+    actualTarget: 80,
+    actualTargetFormatted: "80%",
+    currentValue: 82.5,
+    currentValueFormatted: "82.5%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    funnelPhase: "Loading LP",
+    actions: [
+      "Jika kurang, optimasi landing page agar lebih cepat"
+    ]
+  },
+  {
+    no: 8,
+    id: "lpv_to_atc",
+    metric: "LPV to ATC",
+    targetKpi: "40%",
+    hasProductPrice: false,
+    actualTarget: 40,
+    actualTargetFormatted: "40%",
+    currentValue: 41.2,
+    currentValueFormatted: "41.2%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    funnelPhase: "Copywriting LP",
+    actions: [
+      "Gunakan hypno writing di landingpage"
+    ]
+  },
+  {
+    no: 9,
+    id: "atc_to_ic",
+    metric: "ATC to IC",
+    targetKpi: "30%",
+    hasProductPrice: false,
+    actualTarget: 30,
+    actualTargetFormatted: "30%",
+    currentValue: 32.8,
+    currentValueFormatted: "32.8%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    funnelPhase: "Penawaran / Offer",
+    actions: [
+      "Beri penawaran menarik"
     ]
   }
 ];

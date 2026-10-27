@@ -55,6 +55,11 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           });
         }
 
+        let rdKpis = parsed.rdKpis;
+        if (!rdKpis || !Array.isArray(rdKpis) || rdKpis.length < 9) {
+          rdKpis = [...initialRdKpis];
+        }
+
         return {
           profile: profile || initialProfile,
           tasks: tasks || initialTasks,
@@ -63,7 +68,7 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           campaigns: parsed.campaigns || initialCampaigns,
           donationPrograms: donationPrograms || initialDonationPrograms,
           rdProductPrice: parsed.rdProductPrice !== undefined ? parsed.rdProductPrice : initialRdProductPrice,
-          rdKpis: parsed.rdKpis && parsed.rdKpis.length ? parsed.rdKpis : initialRdKpis,
+          rdKpis: rdKpis,
           activeTab: 'dashboard',
           currentDate: new Date().toISOString(),
           filterPeriod: 'q4-2026',
@@ -171,6 +176,18 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           // Fixed 82%
           actualTarget = 82;
           actualTargetFormatted = '82%';
+        } else if (kpi.id === 'lc_to_lpv') {
+          // Fixed 80%
+          actualTarget = 80;
+          actualTargetFormatted = '80%';
+        } else if (kpi.id === 'lpv_to_atc') {
+          // Fixed 40%
+          actualTarget = 40;
+          actualTargetFormatted = '40%';
+        } else if (kpi.id === 'atc_to_ic') {
+          // Fixed 30%
+          actualTarget = 30;
+          actualTargetFormatted = '30%';
         }
 
         // Clean metric name matching user marking
@@ -180,6 +197,9 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         else if (kpi.id === 'ctr') cleanMetric = 'CTR';
         else if (kpi.id === 'cpr') cleanMetric = 'CPR';
         else if (kpi.id === 'closing_rate') cleanMetric = 'Closing Rate CS';
+        else if (kpi.id === 'lc_to_lpv') cleanMetric = 'LC to LPV';
+        else if (kpi.id === 'lpv_to_atc') cleanMetric = 'LPV to ATC';
+        else if (kpi.id === 'atc_to_ic') cleanMetric = 'ATC to IC';
 
         return {
           ...kpi,

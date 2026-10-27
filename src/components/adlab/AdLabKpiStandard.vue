@@ -50,20 +50,22 @@
           <!-- View Mode Toggle -->
           <div class="flex items-center p-0.5 rounded-xl bg-teal-100/70 border border-teal-200/80 text-xs font-bold">
             <button
-              @click="viewMode = 'table'"
-              class="flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all"
-              :class="viewMode === 'table' ? 'bg-white text-teal-900 shadow-micro' : 'text-slate-600 hover:text-slate-900'"
+              @click="viewMode = 'vertical'"
+              class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
+              :class="viewMode === 'vertical' ? 'bg-white text-teal-900 shadow-micro font-extrabold' : 'text-slate-600 hover:text-slate-900'"
+              title="Formasi KPI Vertikal Ke Bawah"
             >
-              <Table2 class="w-3.5 h-3.5" />
-              <span>Tabel SOP</span>
+              <ArrowDownNarrowWide class="w-3.5 h-3.5 text-teal-700" />
+              <span>Formasi Ke Bawah</span>
             </button>
             <button
-              @click="viewMode = 'cards'"
-              class="flex items-center gap-1 px-2.5 py-1 rounded-lg transition-all"
-              :class="viewMode === 'cards' ? 'bg-white text-teal-900 shadow-micro' : 'text-slate-600 hover:text-slate-900'"
+              @click="viewMode = 'table'"
+              class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
+              :class="viewMode === 'table' ? 'bg-white text-teal-900 shadow-micro font-extrabold' : 'text-slate-600 hover:text-slate-900'"
+              title="Tabel SOP Lengkap (9 KPI)"
             >
-              <LayoutGrid class="w-3.5 h-3.5" />
-              <span>Kartu Ringkas</span>
+              <Table2 class="w-3.5 h-3.5 text-teal-700" />
+              <span>Tabel SOP (9 KPI)</span>
             </button>
           </div>
 
@@ -105,6 +107,18 @@
           <span class="inline-flex items-center gap-1">
             <span class="font-bold text-slate-700">Target Closing CS:</span>
             <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">82%</span>
+          </span>
+          <span class="inline-flex items-center gap-1">
+            <span class="font-bold text-slate-700">LC to LPV:</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">80%</span>
+          </span>
+          <span class="inline-flex items-center gap-1">
+            <span class="font-bold text-slate-700">LPV to ATC:</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">40%</span>
+          </span>
+          <span class="inline-flex items-center gap-1">
+            <span class="font-bold text-slate-700">ATC to IC:</span>
+            <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 font-extrabold text-[11px] border border-blue-200">30%</span>
           </span>
         </div>
         <button
@@ -245,6 +259,34 @@
                       <p>2. Bonus Organik Perbesar nilai nya</p>
                     </div>
                   </template>
+
+                  <template v-else-if="item.id === 'lc_to_lpv'">
+                    <p class="flex items-center gap-1.5 text-slate-700 font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
+                      <span>Jika kurang, optimasi landing page agar lebih cepat</span>
+                    </p>
+                  </template>
+
+                  <template v-else-if="item.id === 'lpv_to_atc'">
+                    <p class="flex items-center gap-1.5 text-slate-700 font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
+                      <span>Gunakan hypno writing di landingpage</span>
+                    </p>
+                  </template>
+
+                  <template v-else-if="item.id === 'atc_to_ic'">
+                    <p class="flex items-center gap-1.5 text-slate-700 font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
+                      <span>Beri penawaran menarik</span>
+                    </p>
+                  </template>
+
+                  <template v-else>
+                    <p v-for="(act, aIdx) in item.actions" :key="aIdx" class="flex items-center gap-1.5 text-slate-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
+                      <span>{{ act }}</span>
+                    </p>
+                  </template>
                 </div>
               </td>
             </tr>
@@ -252,54 +294,116 @@
         </table>
       </div>
 
-      <!-- VIEW 2: KARTU RINGKASAN (CARDS VIEW) -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- VIEW 2: FORMASI KE BAWAH (KARTU VERTIKAL & ALUR FUNNEL MENURUN) -->
+      <div v-else class="space-y-3 max-w-4xl mx-auto">
         <div
-          v-for="item in kpiList"
+          v-for="(item, idx) in kpiList"
           :key="item.no"
-          class="p-4 rounded-xl bg-white border border-teal-100/90 shadow-micro hover:border-teal-300 transition-all flex flex-col justify-between"
+          class="relative"
         >
-          <div>
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
-              <span class="font-bold text-slate-400">#{{ item.no }} Metric</span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
-                Formula: {{ item.targetKpi }}
-              </span>
+          <!-- Downward Funnel Connector Indicator between cards -->
+          <div
+            v-if="idx < kpiList.length - 1"
+            class="flex items-center justify-center -my-1.5 relative z-0"
+          >
+            <div class="w-5 h-5 rounded-full bg-teal-100/90 text-teal-700 flex items-center justify-center text-[10px] font-bold border border-teal-200 shadow-micro">
+              <ArrowDown class="w-3 h-3" />
             </div>
+          </div>
 
-            <div class="mt-2.5">
-              <h4 class="text-base font-extrabold text-slate-800">{{ item.metric }}</h4>
-              <div class="flex items-center justify-between mt-2 p-2.5 rounded-lg bg-blue-50/70 border border-blue-100">
-                <div>
-                  <span class="text-[10px] text-slate-500 font-medium block">Actual Target KPI:</span>
-                  <span class="text-base font-black text-blue-900">{{ item.actualTargetFormatted }}</span>
+          <!-- Vertical Card Item -->
+          <div class="relative z-10 p-4 rounded-2xl bg-white border border-teal-100/90 shadow-micro hover:border-teal-300 hover:shadow-soft transition-all space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <!-- Left: Metric Badge, Name, Formula & Price -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200 text-teal-800 font-black flex items-center justify-center text-xs shadow-micro shrink-0">
+                  #{{ item.no }}
                 </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-slate-500 font-medium block">Harga Jual:</span>
-                  <span class="text-xs font-bold text-slate-700">
-                    {{ item.hasProductPrice ? formatCurrency(store.rdProductPrice) : '-' }}
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <h4 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight">{{ item.metric }}</h4>
+                    <span v-if="item.funnelPhase" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                      {{ item.funnelPhase }}
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-0.5">
+                    <span>Target Formula: <strong class="text-slate-700 font-semibold">{{ item.targetKpi }}</strong></span>
+                    <span v-if="item.hasProductPrice" class="text-slate-300">•</span>
+                    <span v-if="item.hasProductPrice" class="inline-flex items-center gap-1 cursor-pointer text-teal-800 hover:underline" @click="openPriceModal" title="Klik untuk ubah harga jual">
+                      <span>Harga: <strong>{{ item.productPriceFormatted || formatCurrency(store.rdProductPrice) }}</strong></span>
+                      <Edit2 class="w-2.5 h-2.5 text-teal-600" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Actual Target KPI (Blue High-Contrast Badge) -->
+              <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                <div class="text-left sm:text-right">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Actual Target KPI</span>
+                  <span class="inline-block px-3 py-1 rounded-xl bg-blue-100/90 text-blue-900 border border-blue-200 font-black text-sm tracking-tight shadow-micro">
+                    {{ item.actualTargetFormatted }}
                   </span>
                 </div>
               </div>
             </div>
 
-            <!-- Action Guideline -->
-            <div class="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px]">
-              <span class="font-bold text-rose-700 block mb-1">Aksi Jika Tidak Tercapai:</span>
-              <ul class="text-slate-600 space-y-1 list-disc list-inside">
-                <li v-for="(act, idx) in item.actions" :key="idx" class="leading-relaxed">
-                  {{ act }}
-                </li>
-              </ul>
+            <!-- Bottom: Aksi Bila Tidak Tercapai (Curative Action) -->
+            <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50/90 border border-slate-200/80 text-xs">
+              <div class="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2">
+                <span class="text-[11px] font-bold text-rose-700 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                  <AlertCircle class="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                  <span>Aksi Bila Kurang / Tidak Tercapai:</span>
+                </span>
+                <div class="text-slate-700 font-medium flex-1">
+                  <template v-if="item.id === 'cpc'">
+                    <span class="inline-flex items-center gap-1 mr-3 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> perbaiki konten</span>
+                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> tambah konten baru</span>
+                  </template>
+                  <template v-else-if="item.id === 'cost_lpv'">
+                    <span class="inline-flex items-center gap-1 mr-3 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> perbaiki kecepatan LP</span>
+                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> pake lazyload, website booster</span>
+                  </template>
+                  <template v-else-if="item.id === 'cpm'">
+                    <span class="text-rose-800 font-semibold bg-rose-100/60 px-2 py-0.5 rounded border border-rose-200">
+                      tunggu 2-3 hari / masih jelek kill
+                    </span>
+                  </template>
+                  <template v-else-if="item.id === 'ctr'">
+                    <span class="font-semibold text-slate-800">bikin konten yang lebih menarik (komen, share, like)</span>
+                    <span class="text-slate-500 text-[11px] block mt-0.5">• Ciri-ciri: 1. kualitas 4K, 2. Informatif, 3. Menarik, 4. Lucu/humor</span>
+                  </template>
+                  <template v-else-if="item.id === 'cpr'">
+                    <span class="font-bold text-slate-800">Perbaiki Website:</span>
+                    <span class="text-slate-600 text-[11px] block mt-0.5">1. Desain website pro • 2. Offer (penawaran : bonus) • 3. Harga coba turunin jika &lt; 1 pekan • 4. Persingkat tampilan web</span>
+                  </template>
+                  <template v-else-if="item.id === 'closing_rate'">
+                    <span class="text-slate-700 text-[11px]">1. Edukasi CS (IHT, WS) • 2. Bonus Organik perbesar nilainya</span>
+                  </template>
+                  <template v-else-if="item.id === 'lc_to_lpv'">
+                    <span class="font-bold text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                      Jika kurang, optimasi landing page agar lebih cepat
+                    </span>
+                  </template>
+                  <template v-else-if="item.id === 'lpv_to_atc'">
+                    <span class="font-bold text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                      Gunakan hypno writing di landingpage
+                    </span>
+                  </template>
+                  <template v-else-if="item.id === 'atc_to_ic'">
+                    <span class="font-bold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Beri penawaran menarik
+                    </span>
+                  </template>
+                  <template v-else>
+                    <span v-for="(act, aIdx) in item.actions" :key="aIdx" class="mr-2">
+                      {{ act }}
+                    </span>
+                  </template>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-            <span class="text-slate-400">SOP Standar Ads</span>
-            <span class="text-emerald-700 font-bold flex items-center gap-1">
-              <CheckCircle class="w-3.5 h-3.5" />
-              <span>Standar Aktif</span>
-            </span>
           </div>
         </div>
       </div>
@@ -387,7 +491,9 @@ import {
   FlaskConical,
   Tag,
   Table2,
-  LayoutGrid,
+  ArrowDownNarrowWide,
+  ArrowDown,
+  AlertCircle,
   ChevronUp,
   ChevronDown,
   Edit2,
@@ -398,7 +504,7 @@ import {
 
 const store = useGrowthFlowStore();
 
-const viewMode = ref('table'); // 'table' | 'cards'
+const viewMode = ref('vertical'); // 'vertical' (formasi ke bawah) | 'table' (tabel SOP)
 const isCollapsed = ref(false);
 const isPriceModalOpen = ref(false);
 const isEvaluatorModalOpen = ref(false);

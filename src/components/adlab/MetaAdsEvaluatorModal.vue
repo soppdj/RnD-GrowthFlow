@@ -518,6 +518,7 @@ function processRawRows(rows) {
     const cpm = impressions > 0 ? Math.round((spend / impressions) * 1000) : 0;
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
     const cpr = resultsCount > 0 ? Math.round(spend / resultsCount) : spend;
+    const lcToLpv = clicks > 0 ? ((lpViews / clicks) * 100) : 0;
 
     // Decision Engine Logic based on user SOP
     let decision = 'STOP';
@@ -567,6 +568,10 @@ function processRawRows(rows) {
       actionSOP = 'SOP: Segera matikan kampanye! Evaluasi ulang materi video 4K atau perbaiki alur landing page donasi.';
     }
 
+    if (clicks > 0 && lcToLpv < 80) {
+      actionSOP += ` | LC to LPV ${lcToLpv.toFixed(0)}% (< 80%): optimasi landing page agar lebih cepat.`;
+    }
+
     return {
       name,
       spend,
@@ -580,6 +585,7 @@ function processRawRows(rows) {
       cpm,
       ctr,
       cpr,
+      lcToLpv,
       decision,
       decisionIcon,
       decisionLabel,
