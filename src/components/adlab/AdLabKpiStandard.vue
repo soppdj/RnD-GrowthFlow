@@ -50,22 +50,22 @@
           <!-- View Mode Toggle -->
           <div class="flex items-center p-0.5 rounded-xl bg-teal-100/70 border border-teal-200/80 text-xs font-bold">
             <button
-              @click="viewMode = 'vertical'"
+              @click="viewMode = 'compact'"
               class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
-              :class="viewMode === 'vertical' ? 'bg-white text-teal-900 shadow-micro font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              title="Formasi KPI Vertikal Ke Bawah"
-            >
-              <ArrowDownNarrowWide class="w-3.5 h-3.5 text-teal-700" />
-              <span>Formasi Ke Bawah</span>
-            </button>
-            <button
-              @click="viewMode = 'table'"
-              class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
-              :class="viewMode === 'table' ? 'bg-white text-teal-900 shadow-micro font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              title="Tabel SOP Lengkap (9 KPI)"
+              :class="viewMode === 'compact' ? 'bg-white text-teal-900 shadow-micro font-extrabold' : 'text-slate-600 hover:text-slate-900'"
+              title="Tabel Minimalis (Formasi Ke Bawah)"
             >
               <Table2 class="w-3.5 h-3.5 text-teal-700" />
-              <span>Tabel SOP (9 KPI)</span>
+              <span>Tabel Minimalis</span>
+            </button>
+            <button
+              @click="viewMode = 'excel'"
+              class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
+              :class="viewMode === 'excel' ? 'bg-white text-teal-900 shadow-micro font-extrabold' : 'text-slate-600 hover:text-slate-900'"
+              title="Tabel Format Excel (6 Kolom Lengkap)"
+            >
+              <FileSpreadsheet class="w-3.5 h-3.5 text-teal-700" />
+              <span>Format Excel</span>
             </button>
           </div>
 
@@ -132,19 +132,151 @@
 
     <!-- Expanded Body Content -->
     <div v-show="!isCollapsed" class="p-4 sm:p-5">
-      <!-- VIEW 1: TABEL SOP EXCEL (PERSIS DENGAN GAMBAR ACUAN) -->
-      <div v-if="viewMode === 'table'" class="overflow-x-auto rounded-xl border border-teal-200/80 shadow-sm bg-white">
+      <!-- VIEW 1: TABEL MINIMALIS (FORMASI KE BAWAH, 4 KOLOM COMPACT) -->
+      <div v-if="viewMode === 'compact'" class="overflow-x-auto rounded-xl border border-teal-200/80 shadow-sm bg-white">
+        <table class="w-full text-left text-xs text-slate-700 border-collapse">
+          <thead>
+            <tr class="bg-gradient-to-r from-teal-800 to-teal-900 text-white font-bold text-[11px] uppercase tracking-wider">
+              <th scope="col" class="py-2.5 px-3 w-10 text-center border-r border-teal-700/50">#</th>
+              <th scope="col" class="py-2.5 px-3.5 w-56 sm:w-64 border-r border-teal-700/50">KPI METRIC &amp; FORMULA</th>
+              <th scope="col" class="py-2.5 px-3 w-32 sm:w-36 text-center bg-blue-600/90 text-white border-r border-blue-500 shadow-inner">
+                ACTUAL TARGET KPI
+              </th>
+              <th scope="col" class="py-2.5 px-3.5">AKSI BILA TIDAK TERCAPAI (SOP KURATIF)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-medium">
+            <tr
+              v-for="item in kpiList"
+              :key="item.no"
+              class="hover:bg-teal-50/40 transition-colors group"
+            >
+              <!-- 1. No -->
+              <td class="py-2.5 px-3 text-center font-bold text-slate-400 border-r border-slate-100 bg-slate-50/60 text-xs">
+                {{ item.no }}
+              </td>
+
+              <!-- 2. KPI Metric & Formula (Formasi Ke Bawah) -->
+              <td class="py-2.5 px-3.5 border-r border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                  <span class="font-extrabold text-slate-800 text-xs tracking-tight">{{ item.metric }}</span>
+                  <span v-if="item.funnelPhase" class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200/60">
+                    {{ item.funnelPhase }}
+                  </span>
+                </div>
+                <!-- Formula & Harga Jual disusun ke bawah -->
+                <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5 pl-4">
+                  <span>Formula: <strong class="text-slate-700 font-semibold">{{ item.targetKpi }}</strong></span>
+                  <template v-if="item.hasProductPrice">
+                    <span class="text-slate-300">•</span>
+                    <button
+                      type="button"
+                      @click="openPriceModal"
+                      class="inline-flex items-center gap-0.5 text-teal-800 hover:text-teal-900 hover:underline font-semibold"
+                      title="Klik untuk ubah acuan harga jual"
+                    >
+                      <span>({{ item.productPriceFormatted || formatCurrency(store.rdProductPrice) }})</span>
+                      <Edit2 class="w-2.5 h-2.5 text-teal-600 opacity-60 group-hover:opacity-100" />
+                    </button>
+                  </template>
+                </div>
+              </td>
+
+              <!-- 3. Actual Target KPI (Badge Biru Minimalis) -->
+              <td class="py-2.5 px-3 text-center border-r border-blue-100 bg-blue-50/50">
+                <span class="inline-block px-2.5 py-1 rounded-lg bg-blue-100/90 text-blue-900 border border-blue-200 font-black text-xs shadow-micro tracking-tight">
+                  {{ item.actualTargetFormatted }}
+                </span>
+              </td>
+
+              <!-- 4. Aksi Bila Tidak Tercapai (Minimalis) -->
+              <td class="py-2.5 px-3.5 text-xs text-slate-700">
+                <template v-if="item.id === 'cpc'">
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px]">
+                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> perbaiki konten</span>
+                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> tambah konten baru</span>
+                  </div>
+                </template>
+
+                <template v-else-if="item.id === 'cost_lpv'">
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px]">
+                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> perbaiki kecepatan LP</span>
+                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> pake lazyload, website booster</span>
+                  </div>
+                </template>
+
+                <template v-else-if="item.id === 'cpm'">
+                  <span class="inline-block px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-semibold">
+                    tunggu 2-3 hari / masih jelek kill
+                  </span>
+                </template>
+
+                <template v-else-if="item.id === 'ctr'">
+                  <div class="text-[11px]">
+                    <span class="font-semibold text-slate-800">bikin konten yang lebih menarik (komen, share, like)</span>
+                    <span class="text-slate-500 text-[10px] ml-1.5">• Ciri: 1. kualitas 4K, 2. Informatif, 3. Menarik, 4. Lucu</span>
+                  </div>
+                </template>
+
+                <template v-else-if="item.id === 'cpr'">
+                  <div class="text-[11px]">
+                    <span class="font-bold text-slate-800">Perbaiki Website:</span>
+                    <span class="text-slate-600 text-[10px] ml-1.5">1. Desain pro • 2. Offer (bonus) • 3. Harga • 4. Persingkat alur</span>
+                  </div>
+                </template>
+
+                <template v-else-if="item.id === 'closing_rate'">
+                  <div class="flex flex-wrap items-center gap-x-3 text-[11px] text-slate-700">
+                    <span>1. Edukasi CS (IHT, WS)</span>
+                    <span>2. Bonus Organik perbesar nilainya</span>
+                  </div>
+                </template>
+
+                <template v-else-if="item.id === 'lc_to_lpv'">
+                  <span class="inline-block font-bold text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 text-[11px]">
+                    Jika kurang, optimasi landing page agar lebih cepat
+                  </span>
+                </template>
+
+                <template v-else-if="item.id === 'lpv_to_atc'">
+                  <span class="inline-block font-bold text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 text-[11px]">
+                    Gunakan hypno writing di landingpage
+                  </span>
+                </template>
+
+                <template v-else-if="item.id === 'atc_to_ic'">
+                  <span class="inline-block font-bold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
+                    Beri penawaran menarik
+                  </span>
+                </template>
+
+                <template v-else>
+                  <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                    <span v-for="(act, aIdx) in item.actions" :key="aIdx" class="mr-2">
+                      {{ act }}
+                    </span>
+                  </div>
+                </template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VIEW 2: TABEL FORMAT EXCEL (6 KOLOM LENGKAP) -->
+      <div v-else class="overflow-x-auto rounded-xl border border-teal-200/80 shadow-sm bg-white">
         <table class="w-full text-left text-xs text-slate-700 border-collapse">
           <thead>
             <tr class="bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-800 text-white font-extrabold text-[11px] uppercase tracking-wider">
-              <th scope="col" class="py-3 px-3 w-12 text-center border-r border-teal-600/50">NO</th>
-              <th scope="col" class="py-3 px-4 w-44 border-r border-teal-600/50">KPI METRIC</th>
-              <th scope="col" class="py-3 px-4 w-40 border-r border-teal-600/50">TARGET KPI</th>
-              <th scope="col" class="py-3 px-4 w-40 border-r border-teal-600/50">HARGA JUAL</th>
-              <th scope="col" class="py-3 px-4 w-36 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
+              <th scope="col" class="py-2.5 px-3 w-12 text-center border-r border-teal-600/50">NO</th>
+              <th scope="col" class="py-2.5 px-4 w-44 border-r border-teal-600/50">KPI METRIC</th>
+              <th scope="col" class="py-2.5 px-4 w-40 border-r border-teal-600/50">TARGET KPI</th>
+              <th scope="col" class="py-2.5 px-4 w-40 border-r border-teal-600/50">HARGA JUAL</th>
+              <th scope="col" class="py-2.5 px-4 w-36 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
                 ACTUAL TARGET KPI
               </th>
-              <th scope="col" class="py-3 px-4">AKSI BILA TIDAK TERCAPAI</th>
+              <th scope="col" class="py-2.5 px-4">AKSI BILA TIDAK TERCAPAI</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 font-medium">
@@ -154,12 +286,12 @@
               class="hover:bg-teal-50/30 transition-colors"
             >
               <!-- 1. No -->
-              <td class="py-3.5 px-3 text-center font-bold text-slate-500 border-r border-slate-100 bg-slate-50/50">
+              <td class="py-2.5 px-3 text-center font-bold text-slate-500 border-r border-slate-100 bg-slate-50/50">
                 {{ item.no }}
               </td>
 
               <!-- 2. KPI Metric -->
-              <td class="py-3.5 px-4 font-bold text-slate-800 border-r border-slate-100">
+              <td class="py-2.5 px-4 font-bold text-slate-800 border-r border-slate-100">
                 <div class="flex items-center gap-2">
                   <span
                     class="w-2 h-2 rounded-full"
@@ -170,15 +302,15 @@
               </td>
 
               <!-- 3. Target KPI -->
-              <td class="py-3.5 px-4 text-slate-600 border-r border-slate-100">
+              <td class="py-2.5 px-4 text-slate-600 border-r border-slate-100">
                 <span class="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-semibold">
                   {{ item.targetKpi }}
                 </span>
               </td>
 
-              <!-- 4. Harga Jual (Interactive click to edit) -->
+              <!-- 4. Harga Jual -->
               <td
-                class="py-3.5 px-4 text-slate-600 border-r border-slate-100 transition-colors"
+                class="py-2.5 px-4 text-slate-600 border-r border-slate-100 transition-colors"
                 :class="item.hasProductPrice ? 'cursor-pointer hover:bg-teal-50/60 group' : ''"
                 @click="item.hasProductPrice ? openPriceModal() : null"
                 :title="item.hasProductPrice ? 'Klik untuk ubah Harga Jual' : ''"
@@ -192,15 +324,15 @@
                 <span v-else class="text-slate-400 font-normal italic">-</span>
               </td>
 
-              <!-- 5. Actual Target KPI (Highlighted in blue like Excel image, auto-calculated) -->
-              <td class="py-3.5 px-4 text-center font-black border-r border-blue-100 bg-blue-50/70 text-blue-900 text-sm">
+              <!-- 5. Actual Target KPI -->
+              <td class="py-2.5 px-4 text-center font-black border-r border-blue-100 bg-blue-50/70 text-blue-900 text-sm">
                 <span class="px-2.5 py-1 rounded-lg bg-blue-100/90 border border-blue-200 block shadow-micro tracking-tight">
                   {{ item.actualTargetFormatted }}
                 </span>
               </td>
 
               <!-- 6. Aksi Bila Tidak Tercapai -->
-              <td class="py-3.5 px-4 text-slate-700 text-xs">
+              <td class="py-2.5 px-4 text-slate-700 text-xs">
                 <div class="space-y-1">
                   <template v-if="item.id === 'cpc'">
                     <p class="flex items-center gap-1.5 text-slate-700">
@@ -293,120 +425,6 @@
           </tbody>
         </table>
       </div>
-
-      <!-- VIEW 2: FORMASI KE BAWAH (KARTU VERTIKAL & ALUR FUNNEL MENURUN) -->
-      <div v-else class="space-y-3 max-w-4xl mx-auto">
-        <div
-          v-for="(item, idx) in kpiList"
-          :key="item.no"
-          class="relative"
-        >
-          <!-- Downward Funnel Connector Indicator between cards -->
-          <div
-            v-if="idx < kpiList.length - 1"
-            class="flex items-center justify-center -my-1.5 relative z-0"
-          >
-            <div class="w-5 h-5 rounded-full bg-teal-100/90 text-teal-700 flex items-center justify-center text-[10px] font-bold border border-teal-200 shadow-micro">
-              <ArrowDown class="w-3 h-3" />
-            </div>
-          </div>
-
-          <!-- Vertical Card Item -->
-          <div class="relative z-10 p-4 rounded-2xl bg-white border border-teal-100/90 shadow-micro hover:border-teal-300 hover:shadow-soft transition-all space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <!-- Left: Metric Badge, Name, Formula & Price -->
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200 text-teal-800 font-black flex items-center justify-center text-xs shadow-micro shrink-0">
-                  #{{ item.no }}
-                </div>
-                <div>
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <h4 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight">{{ item.metric }}</h4>
-                    <span v-if="item.funnelPhase" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                      {{ item.funnelPhase }}
-                    </span>
-                  </div>
-                  <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-0.5">
-                    <span>Target Formula: <strong class="text-slate-700 font-semibold">{{ item.targetKpi }}</strong></span>
-                    <span v-if="item.hasProductPrice" class="text-slate-300">•</span>
-                    <span v-if="item.hasProductPrice" class="inline-flex items-center gap-1 cursor-pointer text-teal-800 hover:underline" @click="openPriceModal" title="Klik untuk ubah harga jual">
-                      <span>Harga: <strong>{{ item.productPriceFormatted || formatCurrency(store.rdProductPrice) }}</strong></span>
-                      <Edit2 class="w-2.5 h-2.5 text-teal-600" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right: Actual Target KPI (Blue High-Contrast Badge) -->
-              <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                <div class="text-left sm:text-right">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Actual Target KPI</span>
-                  <span class="inline-block px-3 py-1 rounded-xl bg-blue-100/90 text-blue-900 border border-blue-200 font-black text-sm tracking-tight shadow-micro">
-                    {{ item.actualTargetFormatted }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bottom: Aksi Bila Tidak Tercapai (Curative Action) -->
-            <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50/90 border border-slate-200/80 text-xs">
-              <div class="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2">
-                <span class="text-[11px] font-bold text-rose-700 uppercase tracking-wider shrink-0 flex items-center gap-1">
-                  <AlertCircle class="w-3.5 h-3.5 text-rose-600 shrink-0" />
-                  <span>Aksi Bila Kurang / Tidak Tercapai:</span>
-                </span>
-                <div class="text-slate-700 font-medium flex-1">
-                  <template v-if="item.id === 'cpc'">
-                    <span class="inline-flex items-center gap-1 mr-3 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> perbaiki konten</span>
-                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> tambah konten baru</span>
-                  </template>
-                  <template v-else-if="item.id === 'cost_lpv'">
-                    <span class="inline-flex items-center gap-1 mr-3 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> perbaiki kecepatan LP</span>
-                    <span class="inline-flex items-center gap-1 text-slate-700"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> pake lazyload, website booster</span>
-                  </template>
-                  <template v-else-if="item.id === 'cpm'">
-                    <span class="text-rose-800 font-semibold bg-rose-100/60 px-2 py-0.5 rounded border border-rose-200">
-                      tunggu 2-3 hari / masih jelek kill
-                    </span>
-                  </template>
-                  <template v-else-if="item.id === 'ctr'">
-                    <span class="font-semibold text-slate-800">bikin konten yang lebih menarik (komen, share, like)</span>
-                    <span class="text-slate-500 text-[11px] block mt-0.5">• Ciri-ciri: 1. kualitas 4K, 2. Informatif, 3. Menarik, 4. Lucu/humor</span>
-                  </template>
-                  <template v-else-if="item.id === 'cpr'">
-                    <span class="font-bold text-slate-800">Perbaiki Website:</span>
-                    <span class="text-slate-600 text-[11px] block mt-0.5">1. Desain website pro • 2. Offer (penawaran : bonus) • 3. Harga coba turunin jika &lt; 1 pekan • 4. Persingkat tampilan web</span>
-                  </template>
-                  <template v-else-if="item.id === 'closing_rate'">
-                    <span class="text-slate-700 text-[11px]">1. Edukasi CS (IHT, WS) • 2. Bonus Organik perbesar nilainya</span>
-                  </template>
-                  <template v-else-if="item.id === 'lc_to_lpv'">
-                    <span class="font-bold text-teal-900 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                      Jika kurang, optimasi landing page agar lebih cepat
-                    </span>
-                  </template>
-                  <template v-else-if="item.id === 'lpv_to_atc'">
-                    <span class="font-bold text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
-                      Gunakan hypno writing di landingpage
-                    </span>
-                  </template>
-                  <template v-else-if="item.id === 'atc_to_ic'">
-                    <span class="font-bold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      Beri penawaran menarik
-                    </span>
-                  </template>
-                  <template v-else>
-                    <span v-for="(act, aIdx) in item.actions" :key="aIdx" class="mr-2">
-                      {{ act }}
-                    </span>
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- MODAL EDIT HARGA JUAL -->
@@ -491,20 +509,17 @@ import {
   FlaskConical,
   Tag,
   Table2,
-  ArrowDownNarrowWide,
-  ArrowDown,
-  AlertCircle,
+  FileSpreadsheet,
   ChevronUp,
   ChevronDown,
   Edit2,
   CheckCircle,
-  FileSpreadsheet,
   X
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 
-const viewMode = ref('vertical'); // 'vertical' (formasi ke bawah) | 'table' (tabel SOP)
+const viewMode = ref('compact'); // 'compact' (tabel minimalis ke bawah) | 'excel' (tabel format excel 6 kolom)
 const isCollapsed = ref(false);
 const isPriceModalOpen = ref(false);
 const isEvaluatorModalOpen = ref(false);
