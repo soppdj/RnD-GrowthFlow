@@ -25,7 +25,7 @@
             R&amp;D GrowthFlow Access
           </h2>
           <p class="text-xs text-teal-300/80 font-medium mt-1">
-            Gateway Otentikasi Khusus Divisi R&amp;D Digital Marketing
+            Pusat Akses &amp; Kendali Riset Inovasi Digital Marketing
           </p>
         </div>
       </div>
@@ -55,7 +55,7 @@
             {{ store.profile.role }}
           </p>
           <p class="text-[10px] text-slate-400 truncate">
-            {{ store.profile.organization }} • Bandung Barat
+            {{ store.profile.organization }} Bandung Barat
           </p>
         </div>
       </div>
@@ -67,7 +67,6 @@
             <label class="text-xs font-bold text-teal-200 uppercase tracking-wider">
               Masukkan PIN Akses R&amp;D
             </label>
-            <span class="text-[11px] text-slate-400 font-mono">Default: 2026</span>
           </div>
 
           <div class="relative">
@@ -75,8 +74,8 @@
               ref="pinInputRef"
               v-model="pinInput"
               :type="showPassword ? 'text' : 'password'"
-              maxlength="10"
-              placeholder="••••"
+              maxlength="6"
+              placeholder="••••••"
               class="w-full px-4 py-3 rounded-xl bg-slate-950/70 border text-center text-xl font-mono tracking-widest outline-none transition-all focus:ring-2"
               :class="isError 
                 ? 'border-rose-500 text-rose-300 focus:ring-rose-400' 
@@ -93,11 +92,11 @@
           </div>
 
           <p v-if="isError" class="text-[11px] text-rose-400 font-semibold mt-1.5 text-center">
-            ⚠️ PIN salah! Gunakan PIN default 2026 atau verifikasi cepat di bawah.
+            ⚠️ PIN salah! Masukkan 6 digit PIN akses.
           </p>
         </div>
 
-        <!-- Quick One-Touch Access Button -->
+        <!-- Quick Access Button -->
         <button
           type="submit"
           class="w-full py-3 rounded-xl font-extrabold text-sm text-white bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-500 hover:from-teal-500 hover:to-emerald-500 shadow-lg shadow-teal-900/40 transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
@@ -105,21 +104,6 @@
           <LockKeyholeOpen class="w-4 h-4" />
           <span>Buka Workspace R&amp;D</span>
         </button>
-
-        <!-- Alternative: Instant Biometric / One-Click Lead Verification -->
-        <div class="pt-2 text-center border-t border-white/10 space-y-2">
-          <p class="text-[11px] text-slate-400">
-            Akses langsung khusus Lead R&amp;D (Sopianto Djahar):
-          </p>
-          <button
-            type="button"
-            @click="handleInstantBypass"
-            class="w-full py-2.5 px-3 rounded-xl border border-teal-500/40 bg-teal-500/10 hover:bg-teal-500/20 text-teal-200 text-xs font-bold transition-all flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
-          >
-            <ShieldCheck class="w-4 h-4 text-emerald-400" />
-            <span>Verifikasi Kilat Akun Sopianto Djahar</span>
-          </button>
-        </div>
       </form>
 
       <!-- Security Notice Footer -->
@@ -134,11 +118,9 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
-import { useConfetti } from '@/composables/useConfetti';
 import AppLogo from '@/components/common/AppLogo.vue';
 import {
   LockKeyholeOpen,
-  ShieldCheck,
   Shield,
   Eye,
   EyeOff
@@ -154,14 +136,13 @@ const props = defineProps({
 const emit = defineEmits(['authenticated']);
 
 const store = useGrowthFlowStore();
-const { triggerConfetti } = useConfetti();
 
 const pinInput = ref('');
 const isError = ref(false);
 const showPassword = ref(false);
 const pinInputRef = ref(null);
 
-const DEFAULT_PINS = ['2026', '1928', 'rnd2026', 'admin'];
+const DEFAULT_PINS = ['000000', '2026', '1928', 'rnd2026', 'admin'];
 
 function handlePinSubmit() {
   const entered = pinInput.value.trim();
@@ -175,15 +156,10 @@ function handlePinSubmit() {
   }
 }
 
-function handleInstantBypass() {
-  unlockSuccess();
-}
-
 function unlockSuccess() {
   isError.value = false;
   localStorage.setItem('rnd_growthflow_authenticated', 'true');
   localStorage.setItem('rnd_growthflow_last_login', new Date().toISOString());
-  triggerConfetti();
   emit('authenticated');
 }
 

@@ -121,7 +121,6 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
-import { useConfetti } from '@/composables/useConfetti';
 import AppLogo from '@/components/common/AppLogo.vue';
 import {
   X,
@@ -138,7 +137,6 @@ defineProps({
 const emit = defineEmits(['close']);
 
 const store = useGrowthFlowStore();
-const { triggerConfetti } = useConfetti();
 
 const alwaysShowWelcome = ref(localStorage.getItem('rnd_always_show_welcome') !== 'false');
 
@@ -163,7 +161,6 @@ function toggleAlwaysShow() {
 }
 
 function enterWorkspace() {
-  triggerConfetti();
   emit('close');
 }
 

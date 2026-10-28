@@ -27,18 +27,8 @@
         </div>
       </div>
 
-      <!-- Right: Online Status, Welcoming, Tambah Task, & Profile Card -->
+      <!-- Right: Online Status, Lock Session, Tambah Task, & Profile Card -->
       <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
-        <!-- Welcoming Animation Screen Trigger -->
-        <button
-          @click="$emit('open-welcoming')"
-          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/80 shadow-micro transition-all cursor-pointer"
-          title="Tampilkan Layar Welcoming R&D"
-        >
-          <Sparkles class="w-3.5 h-3.5 text-teal-600" />
-          <span class="hidden sm:inline">Welcoming</span>
-        </button>
-
         <!-- Lock / Re-authenticate Session Button -->
         <button
           @click="$emit('open-login')"
@@ -103,9 +93,9 @@
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { useSupabase } from '@/composables/useSupabase';
 import AppLogo from '@/components/common/AppLogo.vue';
-import { Menu, PlusCircle, Sparkles, Lock } from 'lucide-vue-next';
+import { Menu, PlusCircle, Lock } from 'lucide-vue-next';
 
-defineEmits(['toggle-mobile-menu', 'quick-add-task', 'open-welcoming', 'open-login']);
+defineEmits(['toggle-mobile-menu', 'quick-add-task', 'open-login']);
 
 const store = useGrowthFlowStore();
 const { isOnline } = useSupabase();
