@@ -331,15 +331,15 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "perbaiki konten",
-      "tambah konten baru"
+      "Perbaiki konten kreatif",
+      "Tambah variasi konten baru"
     ]
   },
   {
     no: 2,
     id: "cost_lpv",
     metric: "Cost LPV",
-    targetKpi: "2 - 3% harga jual",
+    targetKpi: "2 - 3% Harga Jual",
     hasProductPrice: true,
     actualTarget: 1500,
     actualTargetFormatted: "Rp1,500",
@@ -349,15 +349,15 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "perbaiki kecepatan LP",
-      "pake lazyload, wesite boster"
+      "Perbaiki kecepatan landing page",
+      "Gunakan lazy load, website booster"
     ]
   },
   {
     no: 3,
     id: "cpm",
     metric: "CPM",
-    targetKpi: "32 K OBJECTIVE SALES",
+    targetKpi: "32K Objective Sales",
     hasProductPrice: true,
     actualTarget: 32000,
     actualTargetFormatted: "Rp32,000",
@@ -367,36 +367,36 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "tunggu 2-3 hari / masih jelek kill"
+      "Tunggu 2-3 hari evaluasi stabilisasi algoritma; jika tetap buruk, segera matikan (kill)"
     ]
   },
   {
     no: 4,
     id: "ctr",
     metric: "CTR",
-    targetKpi: "diatas 2%",
+    targetKpi: "> 2%",
     hasProductPrice: true,
     actualTarget: 2.0,
-    actualTargetFormatted: "diatas 2%",
+    actualTargetFormatted: "> 2%",
     currentValue: 2.85,
     currentValueFormatted: "2.85%",
     unit: "percent",
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "bikin konten yang lebih menarik (komen,share,like)",
-      "ciri - ciri :",
-      "1. kualitas konten 4K",
-      "2. Konten Informatif",
-      "3. Konten Menarik",
-      "4. Konten Lucu/humor"
+      "Buat konten yang lebih menarik (komentar, share, like)",
+      "Ciri-ciri:",
+      "1. Kualitas konten 4K",
+      "2. Konten informatif",
+      "3. Konten menarik",
+      "4. Konten lucu / humor"
     ]
   },
   {
     no: 5,
     id: "cpr",
     metric: "CPR",
-    targetKpi: "25% Harga jual",
+    targetKpi: "25% Harga Jual",
     hasProductPrice: true,
     actualTarget: 12500,
     actualTargetFormatted: "Rp12,500",
@@ -406,11 +406,11 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Perbaiki Website :",
-      "1. design website (pro)",
-      "2. Offer (penawaran : bonus)",
-      "3. Harga (coba turunin klo masih kurang bagus dalm 1 pekan)",
-      "4. Persingkat tampilan web jangan terlalu panjang"
+      "Perbaiki Website:",
+      "1. Desain website profesional",
+      "2. Penawaran menarik (bonus/urgensi)",
+      "3. Harga (coba turunkan jika masih kurang optimal dalam 1 pekan)",
+      "4. Persingkat alur checkout, jangan terlalu panjang"
     ]
   },
   {
@@ -428,8 +428,9 @@ export const initialRdKpis = [
     statusLabel: "Optimal",
     funnelPhase: "Closing CS",
     actions: [
-      "1. edukasi CS ( IHT, WS)",
-      "2. Bonus Organik Perbesar nilai nya"
+      "1. Edukasi CS (In-House Training, Workshop)",
+      "2. Perbesar nilai bonus organik",
+      "3. CS fast respon maksimal 5 menit"
     ]
   },
   {

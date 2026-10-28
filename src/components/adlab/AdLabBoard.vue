@@ -2,17 +2,9 @@
   <div class="space-y-6">
     <!-- Board Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-          <span>Ad Lab: Growth Hacking Pipeline</span>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 font-semibold border border-teal-200">
-            3-Stage Validation Framework
-          </span>
-        </h2>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Proses sistematis: Validasi Mikro Creative (TEST) → Winning Ad Set (SCALE 1) → Injeksi Anggaran Penuh (SCALE 2)
-        </p>
-      </div>
+      <h2 class="text-lg sm:text-xl font-extrabold text-slate-800 tracking-tight whitespace-nowrap">
+        Ad Lab: Growth Hacking Pipeline
+      </h2>
 
       <div class="flex items-center gap-2">
         <select
