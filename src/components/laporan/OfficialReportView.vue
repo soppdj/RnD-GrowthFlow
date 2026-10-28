@@ -200,9 +200,8 @@
                 <th class="py-2 px-2 border-r border-slate-300 w-[95px]">KPI METRIC</th>
                 <th class="py-2 px-1 text-center border-r border-slate-300 w-[80px]">TARGET KPI</th>
                 <th class="py-2 px-1 text-center border-r border-slate-300 w-[75px]">HARGA JUAL</th>
-                <th class="py-1.5 px-1 text-center bg-blue-50 font-black text-blue-900 border-r border-slate-300 w-[90px]">
-                  <span class="block leading-tight">ACTUAL TARGET</span>
-                  <span class="block leading-tight text-[10px]">KPI</span>
+                <th class="py-2 px-1 text-center bg-blue-50 font-black text-blue-900 border-r border-slate-300 w-[90px] whitespace-nowrap">
+                  ACTUAL KPI
                 </th>
                 <th class="py-2 px-3">AKSI BILA TIDAK TERCAPAI</th>
               </tr>

@@ -4,30 +4,20 @@
     class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/50 backdrop-blur-sm animate-fade-in"
   >
     <div
-      class="glass-panel rounded-2xl w-full max-w-7xl max-h-[94vh] flex flex-col shadow-2xl border border-teal-200 overflow-hidden bg-white"
+      class="glass-panel rounded-2xl w-full max-w-[1360px] max-h-[92vh] flex flex-col shadow-2xl border border-teal-200 overflow-hidden bg-white"
     >
-      <!-- Modal Header -->
-      <div class="p-4 sm:p-5 bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-800 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shadow-inner shrink-0">
-            <FileSpreadsheet class="w-5 h-5 text-teal-200" />
+      <!-- Modal Header (Ramping, Badge & Subtitle Dihapus Per Tanda X, Diperlebar) -->
+      <div class="px-5 py-3.5 bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-800 text-white flex items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shadow-inner shrink-0">
+            <FileSpreadsheet class="w-4 h-4 text-teal-200" />
           </div>
-          <div>
-            <div class="flex flex-wrap items-center gap-2">
-              <h3 class="text-base sm:text-lg font-extrabold tracking-tight">
-                Evaluator &amp; Converter Meta Ads
-              </h3>
-              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">
-                Decision Engine (Lanjut vs Pantau vs Stop)
-              </span>
-            </div>
-            <p class="text-xs text-teal-100/80 mt-0.5">
-              Upload ekspor Excel/CSV Meta Ads Manager untuk evaluasi otomatis seluruh corong konversi (CTR, CPC, Cost LPV, LC to LPV, LPV to ATC, ATC to IC, CPM, CPR) sesuai SOP
-            </p>
-          </div>
+          <h3 class="text-base sm:text-lg font-extrabold tracking-tight">
+            Evaluator &amp; Converter Meta Ads
+          </h3>
         </div>
 
-        <div class="flex items-center gap-2 self-end sm:self-auto">
+        <div class="flex items-center gap-2.5">
           <!-- Acuan Harga Jual Badge -->
           <div class="px-3 py-1 rounded-xl bg-white/10 border border-white/20 text-xs font-semibold text-teal-100 flex items-center gap-1.5">
             <span>Harga Acuan:</span>
@@ -43,46 +33,79 @@
         </div>
       </div>
 
-      <!-- Modal Body (Scrollable) -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+      <!-- Modal Body (Compact untuk 1 Layar Tanpa Scroll) -->
+      <div class="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-3 sm:space-y-4">
+        <!-- Step 1 Collapsed Bar (Jika Data Sudah Terload & Collapsed) -->
+        <div
+          v-if="evaluatedAds.length > 0 && isStep1Collapsed"
+          class="p-2.5 px-4 rounded-xl bg-teal-50/90 border border-teal-200/90 shadow-micro flex flex-wrap items-center justify-between gap-2 text-xs"
+        >
+          <div class="flex items-center gap-2 text-teal-900 font-medium">
+            <CheckCircle class="w-4 h-4 text-teal-600 shrink-0" />
+            <span>
+              Data Meta Ads berhasil dievaluasi: <strong class="font-bold text-teal-950">{{ evaluatedAds.length }} Iklan / Kampanye</strong>
+            </span>
+          </div>
+          <button
+            @click="isStep1Collapsed = false"
+            class="text-[11px] font-bold text-teal-700 hover:text-teal-900 underline flex items-center gap-1.5 transition-colors"
+          >
+            <UploadCloud class="w-3.5 h-3.5" />
+            <span>Ganti / Upload Ulang Data</span>
+          </button>
+        </div>
+
         <!-- Step 1: Input Methods (Upload / Paste / Load Sample) -->
-        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-teal-50/30 border border-teal-100 shadow-micro">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-teal-100/70">
+        <div
+          v-if="evaluatedAds.length === 0 || !isStep1Collapsed"
+          class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-slate-50 to-teal-50/30 border border-teal-100 shadow-micro"
+        >
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2 pb-2 border-b border-teal-100/70">
             <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-lg bg-teal-600 text-white font-black text-xs flex items-center justify-center">1</span>
+              <span class="w-5 h-5 rounded-lg bg-teal-600 text-white font-black text-xs flex items-center justify-center">1</span>
               <h4 class="text-xs sm:text-sm font-extrabold text-slate-800">
                 Pilih Metode Input Data Ekspor Meta Ads
               </h4>
             </div>
 
-            <!-- Tabs: File Upload vs Copy-Paste -->
-            <div class="flex items-center p-0.5 rounded-xl bg-teal-100/70 text-xs font-bold self-start sm:self-auto">
+            <div class="flex items-center gap-2">
+              <!-- Tabs: File Upload vs Copy-Paste -->
+              <div class="flex items-center p-0.5 rounded-xl bg-teal-100/70 text-xs font-bold self-start sm:self-auto">
+                <button
+                  @click="inputTab = 'file'"
+                  class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
+                  :class="inputTab === 'file' ? 'bg-white text-teal-900 shadow-micro' : 'text-slate-600 hover:text-slate-900'"
+                >
+                  <UploadCloud class="w-3.5 h-3.5" />
+                  <span>Upload File (.xlsx / .csv)</span>
+                </button>
+                <button
+                  @click="inputTab = 'paste'"
+                  class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
+                  :class="inputTab === 'paste' ? 'bg-white text-teal-900 shadow-micro' : 'text-slate-600 hover:text-slate-900'"
+                >
+                  <ClipboardList class="w-3.5 h-3.5" />
+                  <span>Copy-Paste Text</span>
+                </button>
+              </div>
+
               <button
-                @click="inputTab = 'file'"
-                class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
-                :class="inputTab === 'file' ? 'bg-white text-teal-900 shadow-micro' : 'text-slate-600 hover:text-slate-900'"
+                v-if="evaluatedAds.length > 0"
+                @click="isStep1Collapsed = true"
+                class="text-[11px] font-bold text-slate-500 hover:text-slate-800 px-2 py-1 rounded-lg border border-slate-200 bg-white"
               >
-                <UploadCloud class="w-3.5 h-3.5" />
-                <span>Upload File (.xlsx / .csv)</span>
-              </button>
-              <button
-                @click="inputTab = 'paste'"
-                class="flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all"
-                :class="inputTab === 'paste' ? 'bg-white text-teal-900 shadow-micro' : 'text-slate-600 hover:text-slate-900'"
-              >
-                <ClipboardList class="w-3.5 h-3.5" />
-                <span>Copy-Paste Text</span>
+                Sembunyikan
               </button>
             </div>
           </div>
 
           <!-- Tab Content 1: Upload File -->
-          <div v-if="inputTab === 'file'" class="space-y-3">
+          <div v-if="inputTab === 'file'" class="space-y-2">
             <div
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
               @drop.prevent="handleFileDrop"
-              class="border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2"
+              class="border-2 border-dashed rounded-2xl p-4 sm:p-5 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5"
               :class="isDragging ? 'border-teal-500 bg-teal-50/60' : 'border-teal-200 hover:border-teal-400 bg-white'"
               @click="$refs.fileInput.click()"
             >
@@ -93,14 +116,14 @@
                 class="hidden"
                 @change="handleFileInput"
               />
-              <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shadow-micro">
-                <UploadCloud class="w-6 h-6" />
+              <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shadow-micro">
+                <UploadCloud class="w-5 h-5" />
               </div>
               <p class="text-xs sm:text-sm font-bold text-slate-700">
                 Klik untuk memilih file Excel/CSV atau drag &amp; drop ke sini
               </p>
               <p class="text-[11px] text-slate-400">
-                Mendukung file ekspor resmi Ads Manager (.xlsx, .xls, .csv). Sistem otomatis mendeteksi kolom Spend, Impressions, Clicks, Landing Page Views, Adds to Cart, Checkouts, dan Results.
+                Mendukung file ekspor resmi Ads Manager (.xlsx, .xls, .csv). Sistem otomatis mendeteksi corong konversi.
               </p>
             </div>
           </div>
@@ -140,25 +163,28 @@
         </div>
 
         <!-- Step 2: Evaluation Dashboard & Results -->
-        <div v-if="evaluatedAds.length > 0" class="space-y-5 animate-fade-in">
-          <!-- Standar KPI Benchmark Reference Strip -->
-          <div class="p-3 rounded-xl bg-slate-50 border border-teal-200/80 shadow-micro flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div v-if="evaluatedAds.length > 0" class="space-y-4 animate-fade-in">
+          <!-- Standar KPI Benchmark Reference Strip (9 Metrik Berurutan Sesuai Format SOP) -->
+          <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-teal-200/80 shadow-micro flex flex-wrap items-center justify-between gap-2 text-xs">
             <div class="flex items-center gap-1.5 font-bold text-slate-700">
               <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-              <span class="text-[11px] uppercase tracking-wider text-teal-900">Standar Acuan KPI:</span>
+              <span class="text-[11px] uppercase tracking-wider text-teal-900 font-extrabold">Standar Acuan KPI:</span>
             </div>
-            <div class="flex flex-wrap items-center gap-2.5 text-[11px]">
+            <div class="flex flex-wrap items-center gap-2 text-[11px]">
+              <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+                CTR: <strong>&gt; 2.0%</strong>
+              </span>
               <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
                 CPC (1%): <strong>≤ {{ formatCurrency(targetCPC) }}</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
+                LC to LPV: <strong>≥ 80%</strong>
               </span>
               <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
                 Cost LPV (2-3%): <strong>≤ {{ formatCurrency(targetCostLPV) }}</strong>
               </span>
               <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
-                CTR: <strong>&gt; 2.0%</strong>
-              </span>
-              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
-                LC to LPV: <strong>≥ 80%</strong>
+                CPM: <strong>≤ Rp 32.000</strong>
               </span>
               <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
                 LPV to ATC: <strong>≥ 40%</strong>
@@ -166,11 +192,11 @@
               <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
                 ATC to IC: <strong>≥ 30%</strong>
               </span>
-              <span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
-                CPM: <strong>≤ Rp 32.000</strong>
-              </span>
               <span class="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-300 text-blue-900 font-bold">
                 CPR (25%): <strong>≤ {{ formatCurrency(targetCPR) }}</strong>
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-800 font-semibold">
+                Closing Rate: <strong>≥ 82%</strong>
               </span>
             </div>
           </div>
@@ -245,32 +271,48 @@
             </button>
           </div>
 
-          <!-- Evaluated Ads Table -->
+          <!-- Evaluated Ads Table (Format 13 Kolom Sesuai Susunan SOP Excel) -->
           <div class="overflow-x-auto rounded-2xl border border-teal-200/80 shadow-soft bg-white">
             <table class="w-full text-left text-xs text-slate-700 border-collapse">
               <thead>
                 <tr class="bg-gradient-to-r from-teal-800 to-teal-900 text-white font-extrabold text-[10px] uppercase tracking-wider">
-                  <th scope="col" class="py-3 px-3 w-10 text-center">
-                    <input
-                      type="checkbox"
-                      v-model="selectAllScale"
-                      @change="toggleSelectAllScale"
-                      class="rounded text-teal-600"
-                      title="Pilih semua iklan yang dilanjut"
-                    />
+                  <!-- 1. KAMPANYE (Dengan Checkbox) -->
+                  <th scope="col" class="py-2.5 px-3 min-w-[200px]">
+                    <div class="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        v-model="selectAllScale"
+                        @change="toggleSelectAllScale"
+                        class="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5 cursor-pointer"
+                        title="Pilih semua iklan yang dilanjut"
+                      />
+                      <span>KAMPANYE</span>
+                    </div>
                   </th>
-                  <th scope="col" class="py-3 px-3 min-w-[180px]">NAMA KAMPANYE / IKLAN</th>
-                  <th scope="col" class="py-3 px-3 w-32 text-center bg-teal-950/40">KEPUTUSAN</th>
-                  <th scope="col" class="py-3 px-3 w-24">SPEND</th>
-                  <th scope="col" class="py-3 px-3 w-24">CPR (HASIL)</th>
-                  <th scope="col" class="py-3 px-3 w-20">CTR</th>
-                  <th scope="col" class="py-3 px-3 w-20">CPC</th>
-                  <th scope="col" class="py-3 px-3 w-20">COST LPV</th>
-                  <th scope="col" class="py-3 px-3 w-24 bg-emerald-950/30">LC to LPV (80%)</th>
-                  <th scope="col" class="py-3 px-3 w-24 bg-emerald-950/30">LPV to ATC (40%)</th>
-                  <th scope="col" class="py-3 px-3 w-24 bg-emerald-950/30">ATC to IC (30%)</th>
-                  <th scope="col" class="py-3 px-3 w-20">CPM</th>
-                  <th scope="col" class="py-3 px-4 min-w-[280px]">DIAGNOSA &amp; AKSI SOP</th>
+                  <!-- 2. AKSI -->
+                  <th scope="col" class="py-2.5 px-3 w-28 text-center bg-teal-950/40 whitespace-nowrap">AKSI</th>
+                  <!-- 3. SPEND -->
+                  <th scope="col" class="py-2.5 px-2.5 w-24 text-right whitespace-nowrap">SPEND</th>
+                  <!-- 4. CTR -->
+                  <th scope="col" class="py-2.5 px-2.5 w-20 text-center whitespace-nowrap">CTR</th>
+                  <!-- 5. CPC -->
+                  <th scope="col" class="py-2.5 px-2.5 w-20 text-center whitespace-nowrap">CPC</th>
+                  <!-- 6. LC to LPV -->
+                  <th scope="col" class="py-2.5 px-2.5 w-24 text-center bg-emerald-950/20 whitespace-nowrap">LC to LPV</th>
+                  <!-- 7. Cost LPV -->
+                  <th scope="col" class="py-2.5 px-2.5 w-20 text-center whitespace-nowrap">Cost LPV</th>
+                  <!-- 8. CPM -->
+                  <th scope="col" class="py-2.5 px-2.5 w-20 text-center whitespace-nowrap">CPM</th>
+                  <!-- 9. LPV to ATC -->
+                  <th scope="col" class="py-2.5 px-2.5 w-24 text-center bg-emerald-950/20 whitespace-nowrap">LPV to ATC</th>
+                  <!-- 10. ATC to IC -->
+                  <th scope="col" class="py-2.5 px-2.5 w-24 text-center bg-emerald-950/20 whitespace-nowrap">ATC to IC</th>
+                  <!-- 11. CPR -->
+                  <th scope="col" class="py-2.5 px-2.5 w-24 text-center whitespace-nowrap">CPR</th>
+                  <!-- 12. CLOSING RATE -->
+                  <th scope="col" class="py-2.5 px-2.5 w-24 text-center whitespace-nowrap">CLOSING RATE</th>
+                  <!-- 13. DIAGNOSA & AKSI SOP -->
+                  <th scope="col" class="py-2.5 px-3 min-w-[240px]">DIAGNOSA &amp; AKSI SOP</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 font-medium">
@@ -279,29 +321,29 @@
                   :key="idx"
                   class="hover:bg-teal-50/30 transition-colors"
                 >
-                  <!-- Checkbox (only for SCALE ads) -->
-                  <td class="py-3.5 px-3 text-center">
-                    <input
-                      v-if="ad.decision === 'SCALE'"
-                      type="checkbox"
-                      v-model="ad.selectedForImport"
-                      class="rounded text-teal-600"
-                    />
-                    <span v-else class="text-slate-300">-</span>
+                  <!-- 1. KAMPANYE (dengan Checkbox) -->
+                  <td class="py-2.5 px-3">
+                    <div class="flex items-start gap-2">
+                      <input
+                        v-if="ad.decision === 'SCALE'"
+                        type="checkbox"
+                        v-model="ad.selectedForImport"
+                        class="rounded text-teal-600 focus:ring-teal-500 w-3.5 h-3.5 mt-0.5 cursor-pointer"
+                      />
+                      <span v-else class="w-3.5 text-center text-slate-300 select-none shrink-0 text-xs">-</span>
+                      <div>
+                        <span class="font-extrabold text-slate-800 block leading-tight text-xs">
+                          {{ ad.name }}
+                        </span>
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">
+                          {{ ad.results }} Donatur Baru • Impresi: {{ formatNumber(ad.impressions) }} • Klik: {{ formatNumber(ad.clicks) }}
+                        </span>
+                      </div>
+                    </div>
                   </td>
 
-                  <!-- Campaign Name -->
-                  <td class="py-3.5 px-3">
-                    <span class="font-extrabold text-slate-800 block leading-tight text-xs">
-                      {{ ad.name }}
-                    </span>
-                    <span class="text-[10px] text-slate-400 mt-0.5 block">
-                      {{ ad.results }} Donatur Baru • Impresi: {{ formatNumber(ad.impressions) }} • Klik: {{ formatNumber(ad.clicks) }}
-                    </span>
-                  </td>
-
-                  <!-- Decision Badge -->
-                  <td class="py-3.5 px-3 text-center whitespace-nowrap">
+                  <!-- 2. AKSI -->
+                  <td class="py-2.5 px-3 text-center whitespace-nowrap">
                     <span
                       class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black border shadow-micro uppercase"
                       :class="getDecisionBadgeClass(ad.decision)"
@@ -311,48 +353,49 @@
                     </span>
                   </td>
 
-                  <!-- Spend -->
-                  <td class="py-3.5 px-3 font-semibold text-slate-700 whitespace-nowrap">
+                  <!-- 3. SPEND -->
+                  <td class="py-2.5 px-2.5 font-semibold text-slate-700 whitespace-nowrap text-right">
                     {{ formatCurrency(ad.spend) }}
                   </td>
 
-                  <!-- CPR (Cost Per Result) -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
-                    <span
-                      class="font-black px-1.5 py-0.5 rounded text-xs"
-                      :class="ad.results > 0 && ad.cpr <= targetCPR ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'"
-                    >
-                      {{ ad.results > 0 ? formatCurrency(ad.cpr) : 'Rp 0' }}
-                    </span>
-                    <span class="text-[9px] text-slate-400 block mt-0.5">
-                      Max: {{ formatCurrency(targetCPR) }}
-                    </span>
-                  </td>
-
-                  <!-- CTR -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
+                  <!-- 4. CTR -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
                     <span
                       class="font-extrabold text-xs"
                       :class="ad.ctr >= 2.0 ? 'text-emerald-700' : 'text-rose-700'"
                     >
                       {{ ad.ctr.toFixed(2) }}%
                     </span>
-                    <span class="text-[9px] text-slate-400 block">Target &gt; 2%</span>
+                    <span class="text-[9px] text-slate-400 block">&gt; 2%</span>
                   </td>
 
-                  <!-- CPC -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
+                  <!-- 5. CPC -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
                     <span
                       class="font-semibold text-xs"
                       :class="ad.cpc <= targetCPC ? 'text-emerald-700' : 'text-slate-700'"
                     >
                       {{ formatCurrency(ad.cpc) }}
                     </span>
-                    <span class="text-[9px] text-slate-400 block">Target: {{ formatCurrency(targetCPC) }}</span>
+                    <span class="text-[9px] text-slate-400 block">1%</span>
                   </td>
 
-                  <!-- Cost LPV -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
+                  <!-- 6. LC to LPV -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
+                    <template v-if="ad.clicks > 0">
+                      <span
+                        class="font-black text-xs px-1.5 py-0.5 rounded inline-block"
+                        :class="ad.lcToLpv >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.lcToLpv.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">80%</span>
+                    </template>
+                    <span v-else class="text-slate-400">-</span>
+                  </td>
+
+                  <!-- 7. Cost LPV -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
                     <template v-if="ad.costLpv > 0">
                       <span
                         class="font-semibold text-xs"
@@ -360,85 +403,90 @@
                       >
                         {{ formatCurrency(ad.costLpv) }}
                       </span>
-                      <span class="text-[9px] text-slate-400 block">Max: {{ formatCurrency(targetCostLPV) }}</span>
+                      <span class="text-[9px] text-slate-400 block">2 - 3%</span>
                     </template>
                     <span v-else class="text-slate-400 text-center block">-</span>
                   </td>
 
-                  <!-- LC to LPV (Funnel KPI 1: Target >= 80%) -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
-                    <template v-if="ad.clicks > 0">
-                      <span
-                        class="font-black text-xs px-2 py-0.5 rounded inline-block"
-                        :class="ad.lcToLpv >= 80 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
-                      >
-                        {{ ad.lcToLpv.toFixed(0) }}%
-                      </span>
-                      <span class="text-[9px] text-slate-400 block mt-0.5">
-                        {{ formatNumber(ad.lpViews) }} LPV / Target ≥ 80%
-                      </span>
-                    </template>
-                    <span v-else class="text-slate-400">-</span>
-                  </td>
-
-                  <!-- LPV to ATC (Funnel KPI 2: Target >= 40%) -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
-                    <template v-if="ad.lpvToAtc !== null">
-                      <span
-                        class="font-black text-xs px-2 py-0.5 rounded inline-block"
-                        :class="ad.lpvToAtc >= 40 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
-                      >
-                        {{ ad.lpvToAtc.toFixed(0) }}%
-                      </span>
-                      <span class="text-[9px] text-slate-400 block mt-0.5">
-                        {{ formatNumber(ad.atc) }} ATC / Target ≥ 40%
-                      </span>
-                    </template>
-                    <span v-else class="text-slate-300 text-center block" title="Data ATC tidak ditemukan">-</span>
-                  </td>
-
-                  <!-- ATC to IC (Funnel KPI 3: Target >= 30%) -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
-                    <template v-if="ad.atcToIc !== null">
-                      <span
-                        class="font-black text-xs px-2 py-0.5 rounded inline-block"
-                        :class="ad.atcToIc >= 30 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
-                      >
-                        {{ ad.atcToIc.toFixed(0) }}%
-                      </span>
-                      <span class="text-[9px] text-slate-400 block mt-0.5">
-                        {{ formatNumber(ad.ic) }} IC / Target ≥ 30%
-                      </span>
-                    </template>
-                    <span v-else class="text-slate-300 text-center block" title="Data IC tidak ditemukan">-</span>
-                  </td>
-
-                  <!-- CPM -->
-                  <td class="py-3.5 px-3 whitespace-nowrap">
+                  <!-- 8. CPM -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
                     <span
                       class="font-semibold text-xs"
                       :class="ad.cpm <= 32000 ? 'text-slate-700' : 'text-rose-700 font-bold'"
                     >
                       {{ formatCurrency(ad.cpm) }}
                     </span>
-                    <span class="text-[9px] text-slate-400 block">Target: ≤ 32rb</span>
+                    <span class="text-[9px] text-slate-400 block">32K</span>
                   </td>
 
-                  <!-- Diagnosis & SOP Action -->
-                  <td class="py-3.5 px-4 text-xs">
+                  <!-- 9. LPV to ATC -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
+                    <template v-if="ad.lpvToAtc !== null">
+                      <span
+                        class="font-black text-xs px-1.5 py-0.5 rounded inline-block"
+                        :class="ad.lpvToAtc >= 40 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.lpvToAtc.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">40%</span>
+                    </template>
+                    <span v-else class="text-slate-300 text-center block">-</span>
+                  </td>
+
+                  <!-- 10. ATC to IC -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
+                    <template v-if="ad.atcToIc !== null">
+                      <span
+                        class="font-black text-xs px-1.5 py-0.5 rounded inline-block"
+                        :class="ad.atcToIc >= 30 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.atcToIc.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">30%</span>
+                    </template>
+                    <span v-else class="text-slate-300 text-center block">-</span>
+                  </td>
+
+                  <!-- 11. CPR -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
+                    <span
+                      class="font-black px-1.5 py-0.5 rounded text-xs"
+                      :class="ad.results > 0 && ad.cpr <= targetCPR ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'"
+                    >
+                      {{ ad.results > 0 ? formatCurrency(ad.cpr) : 'Rp 0' }}
+                    </span>
+                    <span class="text-[9px] text-slate-400 block mt-0.5">25%</span>
+                  </td>
+
+                  <!-- 12. CLOSING RATE -->
+                  <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
+                    <template v-if="ad.closingRate !== null">
+                      <span
+                        class="font-black text-xs px-1.5 py-0.5 rounded inline-block"
+                        :class="ad.closingRate >= 82 ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'"
+                      >
+                        {{ ad.closingRate.toFixed(0) }}%
+                      </span>
+                      <span class="text-[9px] text-slate-400 block mt-0.5">82%</span>
+                    </template>
+                    <span v-else class="text-slate-300 text-center block">-</span>
+                  </td>
+
+                  <!-- 13. DIAGNOSA & AKSI SOP -->
+                  <td class="py-2.5 px-3 text-xs">
                     <p class="font-bold text-slate-800 leading-tight">
                       {{ ad.reason }}
                     </p>
-                    <div class="mt-1.5 p-2 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                    <div class="mt-1 p-2 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
                       <p class="text-[11px] text-slate-700 leading-relaxed">
                         <strong class="text-teal-900 font-extrabold">Aksi SOP:</strong> {{ ad.actionSOP }}
                       </p>
                       <!-- Specific Funnel Warning Pills -->
-                      <div v-if="ad.funnelAlerts && ad.funnelAlerts.length > 0" class="pt-1 flex flex-wrap gap-1">
+                      <div v-if="ad.funnelAlerts && ad.funnelAlerts.length > 0" class="pt-0.5 flex flex-wrap gap-1">
                         <span
                           v-for="(alert, aIdx) in ad.funnelAlerts"
                           :key="aIdx"
-                          class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300"
+                          class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-900 border border-amber-300"
                         >
                           ⚠️ {{ alert }}
                         </span>
@@ -452,8 +500,8 @@
         </div>
       </div>
 
-      <!-- Modal Footer -->
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 text-xs">
+      <!-- Modal Footer (Ramping & Efisien) -->
+      <div class="py-2.5 px-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0 text-xs">
         <span class="text-slate-500">
           Kriteria evaluasi mengacu pada 9 Standar KPI Ads Yayasan Khoirur Rooziqiin (Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}).
         </span>
@@ -479,7 +527,8 @@ import {
   ClipboardList,
   Sparkles,
   PlusCircle,
-  X
+  X,
+  CheckCircle
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -499,6 +548,7 @@ const pastedText = ref('');
 const filterDecision = ref('ALL');
 const evaluatedAds = ref([]);
 const selectAllScale = ref(false);
+const isStep1Collapsed = ref(false);
 
 // Targets derived from user's SOP:
 // CPC = 1% Harga Jual
@@ -681,6 +731,20 @@ function processRawRows(rows) {
     const lpvToAtc = lpViews > 0 && atc > 0 ? Math.round((atc / lpViews) * 100) : (atc > 0 && clicks > 0 ? Math.round((atc / clicks) * 100) : null);
     const atcToIc = atc > 0 && ic > 0 ? Math.round((ic / atc) * 100) : null;
 
+    // Closing Rate (Target >= 82%)
+    // Baca dari kolom ekspor jika ada ('Closing Rate', 'CR', 'Tingkat Closing') atau hitung (Results / IC * 100)
+    const rawClosingRate = cleanNum(getField(r, ['closing rate', 'closing_rate', 'cr cs', 'cr', 'tingkat closing', 'closing', 'conversion rate'], ['cost', 'biaya', 'cpr', 'atc', 'lpv', 'lc', 'cpc', 'cpm']));
+    let closingRate = null;
+    if (rawClosingRate > 0) {
+      closingRate = rawClosingRate <= 1 ? Math.round(rawClosingRate * 100) : Math.round(rawClosingRate);
+    } else if (ic > 0 && resultsCount > 0) {
+      closingRate = Math.min(100, Math.round((resultsCount / ic) * 100));
+    } else if (atc > 0 && resultsCount > 0) {
+      closingRate = Math.min(100, Math.round((resultsCount / atc) * 100));
+    } else if (resultsCount > 0) {
+      closingRate = 85; // Acuan umum untuk kampanye yang menghasilkan donatur
+    }
+
     // Benchmarks
     const maxSafeCPR = targetCPR.value; // 25% of Harga Jual
     const maxSafeCostLpv = targetCostLPV.value; // 3% of Harga Jual
@@ -696,7 +760,8 @@ function processRawRows(rows) {
     const isLpvAtcGood = (lpvToAtc === null) ? true : (lpvToAtc >= 40);
     // ATC to IC: Target >= 30% (only if IC tracked)
     const isAtcIcGood = (atcToIc === null) ? true : (atcToIc >= 30);
-    const isFunnelGood = isLcLpvGood && isLpvAtcGood && isAtcIcGood;
+    const isClosingRateGood = (closingRate === null) ? true : (closingRate >= 82);
+    const isFunnelGood = isLcLpvGood && isLpvAtcGood && isAtcIcGood && isClosingRateGood;
 
     // Collect specific SOP alerts
     const funnelAlerts = [];
@@ -708,6 +773,9 @@ function processRawRows(rows) {
     }
     if (atcToIc !== null && atcToIc < 30) {
       funnelAlerts.push(`ATC to IC ${atcToIc}% (< 30%): Beri penawaran menarik`);
+    }
+    if (closingRate !== null && closingRate < 82 && resultsCount > 0) {
+      funnelAlerts.push(`Closing Rate ${closingRate}% (< 82%): 1. Edukasi CS (IHT, WS); 2. Perbesar nilai bonus organik; 3. Fast respon maksimal 5 menit.`);
     }
 
     // Decision Engine Logic based on user SOP
@@ -817,6 +885,7 @@ function processRawRows(rows) {
       lcToLpv,
       lpvToAtc,
       atcToIc,
+      closingRate,
       decision,
       decisionIcon,
       decisionLabel,
@@ -828,6 +897,7 @@ function processRawRows(rows) {
   });
 
   evaluatedAds.value = results;
+  isStep1Collapsed.value = true;
 }
 
 function loadSampleMetaAdsData() {
@@ -839,7 +909,8 @@ function loadSampleMetaAdsData() {
       'Link Clicks': 2450,
       'Landing Page Views': 2080,
       'Adds to Cart': 940,
-      'Checkouts Initiated': 330,
+      'Checkouts Initiated': 190,
+      'Closing Rate': 85,
       'Results': 162,
       'Purchases Conversion Value': 12500000
     },
@@ -850,7 +921,8 @@ function loadSampleMetaAdsData() {
       'Link Clicks': 1650,
       'Landing Page Views': 1420,
       'Adds to Cart': 610,
-      'Checkouts Initiated': 210,
+      'Checkouts Initiated': 140,
+      'Closing Rate': 84,
       'Results': 118,
       'Purchases Conversion Value': 8850000
     },
@@ -862,6 +934,7 @@ function loadSampleMetaAdsData() {
       'Landing Page Views': 720, // LC to LPV: 60% (< 80%) -> Optimasi LP Speed
       'Adds to Cart': 320,
       'Checkouts Initiated': 110,
+      'Closing Rate': 55,
       'Results': 60,
       'Purchases Conversion Value': 9000000
     },
@@ -873,6 +946,7 @@ function loadSampleMetaAdsData() {
       'Landing Page Views': 810,
       'Adds to Cart': 195, // LPV to ATC: 24% (< 40%) -> Hypno Writing
       'Checkouts Initiated': 80,
+      'Closing Rate': 56,
       'Results': 45,
       'Purchases Conversion Value': 4200000
     },
@@ -884,6 +958,7 @@ function loadSampleMetaAdsData() {
       'Landing Page Views': 700,
       'Adds to Cart': 310,
       'Checkouts Initiated': 62, // ATC to IC: 20% (< 30%) -> Penawaran Menarik
+      'Closing Rate': 56,
       'Results': 35,
       'Purchases Conversion Value': 3150000
     },
@@ -895,6 +970,7 @@ function loadSampleMetaAdsData() {
       'Landing Page Views': 830,
       'Adds to Cart': 340,
       'Checkouts Initiated': 120,
+      'Closing Rate': 100,
       'Results': 120,
       'Purchases Conversion Value': 6000000
     },
@@ -906,6 +982,7 @@ function loadSampleMetaAdsData() {
       'Landing Page Views': 130,
       'Adds to Cart': 20,
       'Checkouts Initiated': 8,
+      'Closing Rate': 88,
       'Results': 7, // CPR Rp 121.428 (Boncos) -> STOP / KILL
       'Purchases Conversion Value': 400000
     }

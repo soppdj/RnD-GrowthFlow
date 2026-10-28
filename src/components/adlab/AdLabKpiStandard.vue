@@ -60,9 +60,8 @@
               <th scope="col" class="py-2 px-2.5 w-24 border-r border-teal-600/50">KPI METRIC</th>
               <th scope="col" class="py-2 px-2 w-20 text-center border-r border-teal-600/50">TARGET KPI</th>
               <th scope="col" class="py-2 px-2 w-24 text-center border-r border-teal-600/50">HARGA JUAL</th>
-              <th scope="col" class="py-1.5 px-2 w-24 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
-                <span class="block leading-tight">ACTUAL TARGET</span>
-                <span class="block leading-tight text-[10px]">KPI</span>
+              <th scope="col" class="py-2 px-2.5 w-24 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner whitespace-nowrap">
+                ACTUAL KPI
               </th>
               <th scope="col" class="py-2 px-3">AKSI BILA TIDAK TERCAPAI</th>
             </tr>
