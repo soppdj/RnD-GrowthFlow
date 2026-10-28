@@ -81,14 +81,14 @@
         <div class="w-20 shrink-0 hidden sm:block"></div>
       </div>
 
-      <!-- DOCUMENT METADATA (Header judul dicoret/dihapus sesuai tanda X) -->
+      <!-- DOCUMENT METADATA (Satu baris: Laporan • Periode • Tanggal Rilis) -->
       <div class="my-5 text-center">
-        <div class="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-slate-600 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 font-medium">
+        <div class="inline-flex items-center justify-center gap-x-3 text-xs text-slate-700 px-5 py-1.5 rounded-full bg-slate-100 border border-slate-200 font-medium whitespace-nowrap">
+          <span><strong>Laporan:</strong> R&amp;D Digital Marketing</span>
+          <span class="text-slate-400 font-bold">•</span>
           <span><strong>Periode:</strong> {{ periodLabel }}</span>
-          <span>•</span>
+          <span class="text-slate-400 font-bold">•</span>
           <span><strong>Tanggal Rilis:</strong> {{ formatDate(new Date(), true) }}</span>
-          <span>•</span>
-          <span><strong>Penyusun:</strong> {{ store.profile.fullName }} ({{ store.profile.role }})</span>
         </div>
       </div>
 
@@ -232,7 +232,7 @@
         <div class="pb-1 border-b border-slate-200 mb-2.5">
           <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-            <span>III. Rekomendasi Scale-Up Eksperimen</span>
+            <span>III. Rekomendasi Scale-Up</span>
           </h3>
         </div>
 
@@ -240,19 +240,29 @@
           Berdasarkan data validasi di Ad Lab, berikut urutan kampanye berdasarkan ROI aktual tertinggi beserta rekomendasi penyesuaian alokasi anggaran:
         </p>
 
-        <!-- Table Ordered Strictly by ROI Descending -->
-        <div class="overflow-x-auto border border-slate-200 rounded-xl">
-          <table class="w-full text-left text-xs border-collapse">
+        <!-- Table Ordered Strictly by ROI Descending - Fit 100% without scroll -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-xs border-collapse table-fixed">
+            <colgroup>
+              <col style="width: 32px" />
+              <col style="width: 145px" />
+              <col style="width: 65px" />
+              <col style="width: 75px" />
+              <col style="width: 85px" />
+              <col style="width: 68px" />
+              <col style="width: 75px" />
+              <col />
+            </colgroup>
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[10px] uppercase">
               <tr>
-                <th class="py-2.5 px-3 text-center w-12">Rank</th>
-                <th class="py-2.5 px-3 min-w-[180px] max-w-[220px]">Kampanye &amp; Platform</th>
-                <th class="py-2.5 px-3 text-center w-20">Stage</th>
-                <th class="py-2.5 px-3 text-right whitespace-nowrap">Ad Spend</th>
-                <th class="py-2.5 px-3 text-right whitespace-nowrap">Realisasi</th>
-                <th class="py-2.5 px-3 text-right whitespace-nowrap">CPR</th>
-                <th class="py-2.5 px-3 text-right whitespace-nowrap">ROI</th>
-                <th class="py-2.5 px-3 min-w-[220px] text-left">Rekomendasi Aksi Selanjutnya</th>
+                <th class="py-2 px-1 text-center">Rank</th>
+                <th class="py-2 px-1.5">Kampanye &amp; Platform</th>
+                <th class="py-2 px-1 text-center">Stage</th>
+                <th class="py-2 px-1.5 text-right whitespace-nowrap">Ad Spend</th>
+                <th class="py-2 px-1.5 text-right whitespace-nowrap">Realisasi</th>
+                <th class="py-2 px-1.5 text-right whitespace-nowrap">CPR</th>
+                <th class="py-2 px-1.5 text-right whitespace-nowrap">ROI</th>
+                <th class="py-2 px-2 text-left">Rekomendasi Aksi Selanjutnya</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -262,58 +272,58 @@
                 class="hover:bg-slate-50/80 transition-colors"
                 :class="idx === 0 ? 'bg-emerald-50/30' : ''"
               >
-                <td class="py-2.5 px-3 text-center font-bold text-slate-500">
+                <td class="py-2 px-1 text-center font-bold text-slate-500">
                   <span
-                    class="w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px]"
+                    class="w-4 h-4 rounded-full inline-flex items-center justify-center text-[9px]"
                     :class="idx === 0 ? 'bg-amber-100 text-amber-800 font-extrabold' : 'bg-slate-100 text-slate-700'"
                   >
                     #{{ idx + 1 }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3 max-w-[220px]">
-                  <span class="font-bold text-slate-800 block truncate" :title="camp.name">
+                <td class="py-2 px-1.5">
+                  <span class="font-bold text-slate-800 text-[11px] block truncate" :title="camp.name">
                     {{ formatCampaignName(camp.name) }}
                   </span>
-                  <span class="text-[10px] text-slate-400 font-medium block truncate">
-                    {{ camp.platform || 'Meta Ads' }} • {{ camp.hookType || 'Imported Winning Meta Ads' }}
+                  <span class="text-[9px] text-slate-400 font-medium block truncate">
+                    {{ camp.platform || 'Meta Ads' }} • {{ camp.hookType || 'Winning Ads' }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3 text-center">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                <td class="py-2 px-1 text-center">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 whitespace-nowrap">
                     {{ camp.stage }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3 text-right font-medium text-slate-600 whitespace-nowrap">
+                <td class="py-2 px-1.5 text-right font-medium text-slate-600 whitespace-nowrap text-[11px]">
                   {{ formatCurrency(camp.adSpend) }}
                 </td>
-                <td class="py-2.5 px-3 text-right font-extrabold text-slate-900 whitespace-nowrap">
+                <td class="py-2 px-1.5 text-right font-extrabold text-slate-900 whitespace-nowrap text-[11px]">
                   {{ formatCurrency(camp.revenue) }}
                 </td>
-                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                <td class="py-2 px-1.5 text-right whitespace-nowrap">
                   <span
-                    class="font-bold text-xs"
+                    class="font-bold text-[11px]"
                     :class="camp.cpr <= 25000 ? 'text-emerald-700' : 'text-slate-700'"
                   >
                     {{ formatCurrency(camp.cpr) }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                <td class="py-2 px-1.5 text-right whitespace-nowrap">
                   <span
-                    class="font-black text-xs px-1.5 py-0.5 rounded"
+                    class="font-black text-[11px] px-1 py-0.5 rounded"
                     :class="camp.roi >= 400 ? 'text-emerald-800 bg-emerald-100/80' : 'text-slate-800'"
                   >
                     {{ formatPercent(camp.roi) }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3 min-w-[220px]">
-                  <div class="space-y-1">
+                <td class="py-2 px-2">
+                  <div class="space-y-0.5">
                     <span
-                      class="inline-block px-2.5 py-0.5 rounded-md text-[10px] border leading-tight"
+                      class="inline-block px-1.5 py-0.5 rounded text-[9px] border leading-tight font-semibold"
                       :class="camp.recBadge"
                     >
                       {{ camp.recommendation }}
                     </span>
-                    <p class="text-[11px] text-slate-600 leading-snug">
+                    <p class="text-[10px] text-slate-600 leading-snug">
                       {{ camp.actionText }}
                     </p>
                   </div>
@@ -380,19 +390,19 @@ const selectedPeriod = ref('oct-2026');
 
 const periodLabel = computed(() => {
   const map = {
-    'oct-2026': 'Bulan Oktober 2026',
-    'sep-2026': 'Bulan September 2026',
-    'aug-2026': 'Bulan Agustus 2026',
-    'jul-2026': 'Bulan Juli 2026',
-    'jun-2026': 'Bulan Juni 2026',
-    'may-2026': 'Bulan Mei 2026',
-    'q4-2026': 'Kuartal IV (Okt - Des 2026)',
-    'q3-2026': 'Kuartal III (Jul - Sep 2026)',
-    'q2-2026': 'Kuartal II (Apr - Jun 2026)',
-    'q1-2026': 'Kuartal I (Jan - Mar 2026)',
-    'all': 'Semua Periode (Tahun 2026)'
+    'oct-2026': 'Oktober',
+    'sep-2026': 'September',
+    'aug-2026': 'Agustus',
+    'jul-2026': 'Juli',
+    'jun-2026': 'Juni',
+    'may-2026': 'Mei',
+    'q4-2026': 'Kuartal IV',
+    'q3-2026': 'Kuartal III',
+    'q2-2026': 'Kuartal II',
+    'q1-2026': 'Kuartal I',
+    'all': 'Semua Periode'
   };
-  return map[selectedPeriod.value] || 'Bulan Oktober 2026';
+  return map[selectedPeriod.value] || 'Oktober';
 });
 
 function formatCampaignName(name) {
