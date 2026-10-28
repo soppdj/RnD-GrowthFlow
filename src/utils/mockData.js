@@ -450,9 +450,31 @@ export const initialRdProductPrice = 50000;
 export const initialRdKpis = [
   {
     no: 1,
+    id: "ctr",
+    metric: "CTR",
+    targetKpi: "diatas 2%",
+    hasProductPrice: true,
+    actualTarget: 2.0,
+    actualTargetFormatted: "diatas 2%",
+    currentValue: 2.85,
+    currentValueFormatted: "2.85%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "Bikin konten yang lebih menarik (komen, share, like).",
+      "Ciri - ciri:",
+      "1. Kualitas konten 4K;",
+      "2. Konten informatif;",
+      "3. Konten menarik;",
+      "4. Konten lucu / humor."
+    ]
+  },
+  {
+    no: 2,
     id: "cpc",
     metric: "CPC",
-    targetKpi: "1 % Harga Jual",
+    targetKpi: "1% Harga Jual",
     hasProductPrice: true,
     actualTarget: 500,
     actualTargetFormatted: "Rp500",
@@ -462,110 +484,12 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Perbaiki konten kreatif",
-      "Tambah variasi konten baru"
-    ]
-  },
-  {
-    no: 2,
-    id: "cost_lpv",
-    metric: "Cost LPV",
-    targetKpi: "2 - 3% Harga Jual",
-    hasProductPrice: true,
-    actualTarget: 1500,
-    actualTargetFormatted: "Rp1,500",
-    currentValue: 1350,
-    currentValueFormatted: "Rp1,350",
-    unit: "currency",
-    status: "optimal",
-    statusLabel: "Optimal",
-    actions: [
-      "Perbaiki kecepatan landing page",
-      "Gunakan lazy load, website booster"
+      "Perbaiki konten;",
+      "Tambah konten baru."
     ]
   },
   {
     no: 3,
-    id: "cpm",
-    metric: "CPM",
-    targetKpi: "32K Objective Sales",
-    hasProductPrice: true,
-    actualTarget: 32000,
-    actualTargetFormatted: "Rp32,000",
-    currentValue: 28500,
-    currentValueFormatted: "Rp28,500",
-    unit: "currency",
-    status: "optimal",
-    statusLabel: "Optimal",
-    actions: [
-      "Tunggu 2-3 hari evaluasi stabilisasi algoritma; jika tetap buruk, segera matikan (kill)"
-    ]
-  },
-  {
-    no: 4,
-    id: "ctr",
-    metric: "CTR",
-    targetKpi: "> 2%",
-    hasProductPrice: true,
-    actualTarget: 2.0,
-    actualTargetFormatted: "> 2%",
-    currentValue: 2.85,
-    currentValueFormatted: "2.85%",
-    unit: "percent",
-    status: "optimal",
-    statusLabel: "Optimal",
-    actions: [
-      "Buat konten yang lebih menarik (komentar, share, like)",
-      "Ciri-ciri:",
-      "1. Kualitas konten 4K",
-      "2. Konten informatif",
-      "3. Konten menarik",
-      "4. Konten lucu / humor"
-    ]
-  },
-  {
-    no: 5,
-    id: "cpr",
-    metric: "CPR",
-    targetKpi: "25% Harga Jual",
-    hasProductPrice: true,
-    actualTarget: 12500,
-    actualTargetFormatted: "Rp12,500",
-    currentValue: 11800,
-    currentValueFormatted: "Rp11,800",
-    unit: "currency",
-    status: "optimal",
-    statusLabel: "Optimal",
-    actions: [
-      "Perbaiki Website:",
-      "1. Desain website profesional",
-      "2. Penawaran menarik (bonus/urgensi)",
-      "3. Harga (coba turunkan jika masih kurang optimal dalam 1 pekan)",
-      "4. Persingkat alur checkout, jangan terlalu panjang"
-    ]
-  },
-  {
-    no: 6,
-    id: "closing_rate",
-    metric: "Closing Rate CS",
-    targetKpi: "82%",
-    hasProductPrice: false,
-    actualTarget: 82,
-    actualTargetFormatted: "82%",
-    currentValue: 84.5,
-    currentValueFormatted: "84.5%",
-    unit: "percent",
-    status: "optimal",
-    statusLabel: "Optimal",
-    funnelPhase: "Closing CS",
-    actions: [
-      "1. Edukasi CS (In-House Training, Workshop)",
-      "2. Perbesar nilai bonus organik",
-      "3. CS fast respon maksimal 5 menit"
-    ]
-  },
-  {
-    no: 7,
     id: "lc_to_lpv",
     metric: "LC to LPV",
     targetKpi: "80%",
@@ -579,11 +503,46 @@ export const initialRdKpis = [
     statusLabel: "Optimal",
     funnelPhase: "Loading LP",
     actions: [
-      "Jika kurang, optimasi landing page agar lebih cepat"
+      "Jika kurang, optimasi landing page agar lebih cepat."
     ]
   },
   {
-    no: 8,
+    no: 4,
+    id: "cost_lpv",
+    metric: "Cost LPV",
+    targetKpi: "2 - 3% harga jual",
+    hasProductPrice: true,
+    actualTarget: 1500,
+    actualTargetFormatted: "Rp1.500",
+    currentValue: 1350,
+    currentValueFormatted: "Rp1.350",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "Perbaiki kecepatan LP;",
+      "Pakai lazyload, website booster."
+    ]
+  },
+  {
+    no: 5,
+    id: "cpm",
+    metric: "CPM",
+    targetKpi: "32 K OBJECTIVE SALES",
+    hasProductPrice: true,
+    actualTarget: 32000,
+    actualTargetFormatted: "Rp32.000",
+    currentValue: 28500,
+    currentValueFormatted: "Rp28.500",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "Tunggu 2–3 hari / jika masih jelek kill."
+    ]
+  },
+  {
+    no: 6,
     id: "lpv_to_atc",
     metric: "LPV to ATC",
     targetKpi: "40%",
@@ -597,11 +556,11 @@ export const initialRdKpis = [
     statusLabel: "Optimal",
     funnelPhase: "Copywriting LP",
     actions: [
-      "Gunakan hypno writing di landingpage"
+      "Gunakan hypno writing di landingpage."
     ]
   },
   {
-    no: 9,
+    no: 7,
     id: "atc_to_ic",
     metric: "ATC to IC",
     targetKpi: "30%",
@@ -615,7 +574,47 @@ export const initialRdKpis = [
     statusLabel: "Optimal",
     funnelPhase: "Penawaran / Offer",
     actions: [
-      "Beri penawaran menarik"
+      "Beri penawaran menarik."
+    ]
+  },
+  {
+    no: 8,
+    id: "cpr",
+    metric: "CPR",
+    targetKpi: "25% Harga jual",
+    hasProductPrice: true,
+    actualTarget: 12500,
+    actualTargetFormatted: "Rp12.500",
+    currentValue: 11800,
+    currentValueFormatted: "Rp11.800",
+    unit: "currency",
+    status: "optimal",
+    statusLabel: "Optimal",
+    actions: [
+      "Perbaiki Website:",
+      "1. Desain website (pro);",
+      "2. Offer (penawaran: bonus);",
+      "3. Harga (coba turunkan jika masih kurang bagus dalam 1 pekan);",
+      "4. Persingkat tampilan web jangan terlalu panjang."
+    ]
+  },
+  {
+    no: 9,
+    id: "closing_rate",
+    metric: "Closing Rate",
+    targetKpi: "82%",
+    hasProductPrice: false,
+    actualTarget: 82,
+    actualTargetFormatted: "82%",
+    currentValue: 84.5,
+    currentValueFormatted: "84.5%",
+    unit: "percent",
+    status: "optimal",
+    statusLabel: "Optimal",
+    funnelPhase: "Closing CS",
+    actions: [
+      "1. Edukasi CS (IHT, WS);",
+      "2. Bonus organik perbesar nilainya."
     ]
   }
 ];

@@ -80,9 +80,17 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           });
         }
 
-        let rdKpis = parsed.rdKpis;
-        if (!rdKpis || !Array.isArray(rdKpis) || rdKpis.length < 9) {
-          rdKpis = [...initialRdKpis];
+        let rdKpis = [...initialRdKpis];
+        if (Array.isArray(parsed.rdKpis) && parsed.rdKpis.length >= 9) {
+          rdKpis = initialRdKpis.map((init, idx) => {
+            const found = parsed.rdKpis.find(k => k.id === init.id);
+            return {
+              ...init,
+              no: idx + 1,
+              currentValue: found ? found.currentValue : init.currentValue,
+              currentValueFormatted: found ? found.currentValueFormatted : init.currentValueFormatted
+            };
+          });
         }
 
         let campaigns = parsed.campaigns || initialCampaigns;
@@ -192,7 +200,15 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
     // Standar Baku KPI Ads (Lembar Kerja SOP Gambar Acuan)
     rdKpiList(state) {
       const price = Number(state.rdProductPrice) || 0;
-      return (state.rdKpis || []).map(kpi => {
+      const desiredOrder = ['ctr', 'cpc', 'lc_to_lpv', 'cost_lpv', 'cpm', 'lpv_to_atc', 'atc_to_ic', 'cpr', 'closing_rate'];
+
+      const list = [...(state.rdKpis || [])].sort((a, b) => {
+        const idxA = desiredOrder.indexOf(a.id);
+        const idxB = desiredOrder.indexOf(b.id);
+        return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+      });
+
+      return list.map((kpi, index) => {
         let actualTarget = kpi.actualTarget;
         let actualTargetFormatted = kpi.actualTargetFormatted;
 
@@ -241,13 +257,14 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         else if (kpi.id === 'cost_lpv') cleanMetric = 'Cost LPV';
         else if (kpi.id === 'ctr') cleanMetric = 'CTR';
         else if (kpi.id === 'cpr') cleanMetric = 'CPR';
-        else if (kpi.id === 'closing_rate') cleanMetric = 'Closing Rate CS';
+        else if (kpi.id === 'closing_rate') cleanMetric = 'Closing Rate';
         else if (kpi.id === 'lc_to_lpv') cleanMetric = 'LC to LPV';
         else if (kpi.id === 'lpv_to_atc') cleanMetric = 'LPV to ATC';
         else if (kpi.id === 'atc_to_ic') cleanMetric = 'ATC to IC';
 
         return {
           ...kpi,
+          no: index + 1,
           metric: cleanMetric,
           productPriceFormatted: kpi.hasProductPrice ? `Rp${price.toLocaleString('id-ID')}` : '',
           productPriceValue: kpi.hasProductPrice ? price : null,

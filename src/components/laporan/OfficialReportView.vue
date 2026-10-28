@@ -5,7 +5,7 @@
       <div>
         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
           <FileText class="w-5 h-5 text-teal-600" />
-          <span>Laporan Kinerja Resmi (Export PDF)</span>
+          <span>Laporan Kinerja Resmi</span>
         </h2>
         <p class="text-xs text-slate-500 mt-0.5">
           Dokumen standar yayasan dengan Kop Surat, rincian KPI, dan rekomendasi injeksi anggaran Ad Lab
@@ -43,13 +43,13 @@
           class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95"
         >
           <Printer class="w-4 h-4" />
-          <span>Cetak / Simpan PDF</span>
+          <span>Simpan PDF</span>
         </button>
       </div>
     </div>
 
-    <!-- Printable Official Document Paper -->
-    <div class="print-page bg-white rounded-2xl p-6 sm:p-10 shadow-soft border border-slate-200/80 max-w-5xl mx-auto text-slate-800 font-sans">
+    <!-- Printable Official Document Paper (Format Standar Kertas A4: 210 x 297 mm) -->
+    <div class="print-page a4-paper bg-white rounded-2xl p-6 sm:p-10 shadow-soft border border-slate-200/80 mx-auto text-slate-800 font-sans">
       
       <!-- KOP SURAT RESMI YAYASAN KHOIRUR ROOZIQIIN -->
       <div class="flex items-center justify-between gap-4 pb-4 border-b-4 border-double border-slate-800">
@@ -92,11 +92,45 @@
         </div>
       </div>
 
-      <!-- I. RINGKASAN EKSEKUTIF KPI -->
+      <!-- I. CAPAIAN MATRIKS LOGFRAME (Dipindahkan ke Posisi I Sesuai Perintah Gambar) -->
       <div class="mb-6">
         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center gap-1.5 pb-1 border-b border-slate-200">
           <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-          <span>I. Ringkasan Eksekutif KPI & Efisiensi Akuisisi</span>
+          <span>I. Capaian Matriks LogFrame</span>
+        </h3>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+          <div class="p-3 rounded-xl border border-indigo-200 bg-indigo-50/40">
+            <span class="font-extrabold text-[10px] text-indigo-800 block uppercase">GOAL (Dampak Utama)</span>
+            <span class="text-lg font-black text-indigo-900 mt-1 block">{{ store.logFrameProgress.GOAL.percent }}%</span>
+            <span class="text-[10px] text-slate-500 font-medium">{{ store.logFrameProgress.GOAL.completed }}/{{ store.logFrameProgress.GOAL.total }} Task Tervalidasi</span>
+          </div>
+
+          <div class="p-3 rounded-xl border border-teal-200 bg-teal-50/40">
+            <span class="font-extrabold text-[10px] text-teal-800 block uppercase">OUTCOME (Hasil Strategis)</span>
+            <span class="text-lg font-black text-teal-900 mt-1 block">{{ store.logFrameProgress.OUTCOME.percent }}%</span>
+            <span class="text-[10px] text-slate-500 font-medium">{{ store.logFrameProgress.OUTCOME.completed }}/{{ store.logFrameProgress.OUTCOME.total }} Task Tervalidasi</span>
+          </div>
+
+          <div class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/40">
+            <span class="font-extrabold text-[10px] text-emerald-800 block uppercase">OUTPUT (Deliverables)</span>
+            <span class="text-lg font-black text-emerald-900 mt-1 block">{{ store.logFrameProgress.OUTPUT.percent }}%</span>
+            <span class="text-[10px] text-slate-500 font-medium">{{ store.logFrameProgress.OUTPUT.completed }}/{{ store.logFrameProgress.OUTPUT.total }} Task Selesai</span>
+          </div>
+
+          <div class="p-3 rounded-xl border border-amber-200 bg-amber-50/40">
+            <span class="font-extrabold text-[10px] text-amber-800 block uppercase">ACTIVITY (Aksi Taktis)</span>
+            <span class="text-lg font-black text-amber-900 mt-1 block">{{ store.logFrameProgress.ACTIVITY.percent }}%</span>
+            <span class="text-[10px] text-slate-500 font-medium">{{ store.logFrameProgress.ACTIVITY.completed }}/{{ store.logFrameProgress.ACTIVITY.total }} Aksi Dijalankan</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- II. RINGKASAN EKSEKUTIF KPI & EFISIENSI AKUISISI (Menjadi Posisi II Sesuai Perintah Gambar) -->
+      <div class="mb-6">
+        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center gap-1.5 pb-1 border-b border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+          <span>II. Ringkasan Eksekutif KPI &amp; Efisiensi Akuisisi</span>
         </h3>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-2 text-xs">
@@ -141,39 +175,39 @@
           </div>
         </div>
 
-        <!-- Tabel Baku Standar KPI Iklan (Format Excel 6 Kolom) -->
-        <div class="mt-4 border border-slate-300 rounded-lg overflow-hidden">
-          <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between">
-            <span class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">
+        <!-- Tabel Baku Tolak Ukur Standar KPI Iklan (Font Diperbesar, Susunan Baru & EYD Rapih) -->
+        <div class="mt-4 border border-slate-300 rounded-xl overflow-hidden shadow-micro">
+          <div class="bg-slate-100 px-3.5 py-2 border-b border-slate-300 flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">
               Tolak Ukur Standar KPI Iklan
             </span>
-            <span class="text-[9px] font-semibold text-slate-600">
+            <span class="text-[11px] font-semibold text-slate-600">
               Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}
             </span>
           </div>
-          <table class="w-full text-left text-[10px] text-slate-700 border-collapse">
+          <table class="w-full text-left text-xs text-slate-800 border-collapse">
             <thead>
-              <tr class="bg-slate-50 font-bold border-b border-slate-300 text-slate-800">
-                <th class="py-1.5 px-2 w-8 text-center border-r border-slate-300">NO</th>
-                <th class="py-1.5 px-2.5 w-36 border-r border-slate-300">KPI METRIC</th>
-                <th class="py-1.5 px-2.5 w-32 border-r border-slate-300">TARGET KPI</th>
-                <th class="py-1.5 px-2.5 w-28 border-r border-slate-300">HARGA JUAL</th>
-                <th class="py-1.5 px-2.5 w-28 text-center bg-blue-50 font-extrabold text-blue-900 border-r border-slate-300">
+              <tr class="bg-slate-50 font-bold border-b border-slate-300 text-slate-800 text-[11px]">
+                <th class="py-2 px-2.5 w-10 text-center border-r border-slate-300">NO</th>
+                <th class="py-2 px-3 w-36 border-r border-slate-300">KPI METRIC</th>
+                <th class="py-2 px-3 w-36 border-r border-slate-300">TARGET KPI</th>
+                <th class="py-2 px-3 w-28 border-r border-slate-300">HARGA JUAL</th>
+                <th class="py-2 px-3 w-32 text-center bg-blue-50 font-black text-blue-900 border-r border-slate-300">
                   ACTUAL TARGET KPI
                 </th>
-                <th class="py-1.5 px-2.5">AKSI BILA TIDAK TERCAPAI</th>
+                <th class="py-2 px-3.5">AKSI BILA TIDAK TERCAPAI</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
-              <tr v-for="item in store.rdKpiList" :key="item.no" class="hover:bg-slate-50">
-                <td class="py-1.5 px-2 text-center font-bold text-slate-500 border-r border-slate-200">{{ item.no }}</td>
-                <td class="py-1.5 px-2.5 font-bold text-slate-900 border-r border-slate-200">{{ item.metric }}</td>
-                <td class="py-1.5 px-2.5 border-r border-slate-200 font-medium">{{ item.targetKpi }}</td>
-                <td class="py-1.5 px-2.5 border-r border-slate-200 text-slate-600">{{ item.productPriceFormatted || '-' }}</td>
-                <td class="py-1.5 px-2.5 text-center font-black text-blue-900 bg-blue-50/50 border-r border-slate-200">{{ item.actualTargetFormatted }}</td>
-                <td class="py-1.5 px-2.5 text-[9px] text-slate-700">
-                  <div class="space-y-0.5">
-                    <p v-for="(act, idx) in item.actions" :key="idx" class="leading-tight">
+              <tr v-for="item in store.rdKpiList" :key="item.no" class="hover:bg-slate-50/80 transition-colors">
+                <td class="py-2.5 px-2.5 text-center font-bold text-slate-500 border-r border-slate-200 align-top">{{ item.no }}</td>
+                <td class="py-2.5 px-3 font-bold text-slate-900 border-r border-slate-200 align-top whitespace-nowrap">{{ item.metric }}</td>
+                <td class="py-2.5 px-3 border-r border-slate-200 font-semibold text-slate-700 align-top whitespace-nowrap">{{ item.targetKpi }}</td>
+                <td class="py-2.5 px-3 border-r border-slate-200 text-slate-600 align-top whitespace-nowrap">{{ item.productPriceFormatted || '-' }}</td>
+                <td class="py-2.5 px-3 text-center font-black text-blue-900 bg-blue-50/40 border-r border-slate-200 align-top whitespace-nowrap">{{ item.actualTargetFormatted }}</td>
+                <td class="py-2.5 px-3.5 text-xs text-slate-800 align-top leading-relaxed">
+                  <div class="space-y-1">
+                    <p v-for="(act, idx) in item.actions" :key="idx" class="leading-relaxed">
                       {{ act }}
                     </p>
                   </div>
@@ -181,40 +215,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- II. CAPAIAN MATRIKS LOGFRAME -->
-      <div class="mb-6">
-        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center gap-1.5 pb-1 border-b border-slate-200">
-          <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-          <span>II. Capaian Matriks LogFrame</span>
-        </h3>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div class="p-2.5 rounded-lg border border-indigo-200 bg-indigo-50/30">
-            <span class="font-extrabold text-[10px] text-indigo-800 block uppercase">GOAL (Dampak Utama)</span>
-            <span class="text-base font-black text-indigo-900 mt-1 block">{{ store.logFrameProgress.GOAL.percent }}%</span>
-            <span class="text-[10px] text-slate-500">{{ store.logFrameProgress.GOAL.completed }}/{{ store.logFrameProgress.GOAL.total }} Task Tervalidasi</span>
-          </div>
-
-          <div class="p-2.5 rounded-lg border border-teal-200 bg-teal-50/30">
-            <span class="font-extrabold text-[10px] text-teal-800 block uppercase">OUTCOME (Hasil Strategis)</span>
-            <span class="text-base font-black text-teal-900 mt-1 block">{{ store.logFrameProgress.OUTCOME.percent }}%</span>
-            <span class="text-[10px] text-slate-500">{{ store.logFrameProgress.OUTCOME.completed }}/{{ store.logFrameProgress.OUTCOME.total }} Task Tervalidasi</span>
-          </div>
-
-          <div class="p-2.5 rounded-lg border border-emerald-200 bg-emerald-50/30">
-            <span class="font-extrabold text-[10px] text-emerald-800 block uppercase">OUTPUT (Deliverables)</span>
-            <span class="text-base font-black text-emerald-900 mt-1 block">{{ store.logFrameProgress.OUTPUT.percent }}%</span>
-            <span class="text-[10px] text-slate-500">{{ store.logFrameProgress.OUTPUT.completed }}/{{ store.logFrameProgress.OUTPUT.total }} Task Selesai</span>
-          </div>
-
-          <div class="p-2.5 rounded-lg border border-amber-200 bg-amber-50/30">
-            <span class="font-extrabold text-[10px] text-amber-800 block uppercase">ACTIVITY (Aksi Taktis)</span>
-            <span class="text-base font-black text-amber-900 mt-1 block">{{ store.logFrameProgress.ACTIVITY.percent }}%</span>
-            <span class="text-[10px] text-slate-500">{{ store.logFrameProgress.ACTIVITY.completed }}/{{ store.logFrameProgress.ACTIVITY.total }} Aksi Dijalankan</span>
-          </div>
         </div>
       </div>
 
@@ -338,12 +338,12 @@
         </div>
       </div>
 
-      <!-- TANDA TANGAN & PENGESAHAN DOKUMEN (Pindah ke Kanan) -->
+      <!-- TANDA TANGAN & PENGESAHAN DOKUMEN (Pindah ke Kanan & Cursive Dihapus Sesuai Tanda X) -->
       <div class="pt-6 border-t border-slate-200 flex justify-end text-xs text-center">
         <div class="w-64">
           <p class="text-slate-500 font-medium">Diajukan &amp; Disusun Oleh,</p>
           <div class="h-16 flex items-end justify-center">
-            <span class="font-serif italic text-teal-800 font-bold text-sm">{{ store.profile.fullName }}</span>
+            <!-- Ruang tanda tangan / paraf -->
           </div>
           <p class="font-bold text-slate-900 border-t border-slate-400 pt-1 mt-1 inline-block min-w-[180px]">
             {{ store.profile.fullName }}
@@ -352,10 +352,9 @@
         </div>
       </div>
 
-      <!-- Footer Info -->
-      <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+      <!-- Footer Info (Pindah ke Kanan Sesuai Tanda Panah Merah) -->
+      <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-end text-[10px] text-slate-400">
         <span>R&amp;D GrowthFlow Platform • Yayasan Khoirur Rooziqiin © 2026</span>
-        <span>Dokumen Resmi Internal • Rahasia &amp; Terpercaya</span>
       </div>
     </div>
   </div>
@@ -459,3 +458,53 @@ function printDocument() {
   window.print();
 }
 </script>
+
+<style scoped>
+/* A4 Dimensions (210 x 297 mm) for Screen Preview */
+.a4-paper {
+  max-width: 210mm;
+  width: 100%;
+  min-height: 297mm;
+  box-sizing: border-box;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 10mm 12mm;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .a4-paper,
+  .print-page {
+    max-width: 100% !important;
+    width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr,
+  .avoid-page-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+</style>
