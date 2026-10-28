@@ -56,15 +56,15 @@
         <table class="w-full text-left text-xs text-slate-700 border-collapse">
           <thead>
             <tr class="bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-800 text-white font-extrabold text-[11px] uppercase tracking-wider">
-              <th scope="col" class="py-2.5 px-2.5 w-10 text-center border-r border-teal-600/50">NO</th>
-              <th scope="col" class="py-2.5 px-3 w-28 border-r border-teal-600/50">KPI METRIC</th>
-              <th scope="col" class="py-2.5 px-3 w-32 border-r border-teal-600/50">TARGET KPI</th>
-              <th scope="col" class="py-2.5 px-3 w-28 border-r border-teal-600/50">HARGA JUAL</th>
-              <th scope="col" class="py-2 px-2.5 w-28 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
+              <th scope="col" class="py-2 px-2 w-8 text-center border-r border-teal-600/50">NO</th>
+              <th scope="col" class="py-2 px-2.5 w-24 border-r border-teal-600/50">KPI METRIC</th>
+              <th scope="col" class="py-2 px-2 w-20 text-center border-r border-teal-600/50">TARGET KPI</th>
+              <th scope="col" class="py-2 px-2 w-24 text-center border-r border-teal-600/50">HARGA JUAL</th>
+              <th scope="col" class="py-1.5 px-2 w-24 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
                 <span class="block leading-tight">ACTUAL TARGET</span>
                 <span class="block leading-tight text-[10px]">KPI</span>
               </th>
-              <th scope="col" class="py-2.5 px-4">AKSI BILA TIDAK TERCAPAI</th>
+              <th scope="col" class="py-2 px-3">AKSI BILA TIDAK TERCAPAI</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 font-medium">
@@ -74,151 +74,120 @@
               class="hover:bg-teal-50/30 transition-colors"
             >
               <!-- 1. No -->
-              <td class="py-2.5 px-3 text-center font-bold text-slate-500 border-r border-slate-100 bg-slate-50/50">
+              <td class="py-2 px-2 text-center font-bold text-slate-500 border-r border-slate-100 bg-slate-50/50">
                 {{ item.no }}
               </td>
 
-              <!-- 2. KPI Metric -->
-              <td class="py-2.5 px-4 font-bold text-slate-800 border-r border-slate-100">
-                <div class="flex items-center gap-2">
-                  <span
-                    class="w-2 h-2 rounded-full"
-                    :class="item.status === 'optimal' ? 'bg-emerald-500' : 'bg-amber-500'"
-                  ></span>
-                  <span>{{ item.metric }}</span>
-                </div>
+              <!-- 2. KPI Metric (Bullet Hapus Sesuai Gambar) -->
+              <td class="py-2 px-2.5 font-bold text-slate-900 border-r border-slate-100 whitespace-nowrap">
+                {{ item.metric }}
               </td>
 
-              <!-- 3. Target KPI -->
-              <td class="py-2.5 px-4 text-slate-600 border-r border-slate-100">
-                <span class="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-semibold">
+              <!-- 3. Target KPI (Ramping & Efisien) -->
+              <td class="py-2 px-2 text-center text-slate-700 border-r border-slate-100 whitespace-nowrap">
+                <span class="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-800 text-[11px] font-bold">
                   {{ item.targetKpi }}
                 </span>
               </td>
 
               <!-- 4. Harga Jual -->
               <td
-                class="py-2.5 px-4 text-slate-600 border-r border-slate-100 transition-colors"
+                class="py-2 px-2 text-center text-slate-600 border-r border-slate-100 transition-colors whitespace-nowrap text-[11px]"
                 :class="item.hasProductPrice ? 'cursor-pointer hover:bg-teal-50/60 group' : ''"
                 @click="item.hasProductPrice ? openPriceModal() : null"
                 :title="item.hasProductPrice ? 'Klik untuk ubah Harga Jual' : ''"
               >
-                <div v-if="item.hasProductPrice" class="flex items-center justify-between">
+                <div v-if="item.hasProductPrice" class="inline-flex items-center justify-center gap-1">
                   <span class="font-semibold text-slate-700">
                     {{ item.productPriceFormatted || formatCurrency(store.rdProductPrice) }}
                   </span>
-                  <Edit2 class="w-3 h-3 text-teal-600 opacity-60 group-hover:opacity-100 transition-opacity ml-1" />
+                  <Edit2 class="w-3 h-3 text-teal-600 opacity-60 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <span v-else class="text-slate-400 font-normal italic">-</span>
               </td>
 
               <!-- 5. Actual Target KPI -->
-              <td class="py-2.5 px-4 text-center font-black border-r border-blue-100 bg-blue-50/70 text-blue-900 text-sm">
-                <span class="px-2.5 py-1 rounded-lg bg-blue-100/90 border border-blue-200 block shadow-micro tracking-tight">
+              <td class="py-2 px-2 text-center font-black border-r border-blue-100 bg-blue-50/50 text-blue-900 text-xs whitespace-nowrap">
+                <span class="px-2 py-0.5 rounded-lg bg-blue-100/90 border border-blue-200 inline-block shadow-micro tracking-tight font-extrabold">
                   {{ item.actualTargetFormatted }}
                 </span>
               </td>
 
-              <!-- 6. Aksi Bila Tidak Tercapai (Ejaan Yang Benar) -->
-              <td class="py-2.5 px-4 text-slate-700 text-xs">
-                <div class="space-y-1">
-                  <!-- CPC -->
-                  <template v-if="item.id === 'cpc'">
-                    <p class="flex items-center gap-1.5 text-slate-700">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Perbaiki konten kreatif</span>
-                    </p>
-                    <p class="flex items-center gap-1.5 text-slate-700">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Tambah variasi konten baru</span>
-                    </p>
-                  </template>
+              <!-- 6. Aksi Bila Tidak Tercapai (Ramping, Efisien & EYD Rapi) -->
+              <td class="py-2 px-3 text-slate-700 text-xs leading-relaxed">
+                <!-- CTR -->
+                <template v-if="item.id === 'ctr'">
+                  <p class="font-medium text-slate-800">
+                    Buat konten yang lebih menarik (komentar, share, like).
+                  </p>
+                  <p class="text-[11px] text-slate-600 mt-0.5">
+                    <strong class="text-teal-800">Ciri-ciri:</strong> 1. Konten 4K; 2. Informatif; 3. Menarik; 4. Lucu / humor.
+                  </p>
+                </template>
 
-                  <!-- Cost LPV -->
-                  <template v-else-if="item.id === 'cost_lpv'">
-                    <p class="flex items-center gap-1.5 text-slate-700">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Perbaiki kecepatan landing page</span>
-                    </p>
-                    <p class="flex items-center gap-1.5 text-slate-700">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Gunakan lazy load, website booster</span>
-                    </p>
-                  </template>
+                <!-- CPC -->
+                <template v-else-if="item.id === 'cpc'">
+                  <p class="font-medium text-slate-700">
+                    Perbaiki konten kreatif; Tambah variasi konten baru.
+                  </p>
+                </template>
 
-                  <!-- CPM -->
-                  <template v-else-if="item.id === 'cpm'">
-                    <p class="flex items-center gap-1.5 text-rose-800 font-semibold bg-rose-50/80 px-2 py-1 rounded border border-rose-100">
-                      <span>Tunggu 2-3 hari evaluasi stabilisasi algoritma; jika tetap buruk, segera matikan (kill)</span>
-                    </p>
-                  </template>
+                <!-- LC to LPV -->
+                <template v-else-if="item.id === 'lc_to_lpv'">
+                  <p class="font-medium text-slate-700">
+                    Jika kurang, optimasi landing page agar lebih cepat.
+                  </p>
+                </template>
 
-                  <!-- CTR -->
-                  <template v-else-if="item.id === 'ctr'">
-                    <p class="font-semibold text-slate-800">
-                      Buat konten yang lebih menarik (komentar, share, like)
-                    </p>
-                    <div class="pl-2 border-l-2 border-teal-300 text-[11px] text-slate-600 space-y-0.5 mt-1">
-                      <p class="font-bold text-teal-800">Ciri-ciri:</p>
-                      <p>1. Kualitas konten 4K</p>
-                      <p>2. Konten informatif</p>
-                      <p>3. Konten menarik</p>
-                      <p>4. Konten lucu / humor</p>
-                    </div>
-                  </template>
+                <!-- Cost LPV -->
+                <template v-else-if="item.id === 'cost_lpv'">
+                  <p class="font-medium text-slate-700">
+                    Perbaiki kecepatan landing page; Gunakan lazy load, website booster.
+                  </p>
+                </template>
 
-                  <!-- CPR -->
-                  <template v-else-if="item.id === 'cpr'">
-                    <p class="font-bold text-slate-800">Perbaiki Website:</p>
-                    <div class="pl-2 border-l-2 border-amber-300 text-[11px] text-slate-600 space-y-0.5 mt-1">
-                      <p>1. Desain website profesional</p>
-                      <p>2. Penawaran menarik (bonus / urgensi)</p>
-                      <p>3. Harga (coba turunkan jika masih kurang optimal dalam 1 pekan)</p>
-                      <p>4. Persingkat alur checkout, jangan terlalu panjang</p>
-                    </div>
-                  </template>
+                <!-- CPM -->
+                <template v-else-if="item.id === 'cpm'">
+                  <p class="text-rose-800 font-semibold bg-rose-50 px-2 py-0.5 rounded border border-rose-100 inline-block text-[11px]">
+                    Tunggu 2–3 hari evaluasi stabilisasi algoritma; jika tetap buruk, segera matikan (kill)
+                  </p>
+                </template>
 
-                  <!-- Closing Rate CS -->
-                  <template v-else-if="item.id === 'closing_rate'">
-                    <div class="text-[11px] text-slate-700 space-y-0.5">
-                      <p>1. Edukasi CS (In-House Training, Workshop)</p>
-                      <p>2. Perbesar nilai bonus organik</p>
-                      <p>3. CS fast respon maksimal 5 menit</p>
-                    </div>
-                  </template>
+                <!-- LPV to ATC -->
+                <template v-else-if="item.id === 'lpv_to_atc'">
+                  <p class="font-medium text-slate-700">
+                    Gunakan hypno writing di landingpage.
+                  </p>
+                </template>
 
-                  <!-- LC to LPV -->
-                  <template v-else-if="item.id === 'lc_to_lpv'">
-                    <p class="flex items-center gap-1.5 text-slate-700 font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Jika kurang, optimasi landing page agar lebih cepat</span>
-                    </p>
-                  </template>
+                <!-- ATC to IC -->
+                <template v-else-if="item.id === 'atc_to_ic'">
+                  <p class="font-medium text-slate-700">
+                    Beri penawaran menarik.
+                  </p>
+                </template>
 
-                  <!-- LPV to ATC -->
-                  <template v-else-if="item.id === 'lpv_to_atc'">
-                    <p class="flex items-center gap-1.5 text-slate-700 font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Gunakan hypno writing di landingpage</span>
-                    </p>
-                  </template>
+                <!-- CPR -->
+                <template v-else-if="item.id === 'cpr'">
+                  <p class="font-bold text-slate-800 text-[11px]">Perbaiki Website:</p>
+                  <p class="text-[11px] text-slate-600 mt-0.5">
+                    1. Desain pro; 2. Offer (bonus/urgensi); 3. Coba turunkan harga; 4. Persingkat alur checkout.
+                  </p>
+                </template>
 
-                  <!-- ATC to IC -->
-                  <template v-else-if="item.id === 'atc_to_ic'">
-                    <p class="flex items-center gap-1.5 text-slate-700 font-semibold">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>Beri penawaran menarik</span>
-                    </p>
-                  </template>
+                <!-- Closing Rate -->
+                <template v-else-if="item.id === 'closing_rate'">
+                  <p class="font-medium text-slate-700 text-[11px]">
+                    1. Edukasi CS (IHT, WS); 2. Perbesar nilai bonus organik; 3. Fast respon maksimal 5 menit.
+                  </p>
+                </template>
 
-                  <!-- Default Fallback -->
-                  <template v-else>
-                    <p v-for="(act, aIdx) in item.actions" :key="aIdx" class="flex items-center gap-1.5 text-slate-700">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
-                      <span>{{ act }}</span>
-                    </p>
-                  </template>
-                </div>
+                <!-- Default Fallback -->
+                <template v-else>
+                  <p v-for="(act, aIdx) in item.actions" :key="aIdx" class="text-slate-700">
+                    {{ act }}
+                  </p>
+                </template>
               </td>
             </tr>
           </tbody>

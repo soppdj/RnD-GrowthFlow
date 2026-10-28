@@ -187,35 +187,39 @@
           </div>
           <table class="w-full text-left text-xs text-slate-800 border-collapse table-fixed">
             <colgroup>
-              <col style="width: 36px" />
-              <col style="width: 98px" />
-              <col style="width: 115px" />
-              <col style="width: 78px" />
-              <col style="width: 96px" />
+              <col style="width: 32px" />
+              <col style="width: 95px" />
+              <col style="width: 80px" />
+              <col style="width: 75px" />
+              <col style="width: 90px" />
               <col />
             </colgroup>
             <thead>
               <tr class="bg-slate-50 font-bold border-b border-slate-300 text-slate-800 text-[11px]">
-                <th class="py-2 px-1 text-center border-r border-slate-300 w-[36px]">NO</th>
-                <th class="py-2 px-2 border-r border-slate-300 w-[98px]">KPI METRIC</th>
-                <th class="py-2 px-2 border-r border-slate-300 w-[115px]">TARGET KPI</th>
-                <th class="py-2 px-1 text-center border-r border-slate-300 w-[78px]">HARGA JUAL</th>
-                <th class="py-1.5 px-1.5 text-center bg-blue-50 font-black text-blue-900 border-r border-slate-300 w-[96px]">
+                <th class="py-2 px-1 text-center border-r border-slate-300 w-[32px]">NO</th>
+                <th class="py-2 px-2 border-r border-slate-300 w-[95px]">KPI METRIC</th>
+                <th class="py-2 px-1 text-center border-r border-slate-300 w-[80px]">TARGET KPI</th>
+                <th class="py-2 px-1 text-center border-r border-slate-300 w-[75px]">HARGA JUAL</th>
+                <th class="py-1.5 px-1 text-center bg-blue-50 font-black text-blue-900 border-r border-slate-300 w-[90px]">
                   <span class="block leading-tight">ACTUAL TARGET</span>
                   <span class="block leading-tight text-[10px]">KPI</span>
                 </th>
-                <th class="py-2 px-3.5">AKSI BILA TIDAK TERCAPAI</th>
+                <th class="py-2 px-3">AKSI BILA TIDAK TERCAPAI</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
               <tr v-for="item in store.rdKpiList" :key="item.no" class="hover:bg-slate-50/80 transition-colors">
-                <td class="py-2.5 px-1 text-center font-bold text-slate-500 border-r border-slate-200 align-top">{{ item.no }}</td>
-                <td class="py-2.5 px-2 font-bold text-slate-900 border-r border-slate-200 align-top whitespace-nowrap">{{ item.metric }}</td>
-                <td class="py-2.5 px-2 border-r border-slate-200 font-semibold text-slate-700 align-top leading-tight text-[11px] break-words">{{ item.targetKpi }}</td>
-                <td class="py-2.5 px-1 text-center border-r border-slate-200 text-slate-600 align-top whitespace-nowrap text-[11px]">{{ item.productPriceFormatted || '-' }}</td>
-                <td class="py-2.5 px-1.5 text-center font-black text-blue-900 bg-blue-50/40 border-r border-slate-200 align-top whitespace-nowrap text-xs">{{ item.actualTargetFormatted }}</td>
-                <td class="py-2.5 px-3.5 text-xs text-slate-800 align-top leading-relaxed">
-                  <div class="space-y-1">
+                <td class="py-2 px-1 text-center font-bold text-slate-500 border-r border-slate-200 align-top">{{ item.no }}</td>
+                <td class="py-2 px-2 font-bold text-slate-900 border-r border-slate-200 align-top whitespace-nowrap">{{ item.metric }}</td>
+                <td class="py-2 px-1 text-center border-r border-slate-200 font-bold text-slate-800 align-top whitespace-nowrap text-xs">
+                  <span class="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-[11px]">
+                    {{ item.targetKpi }}
+                  </span>
+                </td>
+                <td class="py-2 px-1 text-center border-r border-slate-200 text-slate-600 align-top whitespace-nowrap text-[11px]">{{ item.productPriceFormatted || '-' }}</td>
+                <td class="py-2 px-1 text-center font-black text-blue-900 bg-blue-50/40 border-r border-slate-200 align-top whitespace-nowrap text-xs">{{ item.actualTargetFormatted }}</td>
+                <td class="py-2 px-3 text-xs text-slate-800 align-top leading-relaxed">
+                  <div class="space-y-0.5">
                     <p v-for="(act, idx) in item.actions" :key="idx" class="leading-relaxed">
                       {{ act }}
                     </p>

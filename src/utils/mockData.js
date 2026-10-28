@@ -452,29 +452,25 @@ export const initialRdKpis = [
     no: 1,
     id: "ctr",
     metric: "CTR",
-    targetKpi: "diatas 2%",
+    targetKpi: "> 2%",
     hasProductPrice: true,
     actualTarget: 2.0,
-    actualTargetFormatted: "diatas 2%",
+    actualTargetFormatted: "> 2%",
     currentValue: 2.85,
     currentValueFormatted: "2.85%",
     unit: "percent",
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Bikin konten yang lebih menarik (komen, share, like).",
-      "Ciri - ciri:",
-      "1. Kualitas konten 4K;",
-      "2. Konten informatif;",
-      "3. Konten menarik;",
-      "4. Konten lucu / humor."
+      "Buat konten yang lebih menarik (komen, share, like).",
+      "Ciri-ciri: 1. Kualitas 4K; 2. Informatif; 3. Menarik; 4. Humor."
     ]
   },
   {
     no: 2,
     id: "cpc",
     metric: "CPC",
-    targetKpi: "1% Harga Jual",
+    targetKpi: "1%",
     hasProductPrice: true,
     actualTarget: 500,
     actualTargetFormatted: "Rp500",
@@ -484,8 +480,7 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Perbaiki konten;",
-      "Tambah konten baru."
+      "Perbaiki konten kreatif; Tambah variasi konten baru."
     ]
   },
   {
@@ -510,7 +505,7 @@ export const initialRdKpis = [
     no: 4,
     id: "cost_lpv",
     metric: "Cost LPV",
-    targetKpi: "2 - 3% harga jual",
+    targetKpi: "2 - 3%",
     hasProductPrice: true,
     actualTarget: 1500,
     actualTargetFormatted: "Rp1.500",
@@ -520,15 +515,14 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Perbaiki kecepatan LP;",
-      "Pakai lazyload, website booster."
+      "Perbaiki kecepatan landing page; Gunakan lazy load, website booster."
     ]
   },
   {
     no: 5,
     id: "cpm",
     metric: "CPM",
-    targetKpi: "32 K OBJECTIVE SALES",
+    targetKpi: "32K",
     hasProductPrice: true,
     actualTarget: 32000,
     actualTargetFormatted: "Rp32.000",
@@ -538,7 +532,7 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Tunggu 2–3 hari / jika masih jelek kill."
+      "Tunggu 2–3 hari evaluasi stabilisasi algoritma; jika tetap buruk, segera matikan (kill)."
     ]
   },
   {
@@ -581,7 +575,7 @@ export const initialRdKpis = [
     no: 8,
     id: "cpr",
     metric: "CPR",
-    targetKpi: "25% Harga jual",
+    targetKpi: "25%",
     hasProductPrice: true,
     actualTarget: 12500,
     actualTargetFormatted: "Rp12.500",
@@ -591,11 +585,7 @@ export const initialRdKpis = [
     status: "optimal",
     statusLabel: "Optimal",
     actions: [
-      "Perbaiki Website:",
-      "1. Desain website (pro);",
-      "2. Offer (penawaran: bonus);",
-      "3. Harga (coba turunkan jika masih kurang bagus dalam 1 pekan);",
-      "4. Persingkat tampilan web jangan terlalu panjang."
+      "Perbaiki Website: 1. Desain pro; 2. Offer (bonus/urgensi); 3. Coba turunkan harga; 4. Persingkat alur checkout."
     ]
   },
   {
@@ -613,8 +603,7 @@ export const initialRdKpis = [
     statusLabel: "Optimal",
     funnelPhase: "Closing CS",
     actions: [
-      "1. Edukasi CS (IHT, WS);",
-      "2. Bonus organik perbesar nilainya."
+      "1. Edukasi CS (IHT, WS); 2. Perbesar nilai bonus organik; 3. Fast respon maksimal 5 menit."
     ]
   }
 ];

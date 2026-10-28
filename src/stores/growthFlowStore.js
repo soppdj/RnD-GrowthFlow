@@ -87,6 +87,9 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
             return {
               ...init,
               no: idx + 1,
+              targetKpi: init.targetKpi,
+              actualTargetFormatted: init.actualTargetFormatted,
+              actions: init.actions,
               currentValue: found ? found.currentValue : init.currentValue,
               currentValueFormatted: found ? found.currentValueFormatted : init.currentValueFormatted
             };
@@ -226,9 +229,9 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           actualTarget = 32000;
           actualTargetFormatted = 'Rp32.000';
         } else if (kpi.id === 'ctr') {
-          // Fixed diatas 2%
+          // Fixed > 2%
           actualTarget = 2.0;
-          actualTargetFormatted = 'diatas 2%';
+          actualTargetFormatted = '> 2%';
         } else if (kpi.id === 'cpr') {
           // 25% of Harga Jual
           actualTarget = Math.round(price * 0.25);
