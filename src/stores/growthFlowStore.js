@@ -24,7 +24,7 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         // Load profile with backwards-compatible defaults for avatar adjustments
         let profile = { ...initialProfile, ...(parsed.profile || {}) };
         profile.foundationAddress = 'Jl. Raya Cimareme Rt.001 Rw.002 Desa Cimareme Kec. Ngamprah Kab. Bandung Barat';
-        profile.workDaysPerWeek = profile.workDaysPerWeek || 5;
+        profile.workDaysPerWeek = profile.workDaysPerWeek || 3;
         if (profile.fullName === 'Ustadz Rizky Syahputra') {
           profile = { ...initialProfile, ...profile, fullName: 'Sopianto Djahar' };
         }

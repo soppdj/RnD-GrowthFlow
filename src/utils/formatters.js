@@ -128,38 +128,56 @@ export const LOGFRAME_TYPES = {
 };
 
 /**
- * Calculates week of the month (Minggu 1 - 5)
- * Week 1: 1 - 7
- * Week 2: 8 - 14
- * Week 3: 15 - 21
- * Week 4: 22 - 28
- * Week 5: 29 - 31
+ * Calculates work week of the month (Awal Minggu = Senin, Akhir Minggu = Jumat)
+ * Sesuai arahan SOP: Setiap minggu kerja dimulai pada hari Senin dan berakhir pada hari Jumat.
  */
 export function getWeekOfMonth(dateStr) {
   if (!dateStr) return 1;
   const d = new Date(dateStr);
+  const year = d.getFullYear();
+  const month = d.getMonth();
   const day = d.getDate();
   if (isNaN(day)) return 1;
-  if (day <= 7) return 1;
-  if (day <= 14) return 2;
-  if (day <= 21) return 3;
-  if (day <= 28) return 4;
-  return 5;
+
+  // Cari tanggal hari Senin pertama dalam bulan tersebut
+  let firstMonday = 1;
+  for (let i = 1; i <= 7; i++) {
+    const testD = new Date(year, month, i);
+    if (testD.getDay() === 1) { // 1 = Senin
+      firstMonday = i;
+      break;
+    }
+  }
+
+  // Jika tanggal berada sebelum Senin pertama (awal bulan partial)
+  if (day < firstMonday) {
+    return 1;
+  }
+
+  const daysSinceFirstMonday = day - firstMonday;
+  const weekOffset = firstMonday === 1 ? 1 : 2;
+  const weekNum = weekOffset + Math.floor(daysSinceFirstMonday / 7);
+  return Math.min(weekNum, 5);
 }
 
 /**
- * Checks if a date falls on a working day according to daysPerWeek (5, 6, 7)
- * 5 days: Monday (1) - Friday (5)
- * 6 days: Monday (1) - Saturday (6)
- * 7 days: Every day (0 - 6)
+ * Checks if a date falls on a working day according to daysPerWeek (1 - 7)
+ * Mendukung fleksibilitas input manual (contoh: 3 hari kerja efektif R&D: Senin, Rabu, Jumat)
  */
 export function isWorkDay(dateStr, daysPerWeek = 5) {
   if (!dateStr) return true;
   const d = new Date(dateStr);
-  const dayOfWeek = d.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-  if (daysPerWeek === 7) return true;
-  if (daysPerWeek === 6) return dayOfWeek !== 0; // Exclude Sunday
-  return dayOfWeek >= 1 && dayOfWeek <= 5; // Monday - Friday
+  const dayOfWeek = d.getDay(); // 0: Minggu, 1: Senin, 2: Selasa, 3: Rabu, 4: Kamis, 5: Jumat, 6: Sabtu
+  const days = Number(daysPerWeek) || 5;
+
+  if (days >= 7) return true;
+  if (days === 6) return dayOfWeek !== 0; // Senin - Sabtu (tanpa Minggu)
+  if (days === 5) return dayOfWeek >= 1 && dayOfWeek <= 5; // Senin - Jumat
+  if (days === 4) return dayOfWeek >= 1 && dayOfWeek <= 4; // Senin - Kamis
+  if (days === 3) return dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5; // 3 Hari Efektif: Senin, Rabu, Jumat
+  if (days === 2) return dayOfWeek === 1 || dayOfWeek === 4; // 2 Hari: Senin & Kamis
+  if (days === 1) return dayOfWeek === 1; // 1 Hari: Senin
+  return dayOfWeek >= 1 && dayOfWeek <= days;
 }
 
 /**

@@ -244,6 +244,54 @@
       </form>
     </div>
 
+    <!-- 1.5 Keamanan Akses R&D & Layar Welcoming -->
+    <div class="glass-card rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-soft space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-teal-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs">
+            🛡️
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-800">Keamanan Akses &amp; Antarmuka R&amp;D</h3>
+            <p class="text-[11px] text-slate-500">Kelola kunci sesi PIN R&amp;D dan animasi welcoming workspace</p>
+          </div>
+        </div>
+        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
+          Sesi Aktif
+        </span>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="font-bold text-slate-800 block">Kunci Sesi R&amp;D</span>
+          <span class="text-slate-500 text-[11px]">Kunci layar workspace. Diperlukan PIN (2026) untuk masuk kembali.</span>
+        </div>
+        <button
+          type="button"
+          @click="lockSession"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white shadow-micro transition-all cursor-pointer"
+        >
+          <Lock class="w-3.5 h-3.5" />
+          <span>Kunci Sesi Sekarang</span>
+        </button>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="font-bold text-slate-800 block">Animasi Welcoming UI</span>
+          <span class="text-slate-500 text-[11px]">Buka kembali sambutan interaktif dan ringkasan kesiapan kuartal.</span>
+        </div>
+        <button
+          type="button"
+          @click="showWelcomingPreview = true"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 transition-all cursor-pointer"
+        >
+          <Sparkles class="w-3.5 h-3.5 text-teal-600" />
+          <span>Buka Layar Welcoming</span>
+        </button>
+      </div>
+    </div>
+
     <!-- 2. Supabase Integration Backend Card -->
     <div class="glass-card rounded-2xl p-5 sm:p-6 border border-teal-100 shadow-soft">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-teal-100">
@@ -506,6 +554,12 @@
         </button>
       </div>
     </div>
+
+    <!-- Preview Modal Welcoming -->
+    <WelcomingModal
+      :is-open="showWelcomingPreview"
+      @close="showWelcomingPreview = false"
+    />
   </div>
 </template>
 
@@ -513,6 +567,7 @@
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { useSupabase } from '@/composables/useSupabase';
+import WelcomingModal from '@/components/common/WelcomingModal.vue';
 import {
   Settings,
   User,
@@ -526,10 +581,18 @@ import {
   RefreshCw,
   Camera,
   RotateCcw,
-  Send
+  Send,
+  Lock,
+  Sparkles
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
+const showWelcomingPreview = ref(false);
+
+function lockSession() {
+  localStorage.removeItem('rnd_growthflow_authenticated');
+  window.location.reload();
+}
 const { testConnection, initClient } = useSupabase();
 
 const profileForm = ref({

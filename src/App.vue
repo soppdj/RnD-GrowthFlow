@@ -4,6 +4,8 @@
     <AppHeader
       @toggle-mobile-menu="isMobileDrawerOpen = !isMobileDrawerOpen"
       @quick-add-task="isGlobalTaskModalOpen = true"
+      @open-welcoming="isWelcomingModalOpen = true"
+      @open-login="isRdLoginModalOpen = true"
     />
 
     <!-- Main Body Layout -->
@@ -34,21 +36,21 @@
 
         <!-- JURNAL & AGENDA TAB -->
         <div v-else-if="store.activeTab === 'jurnal'" class="space-y-6 animate-fade-in">
-          <!-- Sub-Tab Switcher -->
+          <!-- Sub-Tab Switcher (Ramping Sesuai Gambar Referensi) -->
           <div class="flex items-center gap-2 p-1 rounded-2xl bg-teal-100/50 w-fit border border-teal-200/60">
             <button
               @click="jurnalSubTab = 'daily'"
-              class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all"
+              class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer"
               :class="jurnalSubTab === 'daily' ? 'bg-white text-teal-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'"
             >
-              📋 Checklist Jurnal (Harian)
+              📋 Checklist Jurnal
             </button>
             <button
               @click="jurnalSubTab = 'milestones'"
-              class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all"
+              class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer"
               :class="jurnalSubTab === 'milestones' ? 'bg-white text-teal-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'"
             >
-              🎯 Agenda & Roadmap (Milestones)
+              🎯 Agenda &amp; Roadmap
             </button>
           </div>
 
@@ -87,16 +89,14 @@
       <div class="w-72 bg-white h-full p-5 shadow-2xl flex flex-col justify-between animate-slide-right">
         <div>
           <div class="flex items-center justify-between pb-4 border-b border-teal-100">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg bg-teal-700 text-white flex items-center justify-center font-bold text-sm">
-                GF
-              </div>
+            <div class="flex items-center gap-2.5">
+              <AppLogo size="sm" />
               <div>
-                <h3 class="text-sm font-bold text-slate-800">R&D GrowthFlow</h3>
-                <p class="text-[10px] text-teal-700">FatherLab © 2026</p>
+                <h3 class="text-sm font-extrabold text-slate-800">R&amp;D GrowthFlow</h3>
+                <p class="text-[10px] text-teal-700 font-semibold">FatherLab © 2026</p>
               </div>
             </div>
-            <button @click="isMobileDrawerOpen = false" class="p-1 text-slate-400 hover:text-slate-600">
+            <button @click="isMobileDrawerOpen = false" class="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
               <X class="w-5 h-5" />
             </button>
           </div>
@@ -132,12 +132,29 @@
       @close="isGlobalTaskModalOpen = false"
       @save="handleSaveGlobalTask"
     />
+
+    <!-- Dedicated R&D Login Gateway -->
+    <RdLoginModal
+      :is-open="isRdLoginModalOpen"
+      @authenticated="handleAuthenticated"
+    />
+
+    <!-- Welcoming Animated Overlay -->
+    <WelcomingModal
+      :is-open="isWelcomingModalOpen"
+      @close="isWelcomingModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
+
+// Common Brand & Auth Components
+import AppLogo from '@/components/common/AppLogo.vue';
+import RdLoginModal from '@/components/common/RdLoginModal.vue';
+import WelcomingModal from '@/components/common/WelcomingModal.vue';
 
 // Layout Components
 import AppHeader from '@/components/layout/AppHeader.vue';
@@ -176,6 +193,24 @@ const store = useGrowthFlowStore();
 const isMobileDrawerOpen = ref(false);
 const isGlobalTaskModalOpen = ref(false);
 const jurnalSubTab = ref('daily');
+
+// R&D Auth & Welcoming States
+const isRdLoginModalOpen = ref(localStorage.getItem('rnd_growthflow_authenticated') !== 'true');
+const isWelcomingModalOpen = ref(false);
+
+onMounted(() => {
+  // Jika sudah terotentikasi dan opsi welcoming tidak dimatikan, tampilkan welcoming animation
+  if (localStorage.getItem('rnd_growthflow_authenticated') === 'true' && localStorage.getItem('rnd_always_show_welcome') !== 'false') {
+    isWelcomingModalOpen.value = true;
+  }
+});
+
+function handleAuthenticated() {
+  isRdLoginModalOpen.value = false;
+  if (localStorage.getItem('rnd_always_show_welcome') !== 'false') {
+    isWelcomingModalOpen.value = true;
+  }
+}
 
 const mobileNavList = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },

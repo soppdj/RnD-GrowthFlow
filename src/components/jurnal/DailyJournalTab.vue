@@ -10,14 +10,14 @@
           </span>
         </h2>
         <p class="text-xs text-slate-500 mt-0.5">
-          Tandai checklist (✅) untuk input evaluasi kendala &amp; picu progres LogFrame
+          Tracking aktivitas harian, capaian tugas, dan evaluasi hasil kerja R&D
         </p>
       </div>
 
       <div class="flex items-center gap-2 flex-wrap">
         <button
           @click="openCreateModal"
-          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 cursor-pointer"
         >
           <Plus class="w-4 h-4" />
           <span>Tambah Task Jurnal</span>
@@ -25,12 +25,12 @@
       </div>
     </div>
 
-    <!-- FILTER & PENGATURAN MINGGU KERJA & HARI KERJA (Sesuai Arahan Gambar) -->
+    <!-- FILTER & PENGATURAN MINGGU KERJA & HARI KERJA (Tanpa Scroll, Senin-Jumat, Input Manual) -->
     <div class="glass-card rounded-2xl p-4 sm:p-5 border border-teal-100 shadow-soft space-y-3.5">
-      <!-- Row 1: Week Selector Tabs & Work Days Settings -->
+      <!-- Row 1: Week Selector Tabs (Wrap Ramping Tanpa Scroll) & Work Days Settings -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-teal-100/70">
-        <!-- Week Tabs (Minggu 1 - 5) -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+        <!-- Week Tabs (Senin - Jumat, Flex-Wrap Bebas Scroll) -->
+        <div class="flex flex-wrap items-center gap-1.5">
           <span class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
             <Calendar class="w-3.5 h-3.5 text-teal-600" />
             <span>Minggu:</span>
@@ -39,28 +39,47 @@
             v-for="tab in weekTabs"
             :key="tab.value"
             @click="selectedWeek = tab.value; customDateFilter = ''"
-            class="px-2.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer"
+            class="px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-micro"
             :class="selectedWeek === tab.value && !customDateFilter
               ? 'bg-teal-600 text-white shadow-sm ring-2 ring-teal-200'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'"
+            :title="`Filter ${tab.label}`"
           >
             {{ tab.label }}
           </button>
         </div>
 
-        <!-- Opsi Berapa Hari Kerja dalam Seminggu -->
-        <div class="flex items-center gap-2 self-start lg:self-auto shrink-0 bg-teal-50/80 px-3 py-1.5 rounded-xl border border-teal-200/80">
+        <!-- Opsi Hari Kerja: Dropdown Preset + Input Manual -->
+        <div class="flex items-center gap-2 self-start lg:self-auto shrink-0 bg-teal-50/80 px-3 py-1.5 rounded-xl border border-teal-200/80 flex-wrap">
           <Briefcase class="w-4 h-4 text-teal-700 shrink-0" />
           <span class="text-xs font-bold text-teal-900 shrink-0">Hari Kerja:</span>
+          
           <select
             v-model="workDaysPerWeek"
             @change="handleWorkDaysChange"
             class="px-2 py-1 rounded-lg border border-teal-300 bg-white text-xs font-bold text-teal-800 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer"
           >
+            <option :value="3">3 Hari Kerja (Senin, Rabu, Jumat)</option>
+            <option :value="1">1 Hari Kerja (Senin)</option>
+            <option :value="2">2 Hari Kerja (Senin &amp; Kamis)</option>
+            <option :value="4">4 Hari Kerja (Senin - Kamis)</option>
             <option :value="5">5 Hari Kerja (Senin - Jumat)</option>
             <option :value="6">6 Hari Kerja (Senin - Sabtu)</option>
             <option :value="7">7 Hari Kerja (Setiap Hari)</option>
           </select>
+
+          <!-- Input Manual Jumlah Hari Kerja Efektif -->
+          <div class="flex items-center gap-1 bg-white border border-teal-300 px-1.5 py-0.5 rounded-lg text-xs" title="Ketik jumlah hari efektif per minggu (1 - 7)">
+            <input
+              type="number"
+              min="1"
+              max="7"
+              v-model.number="workDaysPerWeek"
+              @input="handleWorkDaysChange"
+              class="w-7 text-center font-extrabold text-teal-900 outline-none text-xs"
+            />
+            <span class="text-[10px] text-teal-600 font-semibold pr-0.5">Hari/Mgg</span>
+          </div>
         </div>
       </div>
 
@@ -505,12 +524,12 @@ const isEvaluationModalOpen = ref(false);
 const targetEvaluationTask = ref(null);
 
 const weekTabs = [
-  { value: 'ALL', label: 'Semua Minggu' },
-  { value: '1', label: 'Minggu 1 (Tgl 1-7)' },
-  { value: '2', label: 'Minggu 2 (Tgl 8-14)' },
-  { value: '3', label: 'Minggu 3 (Tgl 15-21)' },
-  { value: '4', label: 'Minggu 4 (Tgl 22-28)' },
-  { value: '5', label: 'Minggu 5 (Tgl 29-31)' }
+  { value: 'ALL', label: 'Semua' },
+  { value: '1', label: 'M1 (1-2 Okt)' },
+  { value: '2', label: 'M2 (5-9 Okt)' },
+  { value: '3', label: 'M3 (12-16 Okt)' },
+  { value: '4', label: 'M4 (19-23 Okt)' },
+  { value: '5', label: 'M5 (26-30 Okt)' }
 ];
 
 const newLog = ref({

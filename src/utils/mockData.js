@@ -10,7 +10,7 @@ export const initialProfile = {
   tagline: "Menebar Manfaat Berkelanjutan Melalui Inovasi Digital",
   quarterTarget: 450000000, // Rp 450 Juta
   workCapacityHoursPerDay: 8,
-  workDaysPerWeek: 5,
+  workDaysPerWeek: 3,
   currentDailyLoggedHours: 5.5,
   avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
   avatarZoom: 100,

@@ -17,14 +17,20 @@
       <form @submit.prevent="handleSubmit" class="mt-4 space-y-4">
         <!-- Title -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Judul Tugas / Aktivitas
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Judul Tugas / Aktivitas
+            </label>
+            <span v-if="autoDetectedCategory && !isCategoryManuallyOverridden" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1 animate-pulse">
+              <Sparkles class="w-3 h-3 text-emerald-600" />
+              <span>Auto LogFrame: {{ autoDetectedCategory }}</span>
+            </span>
+          </div>
           <input
             v-model="form.title"
             type="text"
             required
-            placeholder="Contoh: Audit Database Churn Rate Donatur Adik Asuh..."
+            placeholder="Contoh: Analisis Churn Rate Donatur / Bikin Video Iklan 4K..."
             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm transition-all"
           />
         </div>
@@ -72,24 +78,29 @@
           </div>
         </div>
 
-        <!-- LogFrame Category -->
+        <!-- LogFrame Category (Dengan Fitur Auto-Detect Cerdas) -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Kategori LogFrame (Level Hirarki)
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Kategori LogFrame (Level Hirarki)
+            </label>
+            <span v-if="autoDetectedCategory" class="text-[10px] text-teal-700 font-semibold">
+              {{ isCategoryManuallyOverridden ? 'Pilihan manual' : '✨ Otomatis dari judul' }}
+            </span>
+          </div>
           <div class="grid grid-cols-2 gap-2">
             <button
               type="button"
               v-for="(info, key) in LOGFRAME_TYPES"
               :key="key"
-              @click="form.category = key"
-              class="p-2.5 rounded-xl border text-xs font-bold text-left transition-all flex items-center justify-between"
+              @click="selectCategory(key)"
+              class="p-2.5 rounded-xl border text-xs font-bold text-left transition-all flex items-center justify-between cursor-pointer"
               :class="form.category === key 
-                ? `${info.badgeBg} ${info.badgeText} ${info.badgeBorder} ring-2 ring-teal-400` 
+                ? `${info.badgeBg} ${info.badgeText} ${info.badgeBorder} ring-2 ring-teal-400 shadow-sm` 
                 : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
             >
               <span>{{ info.label }}</span>
-              <span class="text-[10px] font-normal opacity-80">{{ key === 'GOAL' ? 'Utama' : key === 'OUTCOME' ? 'Hasil' : key === 'OUTPUT' ? 'Produk' : 'Aksi' }}</span>
+              <span class="text-[10px] font-normal opacity-80">{{ key === 'GOAL' ? 'Utama' : key === 'OUTCOME' ? 'Hasil' : key === 'OUTPUT' ? 'Produk' : 'Aktivitas' }}</span>
             </button>
           </div>
         </div>
@@ -236,7 +247,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { LOGFRAME_TYPES } from '@/utils/formatters';
-import { CheckSquare, X, Paperclip } from 'lucide-vue-next';
+import { CheckSquare, X, Paperclip, Sparkles } from 'lucide-vue-next';
 
 const props = defineProps({
   isOpen: Boolean,
@@ -245,6 +256,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close', 'save']);
+
+const autoDetectedCategory = ref(null);
+const isCategoryManuallyOverridden = ref(false);
 
 const form = ref({
   title: '',
@@ -262,9 +276,79 @@ const form = ref({
   completed: false
 });
 
+/**
+ * Deteksi Otomatis Kategori LogFrame Berdasarkan Kata Kunci Judul:
+ * - ACTIVITY: "analisis", "riset", "meeting", "audit", "cek", "kordinasi", dll.
+ * - OUTPUT: "bikin", "buat", "desain", "video", "landing page", "konten", dll.
+ * - OUTCOME: "pertumbuhan", "donatur", "cpr", "ctr", "closing", "akuisisi", dll.
+ * - GOAL: "visi", "target kuartal", "miliaran", "dampak", "yayasan", dll.
+ */
+function detectCategory(title) {
+  if (!title) return null;
+  const t = title.toLowerCase();
+
+  // 1. ACTIVITY
+  const activityKeywords = [
+    'analisis', 'analisa', 'riset', 'meeting', 'briefing', 'setup', 'cek', 'evaluasi',
+    'audit', 'diskusi', 'chat', 'kordinasi', 'koordinasi', 'pencatatan', 'rekap', 'tinjau',
+    'review', 'observasi', 'uji coba', 'testing', 'pantau', 'monitoring', 'input',
+    'organisir', 'follow up', 'sinkron', 'backup', 'interview', 'wawancara', 'revisi'
+  ];
+  if (activityKeywords.some(kw => t.includes(kw))) return 'ACTIVITY';
+
+  // 2. OUTPUT
+  const outputKeywords = [
+    'bikin', 'buat', 'desain', 'video', 'landing page', 'lp', 'copywriting', 'konten',
+    'dashboard', 'fitur', 'banner', 'modul', 'script', 'creative', 'poster', 'flyer',
+    'dokumen', 'sop', 'materi', 'feed', 'reels', 'iklan', 'campaign', 'artikel',
+    'carousel', 'foto', 'kamera', 'editing', 'render', 'draft', 'template', 'tools'
+  ];
+  if (outputKeywords.some(kw => t.includes(kw))) return 'OUTPUT';
+
+  // 3. OUTCOME
+  const outcomeKeywords = [
+    'pertumbuhan', 'donatur', 'cpr', 'ctr', 'cpc', 'roas', 'closing', 'akuisisi',
+    'leads', 'konversi', 'omset', 'revenue', 'capaian', 'scale', 'skala', 'optimasi',
+    'peningkatan', 'target perolehan', 'himpunan', 'retensi', 'laporan'
+  ];
+  if (outcomeKeywords.some(kw => t.includes(kw))) return 'OUTCOME';
+
+  // 4. GOAL
+  const goalKeywords = [
+    'visi', 'target kuartal', 'miliaran', 'dampak', 'yayasan', 'roadmap',
+    'rencana strategis', 'jangka panjang', 'q4', 'q1', 'q2', 'q3', 'institusi',
+    'keberlanjutan', 'kemandirian'
+  ];
+  if (goalKeywords.some(kw => t.includes(kw))) return 'GOAL';
+
+  return null;
+}
+
+watch(
+  () => form.value.title,
+  (newTitle) => {
+    if (!props.isEdit && !isCategoryManuallyOverridden.value) {
+      const detected = detectCategory(newTitle);
+      if (detected) {
+        form.value.category = detected;
+        autoDetectedCategory.value = detected;
+      } else {
+        autoDetectedCategory.value = null;
+      }
+    }
+  }
+);
+
+function selectCategory(key) {
+  form.value.category = key;
+  isCategoryManuallyOverridden.value = true;
+}
+
 watch(
   () => props.initialData,
   (val) => {
+    isCategoryManuallyOverridden.value = Boolean(props.isEdit);
+    autoDetectedCategory.value = null;
     if (val) {
       form.value = {
         title: val.title || '',

@@ -1,23 +1,23 @@
 <template>
   <aside class="no-print hidden lg:flex flex-col w-64 glass-panel border-r border-teal-100/80 min-h-screen p-4 sticky top-0 self-start">
-    <!-- Top Branding Box -->
-    <div class="px-3 py-4 mb-3 rounded-2xl bg-gradient-to-br from-teal-800 to-emerald-900 text-white shadow-soft relative overflow-hidden">
+    <!-- Top Branding Box with R&D GrowthFlow Logo -->
+    <div class="px-3 py-3.5 mb-3 rounded-2xl bg-gradient-to-br from-teal-800 to-emerald-950 text-white shadow-soft relative overflow-hidden">
       <!-- Decorative Islamic floral watermark / geometric circle -->
       <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/10 blur-sm pointer-events-none"></div>
-      <div class="relative z-10">
-        <div class="flex items-center gap-2 mb-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span class="text-[10px] tracking-wider uppercase font-bold text-teal-200">Growth Engine</span>
+      <div class="relative z-10 flex items-start gap-2.5">
+        <AppLogo size="sm" variant="light" />
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 mb-0.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="text-[9px] tracking-wider uppercase font-extrabold text-teal-200">Growth Engine</span>
+          </div>
+          <h2 class="text-xs font-black leading-tight truncate tracking-tight text-white" title="Yayasan Khoirur Rooziqiin">
+            Yayasan Khoirur Rooziqiin
+          </h2>
+          <p class="text-[10px] text-teal-200/90 mt-0.5 font-medium">
+            R&amp;D Digital Marketing Hub
+          </p>
         </div>
-        <h2 class="text-[13px] font-extrabold leading-tight whitespace-nowrap tracking-tight text-white" title="Yayasan Khoirur Rooziqiin">
-          Yayasan Khoirur Rooziqiin
-        </h2>
-        <p class="text-xs font-bold text-emerald-300 mt-0.5 tracking-wide">
-          Bandung
-        </p>
-        <p class="text-[10px] text-teal-200/90 mt-0.5">
-          R&D Digital Marketing Hub
-        </p>
       </div>
     </div>
 
@@ -86,6 +86,7 @@
 import { computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { formatCompactCurrency } from '@/utils/formatters';
+import AppLogo from '@/components/common/AppLogo.vue';
 import {
   LayoutDashboard,
   BookOpenCheck,
