@@ -10,7 +10,7 @@
     "bot": "node scripts/telegram-bot.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.1",
+    "@supabase/supabase-js": "^2.118.0",
     "apexcharts": "^5.10.0",
     "canvas-confetti": "^1.9.4",
     "lucide-vue-next": "^0.475.0",

@@ -153,8 +153,32 @@ create table if not exists public.rd_kpis (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 8. AD_LAB_EXPERIMENTS TABLE (REAL-TIME AD EXPERIMENTATION PIPELINE)
+create table if not exists public.ad_lab_experiments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid default null,
+  campaign_name text not null,
+  stage text not null default 'TEST' check (stage in ('TEST', 'SCALE_1', 'SCALE_2')),
+  status text not null default 'ACTIVE' check (status in ('ACTIVE', 'PAUSED', 'GRADUATED', 'STOPPED')),
+  ad_spend numeric default 0,
+  realized_revenue numeric default 0,
+  new_donors int default 0,
+  roi numeric generated always as (case when ad_spend > 0 then (realized_revenue - ad_spend) / ad_spend else 0 end) stored,
+  cpr numeric generated always as (case when new_donors > 0 then ad_spend / new_donors else 0 end) stored,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Safe migrations for ad_lab_experiments if table already exists
+alter table public.ad_lab_experiments add column if not exists campaign_name text;
+alter table public.ad_lab_experiments add column if not exists stage text default 'TEST';
+alter table public.ad_lab_experiments add column if not exists status text default 'ACTIVE';
+alter table public.ad_lab_experiments add column if not exists ad_spend numeric default 0;
+alter table public.ad_lab_experiments add column if not exists realized_revenue numeric default 0;
+alter table public.ad_lab_experiments add column if not exists new_donors int default 0;
+
 -- ==============================================================================
--- 8. ROW LEVEL SECURITY (RLS) & ACCESS CONTROL (IDEMPOTENT)
+-- 9. ROW LEVEL SECURITY (RLS) & ACCESS CONTROL (IDEMPOTENT)
 -- ==============================================================================
 alter table public.profiles enable row level security;
 alter table public.tasks enable row level security;
@@ -163,6 +187,7 @@ alter table public.milestones enable row level security;
 alter table public.campaigns enable row level security;
 alter table public.donation_programs enable row level security;
 alter table public.rd_kpis enable row level security;
+alter table public.ad_lab_experiments enable row level security;
 
 -- Hapus policy lama terlebih dahulu jika sudah ada (mencegah error 42710)
 drop policy if exists "Allow all operations on profiles" on public.profiles;
@@ -172,6 +197,7 @@ drop policy if exists "Allow all operations on milestones" on public.milestones;
 drop policy if exists "Allow all operations on campaigns" on public.campaigns;
 drop policy if exists "Allow all operations on donation_programs" on public.donation_programs;
 drop policy if exists "Allow all operations on rd_kpis" on public.rd_kpis;
+drop policy if exists "Allow all operations on ad_lab_experiments" on public.ad_lab_experiments;
 
 -- Buat ulang policy dengan akses penuh untuk client aplikasi
 create policy "Allow all operations on profiles" on public.profiles for all using (true) with check (true);
@@ -181,9 +207,10 @@ create policy "Allow all operations on milestones" on public.milestones for all 
 create policy "Allow all operations on campaigns" on public.campaigns for all using (true) with check (true);
 create policy "Allow all operations on donation_programs" on public.donation_programs for all using (true) with check (true);
 create policy "Allow all operations on rd_kpis" on public.rd_kpis for all using (true) with check (true);
+create policy "Allow all operations on ad_lab_experiments" on public.ad_lab_experiments for all using (true) with check (true);
 
 -- ==============================================================================
--- 9. ENABLE REAL-TIME REPLICATION (SAFE & IDEMPOTENT)
+-- 10. ENABLE REAL-TIME REPLICATION (SAFE & IDEMPOTENT)
 -- ==============================================================================
 do $$
 begin
@@ -217,6 +244,10 @@ begin
 
   if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'rd_kpis') then
     alter publication supabase_realtime add table public.rd_kpis;
+  end if;
+
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'ad_lab_experiments') then
+    alter publication supabase_realtime add table public.ad_lab_experiments;
   end if;
 end $$;
 
