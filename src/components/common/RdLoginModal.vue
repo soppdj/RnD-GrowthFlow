@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-2xl animate-fade-in"
   >
     <!-- Background Animated Grid Orbs -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import AppLogo from '@/components/common/AppLogo.vue';
 import {
@@ -158,7 +158,6 @@ function handlePinSubmit() {
 
 function unlockSuccess() {
   isError.value = false;
-  localStorage.setItem('rnd_growthflow_authenticated', 'true');
   localStorage.setItem('rnd_growthflow_last_login', new Date().toISOString());
   emit('authenticated');
 }
@@ -166,6 +165,19 @@ function unlockSuccess() {
 function onAvatarError(e) {
   e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250';
 }
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (open) {
+      pinInput.value = '';
+      isError.value = false;
+      nextTick(() => {
+        if (pinInputRef.value) pinInputRef.value.focus();
+      });
+    }
+  }
+);
 
 onMounted(() => {
   nextTick(() => {

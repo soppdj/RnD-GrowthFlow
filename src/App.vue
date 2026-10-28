@@ -1,15 +1,15 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-teal-50/20 to-emerald-50/30 text-slate-800">
-    <!-- Top Header -->
+    <!-- Top Header (Hanya tampil jika sudah login) -->
     <AppHeader
+      v-if="isAuthenticated"
       @toggle-mobile-menu="isMobileDrawerOpen = !isMobileDrawerOpen"
       @quick-add-task="isGlobalTaskModalOpen = true"
-      @open-welcoming="isWelcomingModalOpen = true"
-      @open-login="isRdLoginModalOpen = true"
+      @open-login="handleLockSession"
     />
 
-    <!-- Main Body Layout -->
-    <div class="flex-1 max-w-7xl w-full mx-auto flex">
+    <!-- Main Body Layout (Hanya tampil jika sudah login) -->
+    <div v-if="isAuthenticated" class="flex-1 max-w-7xl w-full mx-auto flex">
       <!-- Desktop Sidebar -->
       <AppSidebar />
 
@@ -82,7 +82,7 @@
 
     <!-- Mobile Drawer Slide-over -->
     <div
-      v-if="isMobileDrawerOpen"
+      v-if="isAuthenticated && isMobileDrawerOpen"
       class="lg:hidden fixed inset-0 z-50 flex bg-slate-900/40 backdrop-blur-sm"
       @click.self="isMobileDrawerOpen = false"
     >
@@ -122,26 +122,27 @@
       </div>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar -->
-    <MobileBottomNav />
+    <!-- Mobile Bottom Navigation Bar (Hanya saat login) -->
+    <MobileBottomNav v-if="isAuthenticated" />
 
     <!-- Global Quick Add Task Modal -->
     <TaskModal
+      v-if="isAuthenticated"
       :is-open="isGlobalTaskModalOpen"
       :is-edit="false"
       @close="isGlobalTaskModalOpen = false"
       @save="handleSaveGlobalTask"
     />
 
-    <!-- Dedicated R&D Login Gateway -->
+    <!-- Dedicated R&D Login Gateway (Selalu aktif saat link dibuka) -->
     <RdLoginModal
-      :is-open="isRdLoginModalOpen"
+      :is-open="!isAuthenticated"
       @authenticated="handleAuthenticated"
     />
 
     <!-- Welcoming Animated Overlay -->
     <WelcomingModal
-      :is-open="isWelcomingModalOpen"
+      :is-open="isAuthenticated && isWelcomingModalOpen"
       @close="isWelcomingModalOpen = false"
     />
   </div>
@@ -195,21 +196,26 @@ const isGlobalTaskModalOpen = ref(false);
 const jurnalSubTab = ref('daily');
 
 // R&D Auth & Welcoming States
-const isRdLoginModalOpen = ref(localStorage.getItem('rnd_growthflow_authenticated') !== 'true');
+// Saat link aplikasi diklik/dibuka, selalu mulai dengan isAuthenticated = false agar tidak bisa diakses sembarang orang
+const isAuthenticated = ref(false);
 const isWelcomingModalOpen = ref(false);
 
 onMounted(() => {
-  // Jika sudah terotentikasi dan opsi welcoming tidak dimatikan, tampilkan welcoming animation
-  if (localStorage.getItem('rnd_growthflow_authenticated') === 'true' && localStorage.getItem('rnd_always_show_welcome') !== 'false') {
-    isWelcomingModalOpen.value = true;
-  }
+  // Bersihkan token cache lama agar setiap kunjungan baru wajib memasukkan PIN
+  localStorage.removeItem('rnd_growthflow_authenticated');
+  isAuthenticated.value = false;
 });
 
 function handleAuthenticated() {
-  isRdLoginModalOpen.value = false;
+  isAuthenticated.value = true;
   if (localStorage.getItem('rnd_always_show_welcome') !== 'false') {
     isWelcomingModalOpen.value = true;
   }
+}
+
+function handleLockSession() {
+  isAuthenticated.value = false;
+  localStorage.removeItem('rnd_growthflow_authenticated');
 }
 
 const mobileNavList = [
