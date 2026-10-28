@@ -56,12 +56,13 @@
         <table class="w-full text-left text-xs text-slate-700 border-collapse">
           <thead>
             <tr class="bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-800 text-white font-extrabold text-[11px] uppercase tracking-wider">
-              <th scope="col" class="py-2.5 px-3 w-12 text-center border-r border-teal-600/50">NO</th>
-              <th scope="col" class="py-2.5 px-4 w-44 border-r border-teal-600/50">KPI METRIC</th>
-              <th scope="col" class="py-2.5 px-4 w-40 border-r border-teal-600/50">TARGET KPI</th>
-              <th scope="col" class="py-2.5 px-4 w-40 border-r border-teal-600/50">HARGA JUAL</th>
-              <th scope="col" class="py-2.5 px-4 w-36 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
-                ACTUAL TARGET KPI
+              <th scope="col" class="py-2.5 px-2.5 w-10 text-center border-r border-teal-600/50">NO</th>
+              <th scope="col" class="py-2.5 px-3 w-28 border-r border-teal-600/50">KPI METRIC</th>
+              <th scope="col" class="py-2.5 px-3 w-32 border-r border-teal-600/50">TARGET KPI</th>
+              <th scope="col" class="py-2.5 px-3 w-28 border-r border-teal-600/50">HARGA JUAL</th>
+              <th scope="col" class="py-2 px-2.5 w-28 text-center bg-blue-600 text-white border-r border-blue-500 shadow-inner">
+                <span class="block leading-tight">ACTUAL TARGET</span>
+                <span class="block leading-tight text-[10px]">KPI</span>
               </th>
               <th scope="col" class="py-2.5 px-4">AKSI BILA TIDAK TERCAPAI</th>
             </tr>
