@@ -145,7 +145,7 @@
         <div class="mt-4 border border-slate-300 rounded-lg overflow-hidden">
           <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between">
             <span class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">
-              Tolok Ukur Standar KPI Iklan (Acuan Operasional &amp; Tindakan Kuratif)
+              Tolak Ukur Standar KPI Iklan
             </span>
             <span class="text-[9px] font-semibold text-slate-600">
               Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}
@@ -188,7 +188,7 @@
       <div class="mb-6">
         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center gap-1.5 pb-1 border-b border-slate-200">
           <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-          <span>II. Capaian Matriks LogFrame (Tingkat Hirarki Sasaran)</span>
+          <span>II. Capaian Matriks LogFrame</span>
         </h3>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -220,14 +220,11 @@
 
       <!-- III. REKOMENDASI SCALE-UP (CRUCIAL TABLE) -->
       <div class="mb-6">
-        <div class="flex items-center justify-between pb-1 border-b border-slate-200 mb-2.5">
+        <div class="pb-1 border-b border-slate-200 mb-2.5">
           <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-            <span>III. Rekomendasi Scale-up Eksperimen (Diurutkan ROI Tertinggi)</span>
+            <span>III. Rekomendasi Scale-Up Eksperimen</span>
           </h3>
-          <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-            Keputusan Injeksi Anggaran Bulan Depan
-          </span>
         </div>
 
         <p class="text-xs text-slate-600 mb-2">
@@ -239,14 +236,14 @@
           <table class="w-full text-left text-xs border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold text-[10px] uppercase">
               <tr>
-                <th class="py-2.5 px-3 text-center">Rank</th>
-                <th class="py-2.5 px-3">Kampanye & Platform</th>
-                <th class="py-2.5 px-3">Stage Saat Ini</th>
-                <th class="py-2.5 px-3 text-right">Ad Spend</th>
-                <th class="py-2.5 px-3 text-right">Realisasi</th>
-                <th class="py-2.5 px-3 text-right">CPR</th>
-                <th class="py-2.5 px-3 text-right">ROI</th>
-                <th class="py-2.5 px-3 text-center">Rekomendasi R&amp;D</th>
+                <th class="py-2.5 px-3 text-center w-12">Rank</th>
+                <th class="py-2.5 px-3 min-w-[180px] max-w-[220px]">Kampanye &amp; Platform</th>
+                <th class="py-2.5 px-3 text-center w-20">Stage</th>
+                <th class="py-2.5 px-3 text-right whitespace-nowrap">Ad Spend</th>
+                <th class="py-2.5 px-3 text-right whitespace-nowrap">Realisasi</th>
+                <th class="py-2.5 px-3 text-right whitespace-nowrap">CPR</th>
+                <th class="py-2.5 px-3 text-right whitespace-nowrap">ROI</th>
+                <th class="py-2.5 px-3 min-w-[220px] text-left">Rekomendasi Aksi Selanjutnya</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -264,11 +261,15 @@
                     #{{ idx + 1 }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3">
-                  <span class="font-bold text-slate-800 block">{{ camp.name }}</span>
-                  <span class="text-[10px] text-slate-400 font-medium">{{ camp.platform }} • {{ camp.hookType }}</span>
+                <td class="py-2.5 px-3 max-w-[220px]">
+                  <span class="font-bold text-slate-800 block truncate" :title="camp.name">
+                    {{ formatCampaignName(camp.name) }}
+                  </span>
+                  <span class="text-[10px] text-slate-400 font-medium block truncate">
+                    {{ camp.platform || 'Meta Ads' }} • {{ camp.hookType || 'Imported Winning Meta Ads' }}
+                  </span>
                 </td>
-                <td class="py-2.5 px-3">
+                <td class="py-2.5 px-3 text-center">
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                     {{ camp.stage }}
                   </span>
@@ -282,7 +283,7 @@
                 <td class="py-2.5 px-3 text-right whitespace-nowrap">
                   <span
                     class="font-bold text-xs"
-                    :class="camp.cpr <= 20000 ? 'text-emerald-700' : 'text-slate-700'"
+                    :class="camp.cpr <= 25000 ? 'text-emerald-700' : 'text-slate-700'"
                   >
                     {{ formatCurrency(camp.cpr) }}
                   </span>
@@ -290,18 +291,23 @@
                 <td class="py-2.5 px-3 text-right whitespace-nowrap">
                   <span
                     class="font-black text-xs px-1.5 py-0.5 rounded"
-                    :class="camp.roi >= 500 ? 'text-emerald-800 bg-emerald-100/80' : 'text-slate-800'"
+                    :class="camp.roi >= 400 ? 'text-emerald-800 bg-emerald-100/80' : 'text-slate-800'"
                   >
                     {{ formatPercent(camp.roi) }}
                   </span>
                 </td>
-                <td class="py-2.5 px-3 text-center">
-                  <span
-                    class="inline-block px-2.5 py-1 rounded-md text-[10px] border leading-tight"
-                    :class="camp.recBadge"
-                  >
-                    {{ camp.recommendation }}
-                  </span>
+                <td class="py-2.5 px-3 min-w-[220px]">
+                  <div class="space-y-1">
+                    <span
+                      class="inline-block px-2.5 py-0.5 rounded-md text-[10px] border leading-tight"
+                      :class="camp.recBadge"
+                    >
+                      {{ camp.recommendation }}
+                    </span>
+                    <p class="text-[11px] text-slate-600 leading-snug">
+                      {{ camp.actionText }}
+                    </p>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -313,7 +319,7 @@
       <div class="mb-8">
         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center gap-1.5 pb-1 border-b border-slate-200">
           <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-          <span>IV. Catatan Evaluasi Eksperimen & Temuan Lapangan</span>
+          <span>IV. Catatan Evaluasi Eksperimen &amp; Temuan Lapangan</span>
         </h3>
 
         <div class="space-y-2 text-xs">
@@ -332,28 +338,17 @@
         </div>
       </div>
 
-      <!-- TANDA TANGAN & PENGESAHAN DOKUMEN -->
-      <div class="pt-6 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs text-center">
-        <div>
+      <!-- TANDA TANGAN & PENGESAHAN DOKUMEN (Pindah ke Kanan) -->
+      <div class="pt-6 border-t border-slate-200 flex justify-end text-xs text-center">
+        <div class="w-64">
           <p class="text-slate-500 font-medium">Diajukan &amp; Disusun Oleh,</p>
           <div class="h-16 flex items-end justify-center">
             <span class="font-serif italic text-teal-800 font-bold text-sm">{{ store.profile.fullName }}</span>
           </div>
-          <p class="font-bold text-slate-900 border-t border-slate-400 pt-1 mt-1 inline-block min-w-[160px]">
+          <p class="font-bold text-slate-900 border-t border-slate-400 pt-1 mt-1 inline-block min-w-[180px]">
             {{ store.profile.fullName }}
           </p>
           <p class="text-[11px] text-slate-500">{{ store.profile.role }}</p>
-        </div>
-
-        <div>
-          <p class="text-slate-500 font-medium">Mengetahui &amp; Menyetujui,</p>
-          <div class="h-16 flex items-end justify-center">
-            <span class="font-serif italic text-slate-700 font-bold text-sm">Khoirur Rooziqiin</span>
-          </div>
-          <p class="font-bold text-slate-900 border-t border-slate-400 pt-1 mt-1 inline-block min-w-[160px]">
-            KH. Muhammad Sholeh, M.A.
-          </p>
-          <p class="text-[11px] text-slate-500">Ketua Dewan Pengurus Yayasan</p>
         </div>
       </div>
 
@@ -392,6 +387,26 @@ const periodLabel = computed(() => {
   return map[selectedPeriod.value] || 'Bulan Oktober 2026';
 });
 
+function formatCampaignName(name) {
+  if (!name) return 'Kampanye';
+  const str = String(name).trim();
+  // If enclosed or contains quoted text like "RUNAUTO CBO150-AScKS-26/10/2026", extract it
+  const match = str.match(/"([^"]+)"/);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+  // If contains commas (raw CSV line), extract the clean campaign name segment
+  if (str.includes(',')) {
+    const parts = str.split(',');
+    const candidate = parts.find(p => {
+      const clean = p.trim().replace(/^["']|["']$/g, '');
+      return clean.length > 3 && !/^\d{4}-\d{2}-\d{2}$/.test(clean) && isNaN(Number(clean)) && !clean.startsWith('active') && !clean.startsWith('actions:');
+    });
+    if (candidate) return candidate.trim().replace(/^["']|["']$/g, '');
+  }
+  return str;
+}
+
 const sortedScaleCampaigns = computed(() => {
   return [...store.campaigns]
     .map(c => {
@@ -400,19 +415,32 @@ const sortedScaleCampaigns = computed(() => {
 
       let recommendation = 'Tahan Anggaran';
       let recBadge = 'bg-slate-100 text-slate-700 border-slate-200';
+      let actionText = 'Biarkan berjalan stabil, pantau rasio konversi harian';
 
       if (c.stage === 'SCALE_2' && roi >= 400) {
         recommendation = 'Injeksi Budget +50%';
         recBadge = 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold';
+        actionText = 'Injeksi anggaran ekstra & pertahankan target CPR efisien';
       } else if (c.stage === 'SCALE_1' && roi >= 300) {
         recommendation = 'Promosi ke SCALE 2';
         recBadge = 'bg-teal-100 text-teal-800 border-teal-300 font-bold';
+        actionText = 'Naikkan budget bertahap 20% dan duplikasi ke broad audience';
       } else if (c.stage === 'TEST' && roi >= 200) {
         recommendation = 'Lolos Validasi ke SCALE 1';
         recBadge = 'bg-indigo-100 text-indigo-800 border-indigo-300 font-bold';
-      } else if (roi < 0) {
-        recommendation = 'Evaluasi Ulang / Matikan';
-        recBadge = 'bg-rose-100 text-rose-800 border-rose-300';
+        actionText = 'Pindahkan dari tahap testing ke scale, uji lookalike 2%';
+      } else if (roi < 0 || (cpr > 50000 && c.newDonors > 0)) {
+        recommendation = 'Evaluasi / Matikan';
+        recBadge = 'bg-rose-100 text-rose-800 border-rose-300 font-bold';
+        actionText = 'Matikan adset boncos, perbaiki materi video atau landing page';
+      } else if (roi >= 200) {
+        recommendation = 'Lanjut & Scale Bertahap';
+        recBadge = 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold';
+        actionText = 'Naikkan budget 20% per hari, pertahankan CPR < Rp 25.000';
+      }
+
+      if (c.notes && c.notes.length > 5) {
+        actionText = c.notes;
       }
 
       return {
@@ -420,7 +448,8 @@ const sortedScaleCampaigns = computed(() => {
         cpr,
         roi,
         recommendation,
-        recBadge
+        recBadge,
+        actionText
       };
     })
     .sort((a, b) => b.roi - a.roi);

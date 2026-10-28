@@ -18,7 +18,7 @@
               </span>
             </div>
             <p class="text-xs text-slate-500 mt-0.5">
-              Tolok ukur baku performa iklan, ambang batas target aktual, dan SOP tindakan kuratif jika metrik tidak tercapai
+              Tolak ukur baku performa iklan, ambang batas target aktual, dan SOP tindakan kuratif jika metrik tidak tercapai
             </p>
           </div>
         </div>

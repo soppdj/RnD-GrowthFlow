@@ -561,17 +561,39 @@ function parseSpreadsheetFile(file) {
   reader.readAsArrayBuffer(file);
 }
 
+function parseCSVLine(text, sep) {
+  if (sep === '\t') {
+    return text.split('\t').map(v => v.trim().replace(/^["']|["']$/g, ''));
+  }
+  const result = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      inQuotes = !inQuotes;
+    } else if (c === sep && !inQuotes) {
+      result.push(cur.trim().replace(/^["']|["']$/g, ''));
+      cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  result.push(cur.trim().replace(/^["']|["']$/g, ''));
+  return result;
+}
+
 function processPastedText() {
   if (!pastedText.value.trim()) return;
-  const lines = pastedText.value.trim().split('\n');
+  const lines = pastedText.value.trim().split('\n').filter(l => l.trim().length > 0);
   if (lines.length < 2) {
     alert('Format paste harus memiliki baris judul kolom dan minimal 1 baris data!');
     return;
   }
   const sep = lines[0].includes('\t') ? '\t' : lines[0].includes(';') ? ';' : ',';
-  const headers = lines[0].split(sep).map(h => h.trim().replace(/^["']|["']$/g, ''));
+  const headers = parseCSVLine(lines[0], sep);
   const rows = lines.slice(1).map(line => {
-    const vals = line.split(sep).map(v => v.trim().replace(/^["']|["']$/g, ''));
+    const vals = parseCSVLine(line, sep);
     const obj = {};
     headers.forEach((h, i) => {
       obj[h] = vals[i] !== undefined ? vals[i] : '';
@@ -618,7 +640,12 @@ function processRawRows(rows) {
   }
 
   const results = rows.map((r, i) => {
-    const name = getField(r, ['campaign name', 'nama kampanye', 'ad name', 'nama iklan', 'adset name', 'ad set name', 'nama set iklan', 'nama', 'campaign']) || `Kampanye #${i + 1}`;
+    let name = getField(r, ['campaign name', 'nama kampanye', 'ad name', 'nama iklan', 'adset name', 'ad set name', 'nama set iklan', 'nama', 'campaign']);
+    if (name) {
+      const match = String(name).match(/"([^"]+)"/);
+      if (match) name = match[1];
+    }
+    name = (name || `Kampanye #${i + 1}`).trim();
     const spend = cleanNum(getField(r, ['amount spent', 'jumlah yang dibelanjakan', 'spend', 'biaya', 'cost', 'anggaran'], ['cpc', 'cpr', 'ctr', 'roas', 'per']));
     const impressions = cleanNum(getField(r, ['impressions', 'penayangan', 'tayangan', 'impresi'], ['cost', 'biaya', 'cpm', 'per', 'rate'])) || 1;
     const clicks = cleanNum(getField(r, ['link clicks', 'clicks (all)', 'klik tautan', 'klik unik', 'klik', 'clicks'], ['cost', 'biaya', 'cpc', 'cpr', 'per', 'rate', 'tampilan']));

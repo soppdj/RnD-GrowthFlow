@@ -85,12 +85,32 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           rdKpis = [...initialRdKpis];
         }
 
+        let campaigns = parsed.campaigns || initialCampaigns;
+        if (Array.isArray(campaigns)) {
+          campaigns = campaigns.map(c => {
+            if (c.name && c.name.includes('"')) {
+              const match = c.name.match(/"([^"]+)"/);
+              if (match) {
+                return { ...c, name: match[1].trim() };
+              }
+            } else if (c.name && c.name.includes(',')) {
+              const parts = c.name.split(',');
+              const candidate = parts.find(p => {
+                const clean = p.trim().replace(/^["']|["']$/g, '');
+                return clean.length > 3 && !/^\d{4}-\d{2}-\d{2}$/.test(clean) && isNaN(Number(clean)) && !clean.startsWith('active') && !clean.startsWith('actions:');
+              });
+              if (candidate) return { ...c, name: candidate.trim().replace(/^["']|["']$/g, '') };
+            }
+            return c;
+          });
+        }
+
         return {
           profile: profile || initialProfile,
           tasks: tasks || initialTasks,
           journalLogs: parsed.journalLogs || initialJournalLogs,
           milestones: milestones || initialMilestones,
-          campaigns: parsed.campaigns || initialCampaigns,
+          campaigns: campaigns || initialCampaigns,
           donationPrograms: donationPrograms || initialDonationPrograms,
           rdProductPrice: parsed.rdProductPrice !== undefined ? parsed.rdProductPrice : initialRdProductPrice,
           rdKpis: rdKpis,
