@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header with Quick Action & Filter -->
+    <!-- Header with Quick Action & Counters -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -10,30 +10,104 @@
           </span>
         </h2>
         <p class="text-xs text-slate-500 mt-0.5">
-          Tandai checklist (✅) untuk memicu progres LogFrame & catat temuan eksperimen
+          Tandai checklist (✅) untuk input evaluasi kendala &amp; picu progres LogFrame
         </p>
       </div>
 
-      <div class="flex items-center gap-2">
-        <!-- Filter Category -->
-        <select
-          v-model="selectedCategory"
-          class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-teal-300"
-        >
-          <option value="ALL">Semua Kategori (LogFrame)</option>
-          <option value="GOAL">GOAL (Dampak Utama)</option>
-          <option value="OUTCOME">OUTCOME (Hasil Strategis)</option>
-          <option value="OUTPUT">OUTPUT (Deliverables)</option>
-          <option value="ACTIVITY">ACTIVITY (Aktivitas Taktis)</option>
-        </select>
-
+      <div class="flex items-center gap-2 flex-wrap">
         <button
           @click="openCreateModal"
-          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0"
         >
           <Plus class="w-4 h-4" />
-          <span>Tambah Task</span>
+          <span>Tambah Task Jurnal</span>
         </button>
+      </div>
+    </div>
+
+    <!-- FILTER & PENGATURAN MINGGU KERJA & HARI KERJA (Sesuai Arahan Gambar) -->
+    <div class="glass-card rounded-2xl p-4 sm:p-5 border border-teal-100 shadow-soft space-y-3.5">
+      <!-- Row 1: Week Selector Tabs & Work Days Settings -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-teal-100/70">
+        <!-- Week Tabs (Minggu 1 - 5) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+            <Calendar class="w-3.5 h-3.5 text-teal-600" />
+            <span>Minggu:</span>
+          </span>
+          <button
+            v-for="tab in weekTabs"
+            :key="tab.value"
+            @click="selectedWeek = tab.value; customDateFilter = ''"
+            class="px-2.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer"
+            :class="selectedWeek === tab.value && !customDateFilter
+              ? 'bg-teal-600 text-white shadow-sm ring-2 ring-teal-200'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+
+        <!-- Opsi Berapa Hari Kerja dalam Seminggu -->
+        <div class="flex items-center gap-2 self-start lg:self-auto shrink-0 bg-teal-50/80 px-3 py-1.5 rounded-xl border border-teal-200/80">
+          <Briefcase class="w-4 h-4 text-teal-700 shrink-0" />
+          <span class="text-xs font-bold text-teal-900 shrink-0">Hari Kerja:</span>
+          <select
+            v-model="workDaysPerWeek"
+            @change="handleWorkDaysChange"
+            class="px-2 py-1 rounded-lg border border-teal-300 bg-white text-xs font-bold text-teal-800 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer"
+          >
+            <option :value="5">5 Hari Kerja (Senin - Jumat)</option>
+            <option :value="6">6 Hari Kerja (Senin - Sabtu)</option>
+            <option :value="7">7 Hari Kerja (Setiap Hari)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Custom Date Picker & Category Filter -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Custom Date Input -->
+          <div class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200 shadow-micro">
+            <span class="text-[11px] font-bold text-slate-600 uppercase">📅 Custom Tanggal:</span>
+            <input
+              type="date"
+              v-model="customDateFilter"
+              class="text-xs font-semibold text-slate-700 outline-none bg-transparent cursor-pointer"
+            />
+            <button
+              v-if="customDateFilter"
+              @click="customDateFilter = ''"
+              class="p-0.5 rounded hover:bg-slate-100 text-slate-400 hover:text-rose-600"
+              title="Reset Tanggal"
+            >
+              <X class="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <!-- Active Filter Badge -->
+          <span
+            v-if="customDateFilter"
+            class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 font-bold border border-teal-200 text-[11px]"
+          >
+            Filter Aktif: {{ formatDate(customDateFilter, true) }}
+          </span>
+        </div>
+
+        <!-- Filter LogFrame Category -->
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] font-bold text-slate-500 uppercase">Kategori:</span>
+          <select
+            v-model="selectedCategory"
+            class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-teal-300"
+          >
+            <option value="ALL">Semua Kategori (LogFrame)</option>
+            <option value="GOAL">GOAL (Dampak Utama)</option>
+            <option value="OUTCOME">OUTCOME (Hasil Strategis)</option>
+            <option value="OUTPUT">OUTPUT (Deliverables)</option>
+            <option value="ACTIVITY">ACTIVITY (Aktivitas Taktis)</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -42,124 +116,200 @@
       <div
         v-for="task in filteredTasks"
         :key="task.id"
-        class="glass-card rounded-2xl p-4 border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        class="glass-card rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col gap-3"
         :class="task.completed 
-          ? 'bg-emerald-50/30 border-emerald-200/80 shadow-micro opacity-90' 
-          : 'border-teal-100 hover:border-teal-300 shadow-soft'"
+          ? 'bg-emerald-50/30 border-emerald-200/80 shadow-micro' 
+          : 'border-teal-100 hover:border-teal-300 shadow-soft bg-white'"
       >
-        <!-- Left: Custom Checkbox & Details -->
-        <div class="flex items-start gap-3.5 flex-1">
-          <!-- Checkbox with confetti trigger -->
-          <button
-            type="button"
-            @click="handleToggleTask(task, $event)"
-            class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer active:scale-90"
-            :class="task.completed 
-              ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm ring-2 ring-emerald-200' 
-              : 'border-slate-300 bg-white hover:border-teal-500'"
-            :aria-label="task.completed ? 'Batalkan selesai' : 'Tandai selesai'"
-          >
-            <Check v-if="task.completed" class="w-4 h-4 stroke-[3]" />
-          </button>
-
-          <!-- Task Info -->
-          <div class="space-y-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <!-- LogFrame Badge -->
-              <span
-                class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase border"
-                :class="getLogFrameBadgeClass(task.category)"
-              >
-                {{ task.category }}
-              </span>
-
-              <!-- Priority Badge -->
-              <span
-                class="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                :class="task.priority === 'HIGH' 
-                  ? 'bg-rose-50 text-rose-700 border border-rose-200' 
-                  : task.priority === 'MEDIUM' 
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200' 
-                    : 'bg-slate-50 text-slate-600 border border-slate-200'"
-              >
-                {{ task.priority }}
-              </span>
-
-              <span class="text-xs text-slate-400 font-medium flex items-center gap-1">
-                <Clock class="w-3 h-3" />
-                {{ task.estimatedHours }} Jam
-              </span>
-            </div>
-
-            <!-- Title -->
-            <p
-              class="text-sm font-semibold transition-colors"
-              :class="task.completed ? 'line-through text-slate-400' : 'text-slate-800'"
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <!-- Left: Checkbox & Main Info -->
+          <div class="flex items-start gap-3.5 flex-1">
+            <!-- Checkbox with Evaluation Trigger -->
+            <button
+              type="button"
+              @click="handleCheckboxClick(task, $event)"
+              class="mt-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 shrink-0 cursor-pointer active:scale-90"
+              :class="task.completed 
+                ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm ring-2 ring-emerald-200' 
+                : 'border-slate-300 bg-white hover:border-teal-500'"
+              :aria-label="task.completed ? 'Batalkan selesai' : 'Tandai selesai & evaluasi'"
+              title="Tandai Selesai (Buka Modal Evaluasi)"
             >
-              {{ task.title }}
-            </p>
+              <Check v-if="task.completed" class="w-4 h-4 stroke-[3]" />
+            </button>
 
-            <!-- Notes / Findings -->
-            <p v-if="task.notes" class="text-xs text-slate-500 italic">
-              "{{ task.notes }}"
-            </p>
+            <!-- Task Info -->
+            <div class="space-y-1.5 flex-1">
+              <!-- Tanggal Jurnal & Metadata Badges -->
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- TANGGAL JURNAL (Jelas & Prominen Sesuai Perintah Gambar) -->
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-teal-50 border border-teal-200 text-teal-900 shadow-micro">
+                  <Calendar class="w-3.5 h-3.5 text-teal-600" />
+                  <span>{{ formatJournalDate(task.date) }}</span>
+                </span>
 
-            <!-- Attachments / Link Hasil Kerja -->
-            <div v-if="getTaskLinks(task).length > 0" class="flex flex-wrap items-center gap-1.5 pt-1">
-              <a
-                v-for="(link, idx) in getTaskLinks(task)"
-                :key="idx"
-                :href="link.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200/90 transition-all shadow-micro hover:shadow-soft group"
-                :title="link.url"
+                <!-- LogFrame Badge -->
+                <span
+                  class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase border"
+                  :class="getLogFrameBadgeClass(task.category)"
+                >
+                  {{ task.category }}
+                </span>
+
+                <!-- Priority Badge -->
+                <span
+                  class="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                  :class="task.priority === 'HIGH' 
+                    ? 'bg-rose-50 text-rose-700 border border-rose-200' 
+                    : task.priority === 'MEDIUM' 
+                      ? 'bg-amber-50 text-amber-700 border border-amber-200' 
+                      : 'bg-slate-50 text-slate-600 border border-slate-200'"
+                >
+                  {{ task.priority }}
+                </span>
+
+                <span class="text-xs text-slate-400 font-medium flex items-center gap-1">
+                  <Clock class="w-3 h-3" />
+                  {{ task.estimatedHours }} Jam
+                </span>
+
+                <!-- Status Kerja Badge (Hari Kerja vs Weekend) -->
+                <span
+                  v-if="!isWorkDay(task.date, workDaysPerWeek)"
+                  class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200"
+                  title="Di luar hari kerja reguler yang diatur"
+                >
+                  Non-Hari Kerja (Weekend)
+                </span>
+              </div>
+
+              <!-- Title -->
+              <p
+                class="text-sm font-semibold transition-colors leading-relaxed"
+                :class="task.completed ? 'text-slate-700' : 'text-slate-900'"
               >
-                <LinkIcon class="w-3.5 h-3.5 text-teal-600 group-hover:scale-110 transition-transform" />
-                <span class="max-w-[200px] truncate">{{ link.title || 'Hasil Kerja' }}</span>
-                <ExternalLink class="w-3 h-3 text-teal-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-              </a>
+                {{ task.title }}
+              </p>
+
+              <!-- Notes / Findings -->
+              <p v-if="task.notes && !task.evaluation" class="text-xs text-slate-500 italic">
+                "{{ task.notes }}"
+              </p>
+
+              <!-- Attachments / Link Hasil Kerja -->
+              <div v-if="getTaskLinks(task).length > 0" class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                <a
+                  v-for="(link, idx) in getTaskLinks(task)"
+                  :key="idx"
+                  :href="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200/90 transition-all shadow-micro hover:shadow-soft group"
+                  :title="link.url"
+                >
+                  <LinkIcon class="w-3.5 h-3.5 text-teal-600 group-hover:scale-110 transition-transform" />
+                  <span class="max-w-[220px] truncate">{{ link.title || 'Hasil Kerja' }}</span>
+                  <ExternalLink class="w-3 h-3 text-teal-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                </a>
+              </div>
             </div>
+          </div>
+
+          <!-- Right: Actions -->
+          <div class="flex items-center gap-1.5 self-end sm:self-start shrink-0">
+            <!-- Catat / Edit Evaluasi Button -->
+            <button
+              @click="openEvaluationModal(task)"
+              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border"
+              :class="(task.obstacle || task.evaluation || task.conclusion)
+                ? 'text-indigo-700 bg-indigo-50 border-indigo-200 hover:bg-indigo-100'
+                : 'text-slate-500 hover:text-indigo-700 hover:bg-indigo-50 border-slate-200'"
+              title="Catat Kendala, Evaluasi & Kesimpulan"
+            >
+              <MessageSquare class="w-3.5 h-3.5 text-indigo-500" />
+              <span>{{ (task.obstacle || task.evaluation || task.conclusion) ? 'Evaluasi' : '+ Evaluasi' }}</span>
+            </button>
+
+            <!-- Quick Attach Link Button -->
+            <button
+              @click="openAttachModal(task)"
+              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border"
+              :class="getTaskLinks(task).length > 0
+                ? 'text-teal-700 bg-teal-50 border-teal-200 hover:bg-teal-100'
+                : 'text-slate-500 hover:text-teal-700 hover:bg-teal-50 border-slate-200'"
+              title="Lampirkan Link Hasil Kerja"
+            >
+              <Paperclip class="w-3.5 h-3.5" />
+              <span class="hidden sm:inline">{{ getTaskLinks(task).length > 0 ? `${getTaskLinks(task).length} Link` : 'Attach Link' }}</span>
+            </button>
+
+            <button
+              @click="editTask(task)"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors"
+              title="Edit Task"
+            >
+              <Edit2 class="w-4 h-4" />
+            </button>
+            <button
+              @click="deleteTask(task.id)"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              title="Hapus Task"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
           </div>
         </div>
 
-        <!-- Right: Actions -->
-        <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
-          <!-- Quick Attach Link Button -->
-          <button
-            @click="openAttachModal(task)"
-            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border"
-            :class="getTaskLinks(task).length > 0
-              ? 'text-teal-700 bg-teal-50 border-teal-200 hover:bg-teal-100'
-              : 'text-slate-500 hover:text-teal-700 hover:bg-teal-50 border-slate-200'"
-            title="Lampirkan Link Hasil Kerja"
-          >
-            <Paperclip class="w-3.5 h-3.5" />
-            <span class="hidden sm:inline">{{ getTaskLinks(task).length > 0 ? `${getTaskLinks(task).length} Link` : 'Attach Link' }}</span>
-          </button>
+        <!-- EVALUATION NOTES SECTION (KENDALA, EVALUASI, KESIMPULAN) JIKA ADA -->
+        <div
+          v-if="task.obstacle || task.evaluation || task.conclusion"
+          class="mt-1 pt-2.5 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs bg-slate-50/70 p-3 rounded-xl border border-slate-200/80"
+        >
+          <!-- 1. Kendala -->
+          <div v-if="task.obstacle" class="space-y-0.5">
+            <span class="text-[10px] font-extrabold text-amber-800 uppercase flex items-center gap-1">
+              <AlertTriangle class="w-3 h-3 text-amber-500" />
+              <span>Kendala:</span>
+            </span>
+            <p class="text-slate-700 text-[11px] leading-relaxed">
+              {{ task.obstacle }}
+            </p>
+          </div>
+          <div v-else class="hidden md:block"></div>
 
-          <button
-            @click="editTask(task)"
-            class="p-1.5 rounded-lg text-slate-400 hover:text-teal-700 hover:bg-teal-50 transition-colors"
-            title="Edit Task"
-          >
-            <Edit2 class="w-4 h-4" />
-          </button>
-          <button
-            @click="deleteTask(task.id)"
-            class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-            title="Hapus Task"
-          >
-            <Trash2 class="w-4 h-4" />
-          </button>
+          <!-- 2. Evaluasi -->
+          <div v-if="task.evaluation" class="space-y-0.5">
+            <span class="text-[10px] font-extrabold text-indigo-800 uppercase flex items-center gap-1">
+              <Search class="w-3 h-3 text-indigo-500" />
+              <span>Evaluasi Hasil:</span>
+            </span>
+            <p class="text-slate-700 text-[11px] leading-relaxed">
+              {{ task.evaluation }}
+            </p>
+          </div>
+          <div v-else class="hidden md:block"></div>
+
+          <!-- 3. Kesimpulan -->
+          <div v-if="task.conclusion" class="space-y-0.5">
+            <span class="text-[10px] font-extrabold text-emerald-800 uppercase flex items-center gap-1">
+              <CheckCircle2 class="w-3 h-3 text-emerald-600" />
+              <span>Kesimpulan &amp; Tindak Lanjut:</span>
+            </span>
+            <p class="text-slate-700 text-[11px] leading-relaxed">
+              {{ task.conclusion }}
+            </p>
+          </div>
+          <div v-else class="hidden md:block"></div>
         </div>
       </div>
 
       <!-- Empty State if no tasks -->
-      <div v-if="filteredTasks.length === 0" class="text-center py-8 bg-white/50 rounded-2xl border border-dashed border-teal-200">
-        <CheckSquare class="w-8 h-8 text-teal-400 mx-auto mb-2" />
-        <p class="text-sm font-semibold text-slate-600">Tidak ada tugas pada filter ini</p>
-        <p class="text-xs text-slate-400 mt-1">Tambahkan tugas baru untuk memperbarui progres LogFrame</p>
+      <div v-if="filteredTasks.length === 0" class="text-center py-10 bg-white/60 rounded-2xl border border-dashed border-teal-200 p-6">
+        <CheckSquare class="w-9 h-9 text-teal-400 mx-auto mb-2" />
+        <p class="text-sm font-bold text-slate-700">Tidak ada tugas pada filter ini</p>
+        <p class="text-xs text-slate-500 mt-1">
+          Pilih minggu kerja lain, ubah custom tanggal, atau klik "Tambah Task Jurnal" untuk membuat task baru.
+        </p>
       </div>
     </div>
 
@@ -171,7 +321,7 @@
             <BookOpen class="w-4 h-4" />
           </div>
           <div>
-            <h3 class="text-sm font-bold text-slate-800">Log Harian: Evaluasi & Temuan Eksperimen</h3>
+            <h3 class="text-sm font-bold text-slate-800">Log Harian: Evaluasi &amp; Temuan Eksperimen</h3>
             <p class="text-[11px] text-slate-500">Catat hipotesis, data CPR/ROI aktual, dan keputusan scale-up hari ini</p>
           </div>
         </div>
@@ -189,13 +339,13 @@
       <form @submit.prevent="saveDailyLog" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Fokus & Validasi Hari Ini
+            Fokus &amp; Validasi Hari Ini
           </label>
           <input
             v-model="newLog.focus"
             type="text"
             required
-            placeholder="Contoh: Validasi Creative Video Testimoni Sumur & Optimasi CPR..."
+            placeholder="Contoh: Validasi Creative Video Testimoni Sumur &amp; Optimasi CPR..."
             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-xs sm:text-sm font-semibold transition-all"
           />
         </div>
@@ -203,7 +353,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Evaluasi & Temuan Eksperimen (Growth Findings)
+              Evaluasi &amp; Temuan Eksperimen (Growth Findings)
             </label>
             <textarea
               v-model="newLog.evaluation"
@@ -270,7 +420,15 @@
       </div>
     </div>
 
-    <!-- Task Modal -->
+    <!-- Complete / Evaluation Modal for Tasks -->
+    <CompleteTaskEvaluationModal
+      :is-open="isEvaluationModalOpen"
+      :task="targetEvaluationTask"
+      @close="closeEvaluationModal"
+      @complete="handleSaveEvaluation"
+    />
+
+    <!-- Task Modal (Create & Edit) -->
     <TaskModal
       :is-open="isTaskModalOpen"
       :initial-data="editingTask"
@@ -294,9 +452,16 @@
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { useConfetti } from '@/composables/useConfetti';
-import { formatDate, LOGFRAME_TYPES } from '@/utils/formatters';
+import {
+  formatDate,
+  formatJournalDate,
+  getWeekOfMonth,
+  isWorkDay,
+  LOGFRAME_TYPES
+} from '@/utils/formatters';
 import TaskModal from './TaskModal.vue';
 import AttachLinkModal from './AttachLinkModal.vue';
+import CompleteTaskEvaluationModal from './CompleteTaskEvaluationModal.vue';
 import {
   Check,
   Plus,
@@ -309,13 +474,24 @@ import {
   CheckSquare,
   Paperclip,
   Link as LinkIcon,
-  ExternalLink
+  ExternalLink,
+  Calendar,
+  Briefcase,
+  X,
+  AlertTriangle,
+  Search,
+  CheckCircle2,
+  MessageSquare
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 const { triggerConfetti } = useConfetti();
 
 const selectedCategory = ref('ALL');
+const selectedWeek = ref('ALL');
+const customDateFilter = ref('');
+const workDaysPerWeek = ref(store.profile?.workDaysPerWeek || 5);
+
 const showPastLogs = ref(false);
 const logSavedToast = ref(false);
 
@@ -325,15 +501,50 @@ const editingTask = ref(null);
 const isAttachModalOpen = ref(false);
 const targetAttachTask = ref(null);
 
+const isEvaluationModalOpen = ref(false);
+const targetEvaluationTask = ref(null);
+
+const weekTabs = [
+  { value: 'ALL', label: 'Semua Minggu' },
+  { value: '1', label: 'Minggu 1 (Tgl 1-7)' },
+  { value: '2', label: 'Minggu 2 (Tgl 8-14)' },
+  { value: '3', label: 'Minggu 3 (Tgl 15-21)' },
+  { value: '4', label: 'Minggu 4 (Tgl 22-28)' },
+  { value: '5', label: 'Minggu 5 (Tgl 29-31)' }
+];
+
 const newLog = ref({
   focus: '',
   evaluation: '',
   nextSteps: ''
 });
 
+function handleWorkDaysChange() {
+  store.setWorkDaysPerWeek(Number(workDaysPerWeek.value));
+}
+
 const filteredTasks = computed(() => {
-  if (selectedCategory.value === 'ALL') return store.tasks;
-  return store.tasks.filter(t => t.category === selectedCategory.value);
+  return store.tasks.filter(t => {
+    // 1. Filter Category
+    if (selectedCategory.value !== 'ALL' && t.category !== selectedCategory.value) {
+      return false;
+    }
+
+    // 2. Filter Custom Date if active
+    if (customDateFilter.value) {
+      return t.date === customDateFilter.value;
+    }
+
+    // 3. Filter Week of Month
+    if (selectedWeek.value !== 'ALL') {
+      const taskWeek = getWeekOfMonth(t.date);
+      if (String(taskWeek) !== String(selectedWeek.value)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 });
 
 const completedCount = computed(() => store.tasks.filter(t => t.completed).length);
@@ -344,17 +555,31 @@ function getLogFrameBadgeClass(category) {
   return `${info.badgeBg} ${info.badgeText} ${info.badgeBorder}`;
 }
 
-function handleToggleTask(task, event) {
-  const willBeCompleted = !task.completed;
-  store.toggleTask(task.id);
-  
-  if (willBeCompleted) {
-    // Trigger celebratory confetti burst!
-    const rect = event.target.getBoundingClientRect();
-    const x = (rect.left + rect.width / 2) / window.innerWidth;
-    const y = (rect.top + rect.height / 2) / window.innerHeight;
-    triggerConfetti({ x, y });
+function handleCheckboxClick(task, event) {
+  if (task.completed) {
+    // Toggle directly back to uncompleted
+    store.toggleTask(task.id);
+  } else {
+    // Prompt evaluation modal before marking complete!
+    targetEvaluationTask.value = { ...task };
+    isEvaluationModalOpen.value = true;
   }
+}
+
+function openEvaluationModal(task) {
+  targetEvaluationTask.value = { ...task };
+  isEvaluationModalOpen.value = true;
+}
+
+function closeEvaluationModal() {
+  isEvaluationModalOpen.value = false;
+  targetEvaluationTask.value = null;
+}
+
+function handleSaveEvaluation({ taskId, obstacle, evaluation, conclusion }) {
+  store.completeTaskWithEvaluation(taskId, { obstacle, evaluation, conclusion });
+  closeEvaluationModal();
+  triggerConfetti();
 }
 
 function openCreateModal() {

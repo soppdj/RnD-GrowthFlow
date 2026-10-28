@@ -16,7 +16,7 @@ export const initialProfile = {
   avatarZoom: 100,
   avatarX: 50,
   avatarY: 50,
-  foundationAddress: "Cimareme, Kab. Bandung Barat",
+  foundationAddress: "Jl. Raya Cimareme Rt.001 Rw.002 Desa Cimareme Kec. Ngamprah Kab. Bandung Barat",
   foundationContact: "admin@khoirurroziqiin.org | +62 812-9988-7766",
   supabaseUrl: import.meta.env?.VITE_SUPABASE_URL || import.meta.env?.NEXT_PUBLIC_SUPABASE_URL || "https://rsnjmllhuucyophursng.supabase.co",
   supabaseAnonKey: import.meta.env?.VITE_SUPABASE_ANON_KEY || import.meta.env?.NEXT_PUBLIC_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzbmptbGxodXVjeW9waHVyc25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzQ0MTAsImV4cCI6MjEwNzcxMDQxMH0.nVLriES26tvWFXLbkeD0irZs7AXZvsFq7Zdue7jKClI",
@@ -26,56 +26,83 @@ export const initialProfile = {
 };
 
 export const initialTasks = [
+  // --- MINGGU 1 (1 - 7 Oktober 2026) ---
   {
-    id: "task-1",
-    title: "A/B Testing 3 Hook Video Emosional Cerita Santri Penghafal Quran (Meta Ads)",
+    id: "task-w1-1",
+    title: "Kick-off Riset Angle Iklan Wakaf Sumur & Benchmarking Kompetitor",
+    category: "ACTIVITY",
+    completed: true,
+    estimatedHours: 2.0,
+    priority: "MEDIUM",
+    date: "2026-10-02",
+    notes: "Riset 15 ad library kompetitor filantropi dan identifikasi sudut pandang air bersih santri.",
+    obstacle: "Minim data performa spesifik audiens wilayah Jawa Barat",
+    evaluation: "Ditemukan 3 hook potensial tentang santri pelosok yang kesulitan air saat berwudhu",
+    conclusion: "Gunakan narasi air bersih untuk wudhu santri sebagai angle utama kampanye",
+    workResultUrl: "https://docs.google.com/document/d/riset-angle-kompetitor",
+    workResultTitle: "📝 Docs: Riset 15 Ad Library Kompetitor",
+    attachments: [
+      { title: "📝 Docs: Riset 15 Ad Library Kompetitor", url: "https://docs.google.com/document/d/riset-angle-kompetitor" }
+    ]
+  },
+  {
+    id: "task-w1-2",
+    title: "Audit Setup Tracking Meta Pixel, Google Analytics 4 & CAPI Server-Side",
     category: "OUTPUT",
     completed: true,
-    estimatedHours: 2.0,
-    priority: "HIGH",
-    date: "2026-10-22",
-    notes: "Hook 1 (Problem-Agitate-Solve) menghasilkan CTR 3.8% vs Hook 2 yang hanya 1.2%.",
-    workResultUrl: "https://drive.google.com/drive/folders/santri-video-draft",
-    workResultTitle: "📁 Drive: 3 Video Draft & Script",
-    attachments: [
-      { title: "📁 Drive: 3 Video Draft & Script", url: "https://drive.google.com/drive/folders/santri-video-draft" }
-    ]
-  },
-  {
-    id: "task-2",
-    title: "Optimasi Landing Page Wakaf Sumur: Ubah form 3 langkah jadi 1-step Fast Checkout via QRIS",
-    category: "OUTCOME",
-    completed: true,
-    estimatedHours: 2.5,
-    priority: "HIGH",
-    date: "2026-10-22",
-    notes: "Conversion rate landing page melonjak dari 4.1% ke 8.9% setelah payment direct QRIS.",
-    workResultUrl: "https://wakaf.khoirurroziqiin.org/sumur-air",
-    workResultTitle: "🌐 Live LP: Fast Checkout QRIS",
-    attachments: [
-      { title: "🌐 Live LP: Fast Checkout QRIS", url: "https://wakaf.khoirurroziqiin.org/sumur-air" }
-    ]
-  },
-  {
-    id: "task-3",
-    title: "Analisis Cohort Donatur Kuartal III & Desain Skema Nurturing Donasi Rutin (WhatsApp Bot)",
-    category: "ACTIVITY",
-    completed: false,
     estimatedHours: 1.5,
-    priority: "MEDIUM",
-    date: "2026-10-22",
-    notes: "Siapkan 4 template pesan doa harian dan reminder zakat penghasilan tanggal 25."
+    priority: "HIGH",
+    date: "2026-10-05",
+    notes: "Memastikan deduplikasi event Purchase dan Lead berjalan dengan match rate > 80%.",
+    obstacle: "Event Purchase sempat double-counting pada perangkat iOS Safari",
+    evaluation: "Konfigurasi deduplikasi via Event ID unik dan server CAPI berhasil menurunkan error ke 0%",
+    conclusion: "Tracking siap menampung traffic skala besar tanpa kehilangan data konversi",
+    workResultUrl: "https://analytics.google.com",
+    workResultTitle: "📊 GA4 & Meta Pixel Verified",
+    attachments: [
+      { title: "📊 GA4 & Meta Pixel Verified", url: "https://analytics.google.com" }
+    ]
+  },
+
+  // --- MINGGU 2 (8 - 14 Oktober 2026) ---
+  {
+    id: "task-w2-1",
+    title: "Shooting Dokumentasi Sumur Santri di Pesantren & Editing Video Hook",
+    category: "OUTPUT",
+    completed: true,
+    estimatedHours: 3.0,
+    priority: "HIGH",
+    date: "2026-10-09",
+    notes: "Pengambilan footage b-roll santri menimba air dan testimoni ustadz pimpinan pondok.",
+    obstacle: "Cuaca mendung membatasi pengambilan gambar aerial drone",
+    evaluation: "Footage indoor dan ekspresi bahagia santri saat air keluar jernih sangat menyentuh",
+    conclusion: "Materi visual mencukupi untuk 5 variasi creative video A/B test",
+    workResultUrl: "https://drive.google.com/drive/folders/footage-sumur-santri",
+    workResultTitle: "📁 Drive: Footage Mentah & Raw Edits",
+    attachments: [
+      { title: "📁 Drive: Footage Mentah & Raw Edits", url: "https://drive.google.com/drive/folders/footage-sumur-santri" }
+    ]
   },
   {
-    id: "task-4",
-    title: "Validasi Laporan Bulanan & Injeksi Anggaran Kampanye Winning ke Scale 2",
-    category: "GOAL",
-    completed: false,
+    id: "task-w2-2",
+    title: "Penyusunan Copywriting Landing Page Berbasis Hypno-Writing & Urgensi Syar'i",
+    category: "ACTIVITY",
+    completed: true,
     estimatedHours: 2.0,
-    priority: "HIGH",
-    date: "2026-10-22",
-    notes: "Realisasi ROI kampanye Wakaf Produktif telah mencapai 525%, siap injeksi Rp 15 Juta."
+    priority: "MEDIUM",
+    date: "2026-10-12",
+    notes: "Struktur AIDA + PAS disesuaikan dengan dalil shahih sedekah jariyah air.",
+    obstacle: "Memerlukan konsultasi asatidz agar pencantuman dalil tepat sasaran",
+    evaluation: "Alur copywriting mengalir alami dari empati santri ke kemudahan berwakaf",
+    conclusion: "Draft disetujui dewan syariah yayasan dan siap dimasukkan ke landing page",
+    workResultUrl: "https://docs.google.com/document/d/copy-hypnowriting-sumur",
+    workResultTitle: "📝 Docs: Naskah Copywriting Hypno-Writing",
+    attachments: [
+      { title: "📝 Docs: Naskah Copywriting Hypno-Writing", url: "https://docs.google.com/document/d/copy-hypnowriting-sumur" }
+    ]
   },
+
+  // --- MINGGU 3 (15 - 21 Oktober 2026) ---
   {
     id: "task-5",
     title: "Riset Copywriting Sudut Pandang 'Pahala Jariyah yang Terus Mengalir Pasca Ramadhan'",
@@ -83,8 +110,11 @@ export const initialTasks = [
     completed: true,
     estimatedHours: 1.0,
     priority: "LOW",
-    date: "2026-10-21",
+    date: "2026-10-16",
     notes: "Sudut pandang amal jariyah sangat resonan pada segmen usia 35-54 tahun.",
+    obstacle: "Segmentasi broad terlalu mahal di awal peluncuran kampanye",
+    evaluation: "Segmen orang tua usia 35+ memiliki retensi donasi dan average donation value tertinggi",
+    conclusion: "Fokuskan alokasi testing Meta Ads ke demografi 35-54 tahun",
     workResultUrl: "https://docs.google.com/document/d/copywriting-pahala-jariyah",
     workResultTitle: "📝 Docs: Naskah Copywriting Resonan",
     attachments: [
@@ -99,7 +129,90 @@ export const initialTasks = [
     estimatedHours: 1.5,
     priority: "MEDIUM",
     date: "2026-10-20",
-    notes: "Event 'CompleteDonation' terkirim akurat dengan match rate 88%."
+    notes: "Event 'CompleteDonation' terkirim akurat dengan match rate 88%.",
+    obstacle: "Access Token TikTok sempat expired saat proses handshake awal",
+    evaluation: "Event terkirim presisi ke TikTok Events Manager tanpa lag data",
+    conclusion: "Gunakan token jangka panjang via TikTok Business Developer Portal"
+  },
+
+  // --- MINGGU 4 (22 - 28 Oktober 2026) ---
+  {
+    id: "task-1",
+    title: "A/B Testing 3 Hook Video Emosional Cerita Santri Penghafal Quran (Meta Ads)",
+    category: "OUTPUT",
+    completed: true,
+    estimatedHours: 2.0,
+    priority: "HIGH",
+    date: "2026-10-23",
+    notes: "Hook 1 (Problem-Agitate-Solve) menghasilkan CTR 3.8% vs Hook 2 yang hanya 1.2%.",
+    obstacle: "Waktu rendering video resolusi 4K memakan kapasitas komputasi lokal",
+    evaluation: "Hook 1 unggul telak dengan CPR Rp 41.250 dan donatur direct transfer meningkat 3x lipat",
+    conclusion: "Scale up anggaran Hook 1 sebesar +20% dan matikan Hook 2 & 3",
+    workResultUrl: "https://drive.google.com/drive/folders/santri-video-draft",
+    workResultTitle: "📁 Drive: 3 Video Draft & Script",
+    attachments: [
+      { title: "📁 Drive: 3 Video Draft & Script", url: "https://drive.google.com/drive/folders/santri-video-draft" }
+    ]
+  },
+  {
+    id: "task-2",
+    title: "Optimasi Landing Page Wakaf Sumur: Ubah form 3 langkah jadi 1-step Fast Checkout via QRIS",
+    category: "OUTCOME",
+    completed: true,
+    estimatedHours: 2.5,
+    priority: "HIGH",
+    date: "2026-10-26",
+    notes: "Conversion rate landing page melonjak dari 4.1% ke 8.9% setelah payment direct QRIS.",
+    obstacle: "Integrasi webhook QRIS dinamis membutuhkan mekanisme retry otomatis",
+    evaluation: "Drop-off donatur di keranjang donasi turun signifikan sebesar 52%",
+    conclusion: "Terapkan standard form 1-step QRIS untuk semua landing page program lainnya",
+    workResultUrl: "https://wakaf.khoirurroziqiin.org/sumur-air",
+    workResultTitle: "🌐 Live LP: Fast Checkout QRIS",
+    attachments: [
+      { title: "🌐 Live LP: Fast Checkout QRIS", url: "https://wakaf.khoirurroziqiin.org/sumur-air" }
+    ]
+  },
+  {
+    id: "task-3",
+    title: "Analisis Cohort Donatur Kuartal III & Desain Skema Nurturing Donasi Rutin (WhatsApp Bot)",
+    category: "ACTIVITY",
+    completed: false,
+    estimatedHours: 1.5,
+    priority: "MEDIUM",
+    date: "2026-10-27",
+    notes: "Siapkan 4 template pesan doa harian dan reminder zakat penghasilan tanggal 25."
+  },
+  {
+    id: "task-4",
+    title: "Validasi Laporan Bulanan & Injeksi Anggaran Kampanye Winning ke Scale 2",
+    category: "GOAL",
+    completed: false,
+    estimatedHours: 2.0,
+    priority: "HIGH",
+    date: "2026-10-28",
+    notes: "Realisasi ROI kampanye Wakaf Produktif telah mencapai 525%, siap injeksi Rp 15 Juta."
+  },
+
+  // --- MINGGU 5 (29 - 31 Oktober 2026) ---
+  {
+    id: "task-w5-1",
+    title: "Evaluasi Akhir Bulan & Rekapitulasi Efisiensi CPR Antar-Channel (Meta vs TikTok)",
+    category: "GOAL",
+    completed: false,
+    estimatedHours: 2.5,
+    priority: "HIGH",
+    date: "2026-10-29",
+    notes: "Bandingkan CPR Meta Ads vs TikTok Ads vs Google Search untuk alokasi budget November."
+  },
+  {
+    id: "task-w5-2",
+    title: "Penyusunan Rencana Eskalasi Budget Kampanye Sedekah Subuh & Wakaf Quran",
+    category: "OUTPUT",
+    completed: false,
+    estimatedHours: 1.5,
+    priority: "MEDIUM",
+    date: "2026-10-30",
+    notes: "Alokasikan ekstra budget Rp 10 Juta untuk winning creative subuh berbasis automated rules."
   }
 ];
 
@@ -123,6 +236,24 @@ export const initialJournalLogs = [
 ];
 
 export const initialMilestones = [
+  {
+    id: "m-0",
+    title: "Setup & Testing Fast Checkout QRIS Landing Page",
+    deadline: "2026-10-15",
+    type: "Weekly",
+    category: "OUTPUT",
+    targetMetric: "Conversion Rate LP > 5%",
+    progressPercent: 100,
+    status: "Done",
+    obstacle: "Penyesuaian waktu kedaluwarsa QRIS dinamis agar tidak terlalu cepat",
+    evaluation: "Conversion rate melonjak ke 8.9% dengan bounce rate berkurang drastis",
+    conclusion: "Standardisasi implementasi QRIS 1-step ke seluruh sub-domain campaign",
+    workResultUrl: "https://wakaf.khoirurroziqiin.org/sumur-air",
+    workResultTitle: "🌐 Live LP: Fast Checkout QRIS",
+    attachments: [
+      { title: "🌐 Live LP: Fast Checkout QRIS", url: "https://wakaf.khoirurroziqiin.org/sumur-air" }
+    ]
+  },
   {
     id: "m-1",
     title: "Peluncuran Fitur Wakaf Otomatis Autodebit Bulanan",

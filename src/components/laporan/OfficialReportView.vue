@@ -12,15 +12,29 @@
         </p>
       </div>
 
-      <div class="flex items-center gap-2.5">
-        <!-- Strict Period Filter -->
+      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+        <!-- Strict Period Filter with Previous Months Option -->
         <select
           v-model="selectedPeriod"
-          class="px-3 py-2 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none"
+          class="px-3 py-2 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-teal-400"
         >
-          <option value="q4-2026">Kuartal IV (Okt - Des 2026)</option>
-          <option value="oct-2026">Bulan Berjalan (Oktober 2026)</option>
-          <option value="all">Semua Periode</option>
+          <optgroup label="Bulan Berjalan">
+            <option value="oct-2026">Bulan Berjalan (Oktober 2026)</option>
+          </optgroup>
+          <optgroup label="Bulan-Bulan Sebelumnya">
+            <option value="sep-2026">September 2026</option>
+            <option value="aug-2026">Agustus 2026</option>
+            <option value="jul-2026">Juli 2026</option>
+            <option value="jun-2026">Juni 2026</option>
+            <option value="may-2026">Mei 2026</option>
+          </optgroup>
+          <optgroup label="Kuartal & Tahunan">
+            <option value="q4-2026">Kuartal IV (Okt - Des 2026)</option>
+            <option value="q3-2026">Kuartal III (Jul - Sep 2026)</option>
+            <option value="q2-2026">Kuartal II (Apr - Jun 2026)</option>
+            <option value="q1-2026">Kuartal I (Jan - Mar 2026)</option>
+            <option value="all">Semua Periode (Tahun 2026)</option>
+          </optgroup>
         </select>
 
         <!-- Print PDF Button -->
@@ -39,44 +53,37 @@
       
       <!-- KOP SURAT RESMI YAYASAN KHOIRUR ROOZIQIIN -->
       <div class="flex items-center justify-between gap-4 pb-4 border-b-4 border-double border-slate-800">
-        <!-- Logo Yayasan -->
-        <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-teal-800 via-teal-700 to-emerald-600 flex items-center justify-center text-white shrink-0 shadow-md">
-          <div class="text-center">
-            <span class="block text-2xl font-black font-serif">KR</span>
-            <span class="block text-[8px] tracking-widest uppercase font-bold text-teal-200">Yayasan</span>
-          </div>
-        </div>
+        <!-- Logo Yayasan (Official circular emblem) -->
+        <img
+          src="/logo-yayasan.png"
+          alt="Logo Yayasan Khoirur Rooziqiin"
+          class="w-20 h-20 object-contain shrink-0"
+        />
 
-        <!-- Foundation Text Info -->
+        <!-- Foundation Text Info (Alamat & Legalitas Resmi Baru) -->
         <div class="flex-1 text-center">
           <h1 class="text-xl sm:text-2xl font-black tracking-wide text-slate-900 uppercase font-serif">
             YAYASAN KHOIRUR ROOZIQIIN
           </h1>
           <p class="text-xs font-bold text-teal-800 tracking-wider uppercase mt-0.5">
-            Lembaga Filantropi & Pengembangan ZISWAF Berkelanjutan
+            LEMBAGA PENGHIMPUNAN ZISWAF
           </p>
-          <p class="text-[11px] text-slate-600 mt-1">
-            SK Kemenkumham RI No. AHU-0014285.AH.01.04.Tahun 2021 • NPWP: 94.321.876.5-012.000
+          <p class="text-[11px] font-semibold text-slate-700 mt-0.5">
+            NPYP: AZ0613 &nbsp;|&nbsp; UPZ No: 027/SK-UPZ/BAZNAS-KBB/XI/2024
           </p>
-          <p class="text-[11px] text-slate-500">
-            {{ store.profile.foundationAddress }} | Telp: +62 812-9988-7766 | Email: admin@khoirurroziqiin.org
+          <p class="text-[11px] text-slate-600 mt-0.5">
+            Jl. Raya Cimareme Rt.001 Rw.002 Desa Cimareme<br />
+            Kecamatan Ngamprah Kab. Bandung Barat
           </p>
         </div>
 
-        <!-- Seal Stamp Placeholder / Badge -->
-        <div class="hidden sm:flex flex-col items-center justify-center w-20 text-center">
-          <div class="w-14 h-14 rounded-full border-2 border-dashed border-teal-600 flex items-center justify-center p-1 text-[9px] font-bold text-teal-700 text-center leading-tight">
-            DIVISI R&amp;D DIGITAL
-          </div>
-        </div>
+        <!-- Spacer to balance center alignment with logo on left (stamp badge deleted per user X mark) -->
+        <div class="w-20 shrink-0 hidden sm:block"></div>
       </div>
 
-      <!-- DOCUMENT HEADER & METADATA -->
-      <div class="my-6 text-center">
-        <h2 class="text-base sm:text-lg font-extrabold uppercase tracking-tight text-slate-900 underline underline-offset-4 decoration-teal-600">
-          LAPORAN KINERJA R&D DIGITAL MARKETING &amp; REKOMENDASI SCALE-UP
-        </h2>
-        <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-slate-600 mt-2 font-medium">
+      <!-- DOCUMENT METADATA (Header judul dicoret/dihapus sesuai tanda X) -->
+      <div class="my-5 text-center">
+        <div class="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-slate-600 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 font-medium">
           <span><strong>Periode:</strong> {{ periodLabel }}</span>
           <span>•</span>
           <span><strong>Tanggal Rilis:</strong> {{ formatDate(new Date(), true) }}</span>
@@ -134,14 +141,14 @@
           </div>
         </div>
 
-        <!-- Tabel Baku Standar KPI Ads (Acuan Operasional & Aksi Mitigasi) -->
+        <!-- Tabel Baku Standar KPI Iklan (Format Excel 6 Kolom) -->
         <div class="mt-4 border border-slate-300 rounded-lg overflow-hidden">
           <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between">
             <span class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">
-              Tolok Ukur Standar KPI Ads (Acuan Operasional &amp; Aksi Mitigasi)
+              Tolok Ukur Standar KPI Iklan (Acuan Operasional &amp; Tindakan Kuratif)
             </span>
             <span class="text-[9px] font-semibold text-slate-600">
-              Harga Jual Acuan: {{ formatCurrency(store.rdProductPrice) }}
+              Harga Acuan: {{ formatCurrency(store.rdProductPrice) }}
             </span>
           </div>
           <table class="w-full text-left text-[10px] text-slate-700 border-collapse">
@@ -238,65 +245,57 @@
                 <th class="py-2.5 px-3 text-right">Ad Spend</th>
                 <th class="py-2.5 px-3 text-right">Realisasi</th>
                 <th class="py-2.5 px-3 text-right">CPR</th>
-                <th class="py-2.5 px-3 text-right">ROI (%)</th>
-                <th class="py-2.5 px-3">Rekomendasi Injeksi Anggaran</th>
+                <th class="py-2.5 px-3 text-right">ROI</th>
+                <th class="py-2.5 px-3 text-center">Rekomendasi R&amp;D</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr
-                v-for="(camp, index) in store.scaleUpRecommendations"
+                v-for="(camp, idx) in sortedScaleCampaigns"
                 :key="camp.id"
-                class="hover:bg-slate-50/60"
-                :class="index === 0 ? 'bg-emerald-50/30 font-semibold' : ''"
+                class="hover:bg-slate-50/80 transition-colors"
+                :class="idx === 0 ? 'bg-emerald-50/30' : ''"
               >
-                <!-- Rank -->
-                <td class="py-2.5 px-3 text-center font-bold text-slate-700">
+                <td class="py-2.5 px-3 text-center font-bold text-slate-500">
                   <span
                     class="w-5 h-5 rounded-full inline-flex items-center justify-center text-[10px]"
-                    :class="index === 0 ? 'bg-amber-400 text-slate-900 font-extrabold' : 'bg-slate-100 text-slate-600'"
+                    :class="idx === 0 ? 'bg-amber-100 text-amber-800 font-extrabold' : 'bg-slate-100 text-slate-700'"
                   >
-                    #{{ index + 1 }}
+                    #{{ idx + 1 }}
                   </span>
                 </td>
-
-                <!-- Campaign Name & Platform -->
                 <td class="py-2.5 px-3">
-                  <span class="font-bold text-slate-800 block text-xs">{{ camp.name }}</span>
-                  <span class="text-[10px] text-slate-500 font-medium">{{ camp.platform }} • {{ camp.hookType || 'Standard Hook' }}</span>
+                  <span class="font-bold text-slate-800 block">{{ camp.name }}</span>
+                  <span class="text-[10px] text-slate-400 font-medium">{{ camp.platform }} • {{ camp.hookType }}</span>
                 </td>
-
-                <!-- Current Stage -->
-                <td class="py-2.5 px-3 whitespace-nowrap">
-                  <span
-                    class="px-2 py-0.5 rounded text-[10px] font-bold"
-                    :class="camp.stage === 'SCALE_2' ? 'bg-emerald-100 text-emerald-800' : camp.stage === 'SCALE_1' ? 'bg-teal-100 text-teal-800' : 'bg-amber-100 text-amber-800'"
-                  >
+                <td class="py-2.5 px-3">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                     {{ camp.stage }}
                   </span>
                 </td>
-
-                <!-- Ad Spend -->
-                <td class="py-2.5 px-3 text-right font-medium text-slate-700 whitespace-nowrap">
+                <td class="py-2.5 px-3 text-right font-medium text-slate-600 whitespace-nowrap">
                   {{ formatCurrency(camp.adSpend) }}
                 </td>
-
-                <!-- Realisasi -->
-                <td class="py-2.5 px-3 text-right font-bold text-emerald-800 whitespace-nowrap">
+                <td class="py-2.5 px-3 text-right font-extrabold text-slate-900 whitespace-nowrap">
                   {{ formatCurrency(camp.revenue) }}
                 </td>
-
-                <!-- CPR -->
-                <td class="py-2.5 px-3 text-right font-bold text-teal-800 whitespace-nowrap">
-                  {{ formatCurrency(camp.calculatedCPR) }}
+                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                  <span
+                    class="font-bold text-xs"
+                    :class="camp.cpr <= 20000 ? 'text-emerald-700' : 'text-slate-700'"
+                  >
+                    {{ formatCurrency(camp.cpr) }}
+                  </span>
                 </td>
-
-                <!-- ROI (Crucial ordering metric) -->
-                <td class="py-2.5 px-3 text-right font-black text-emerald-700 whitespace-nowrap">
-                  {{ formatPercent(camp.calculatedROI) }}
+                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                  <span
+                    class="font-black text-xs px-1.5 py-0.5 rounded"
+                    :class="camp.roi >= 500 ? 'text-emerald-800 bg-emerald-100/80' : 'text-slate-800'"
+                  >
+                    {{ formatPercent(camp.roi) }}
+                  </span>
                 </td>
-
-                <!-- Recommendation Action Badge -->
-                <td class="py-2.5 px-3">
+                <td class="py-2.5 px-3 text-center">
                   <span
                     class="inline-block px-2.5 py-1 rounded-md text-[10px] border leading-tight"
                     :class="camp.recBadge"
@@ -319,7 +318,7 @@
 
         <div class="space-y-2 text-xs">
           <div
-            v-for="log in store.journalLogs.slice(0, 2)"
+            v-for="log in store.journalLogs.slice(0, 3)"
             :key="log.id"
             class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1"
           >
@@ -338,7 +337,7 @@
         <div>
           <p class="text-slate-500 font-medium">Diajukan &amp; Disusun Oleh,</p>
           <div class="h-16 flex items-end justify-center">
-            <span class="font-serif italic text-teal-800 font-bold text-sm">Ahmad Fauzan</span>
+            <span class="font-serif italic text-teal-800 font-bold text-sm">{{ store.profile.fullName }}</span>
           </div>
           <p class="font-bold text-slate-900 border-t border-slate-400 pt-1 mt-1 inline-block min-w-[160px]">
             {{ store.profile.fullName }}
@@ -360,7 +359,7 @@
 
       <!-- Footer Info -->
       <div class="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-        <span>R&amp;D GrowthFlow Platform • FatherLab Framework © 2026</span>
+        <span>R&amp;D GrowthFlow Platform • Yayasan Khoirur Rooziqiin © 2026</span>
         <span>Dokumen Resmi Internal • Rahasia &amp; Terpercaya</span>
       </div>
     </div>
@@ -374,12 +373,57 @@ import { formatCurrency, formatPercent, formatDate } from '@/utils/formatters';
 import { FileText, Printer } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
-const selectedPeriod = ref('q4-2026');
+const selectedPeriod = ref('oct-2026');
 
 const periodLabel = computed(() => {
-  if (selectedPeriod.value === 'oct-2026') return 'Bulan Oktober 2026';
-  if (selectedPeriod.value === 'q4-2026') return 'Kuartal IV (Okt - Des 2026)';
-  return 'Tahun Berjalan 2026';
+  const map = {
+    'oct-2026': 'Bulan Oktober 2026',
+    'sep-2026': 'Bulan September 2026',
+    'aug-2026': 'Bulan Agustus 2026',
+    'jul-2026': 'Bulan Juli 2026',
+    'jun-2026': 'Bulan Juni 2026',
+    'may-2026': 'Bulan Mei 2026',
+    'q4-2026': 'Kuartal IV (Okt - Des 2026)',
+    'q3-2026': 'Kuartal III (Jul - Sep 2026)',
+    'q2-2026': 'Kuartal II (Apr - Jun 2026)',
+    'q1-2026': 'Kuartal I (Jan - Mar 2026)',
+    'all': 'Semua Periode (Tahun 2026)'
+  };
+  return map[selectedPeriod.value] || 'Bulan Oktober 2026';
+});
+
+const sortedScaleCampaigns = computed(() => {
+  return [...store.campaigns]
+    .map(c => {
+      const cpr = c.newDonors > 0 ? Math.round(c.adSpend / c.newDonors) : 0;
+      const roi = c.adSpend > 0 ? ((c.revenue - c.adSpend) / c.adSpend) * 100 : 0;
+
+      let recommendation = 'Tahan Anggaran';
+      let recBadge = 'bg-slate-100 text-slate-700 border-slate-200';
+
+      if (c.stage === 'SCALE_2' && roi >= 400) {
+        recommendation = 'Injeksi Budget +50%';
+        recBadge = 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold';
+      } else if (c.stage === 'SCALE_1' && roi >= 300) {
+        recommendation = 'Promosi ke SCALE 2';
+        recBadge = 'bg-teal-100 text-teal-800 border-teal-300 font-bold';
+      } else if (c.stage === 'TEST' && roi >= 200) {
+        recommendation = 'Lolos Validasi ke SCALE 1';
+        recBadge = 'bg-indigo-100 text-indigo-800 border-indigo-300 font-bold';
+      } else if (roi < 0) {
+        recommendation = 'Evaluasi Ulang / Matikan';
+        recBadge = 'bg-rose-100 text-rose-800 border-rose-300';
+      }
+
+      return {
+        ...c,
+        cpr,
+        roi,
+        recommendation,
+        recBadge
+      };
+    })
+    .sort((a, b) => b.roi - a.roi);
 });
 
 function printDocument() {

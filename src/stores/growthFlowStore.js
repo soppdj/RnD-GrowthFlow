@@ -23,8 +23,10 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         const parsed = JSON.parse(saved);
         // Load profile with backwards-compatible defaults for avatar adjustments
         let profile = { ...initialProfile, ...(parsed.profile || {}) };
+        profile.foundationAddress = 'Jl. Raya Cimareme Rt.001 Rw.002 Desa Cimareme Kec. Ngamprah Kab. Bandung Barat';
+        profile.workDaysPerWeek = profile.workDaysPerWeek || 5;
         if (profile.fullName === 'Ustadz Rizky Syahputra') {
-          profile = { ...initialProfile, ...profile, fullName: 'Sopianto Djahar', foundationAddress: 'Cimareme, Kab. Bandung Barat' };
+          profile = { ...initialProfile, ...profile, fullName: 'Sopianto Djahar' };
         }
 
         let donationPrograms = parsed.donationPrograms;
@@ -32,24 +34,47 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           donationPrograms = [...initialDonationPrograms];
         }
 
-        // Backward compatibility: merge sample workResultUrl if missing
+        // Backward compatibility: load updated week tasks if existing list is short
         let tasks = parsed.tasks || initialTasks;
-        if (Array.isArray(tasks) && tasks.length && !tasks[0].workResultUrl) {
+        if (!Array.isArray(tasks) || tasks.length < 8) {
+          tasks = [...initialTasks];
+        } else {
           tasks = tasks.map(t => {
             const init = initialTasks.find(it => it.id === t.id);
-            if (init && init.workResultUrl && !t.workResultUrl) {
-              return { ...t, workResultUrl: init.workResultUrl, workResultTitle: init.workResultTitle, attachments: init.attachments };
+            if (init) {
+              return {
+                ...init,
+                ...t,
+                date: t.date || init.date,
+                obstacle: t.obstacle !== undefined ? t.obstacle : init.obstacle,
+                evaluation: t.evaluation !== undefined ? t.evaluation : init.evaluation,
+                conclusion: t.conclusion !== undefined ? t.conclusion : init.conclusion,
+                workResultUrl: t.workResultUrl || init.workResultUrl,
+                workResultTitle: t.workResultTitle || init.workResultTitle,
+                attachments: t.attachments || init.attachments
+              };
             }
             return t;
           });
         }
 
         let milestones = parsed.milestones || initialMilestones;
-        if (Array.isArray(milestones) && milestones.length && !milestones[0].workResultUrl) {
+        if (!Array.isArray(milestones) || milestones.length < 4) {
+          milestones = [...initialMilestones];
+        } else {
           milestones = milestones.map(m => {
             const init = initialMilestones.find(im => im.id === m.id);
-            if (init && init.workResultUrl && !m.workResultUrl) {
-              return { ...m, workResultUrl: init.workResultUrl, workResultTitle: init.workResultTitle, attachments: init.attachments };
+            if (init) {
+              return {
+                ...init,
+                ...m,
+                workResultUrl: m.workResultUrl || init.workResultUrl,
+                workResultTitle: m.workResultTitle || init.workResultTitle,
+                attachments: m.attachments || init.attachments,
+                obstacle: m.obstacle !== undefined ? m.obstacle : init.obstacle,
+                evaluation: m.evaluation !== undefined ? m.evaluation : init.evaluation,
+                conclusion: m.conclusion !== undefined ? m.conclusion : init.conclusion
+              };
             }
             return m;
           });
@@ -448,6 +473,38 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       return false;
     },
 
+    completeTaskWithEvaluation(taskId, { obstacle = '', evaluation = '', conclusion = '' } = {}) {
+      const task = this.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.completed = true;
+        if (obstacle) task.obstacle = obstacle;
+        if (evaluation) task.evaluation = evaluation;
+        if (conclusion) task.conclusion = conclusion;
+        this.saveToStorage();
+
+        // Sync to Supabase if connected
+        const client = this.getSupabaseClient();
+        if (client) {
+          client.from('tasks').update({
+            completed: true,
+            obstacle: task.obstacle || null,
+            evaluation: task.evaluation || null,
+            conclusion: task.conclusion || null
+          }).eq('id', taskId).then();
+        }
+
+        return true;
+      }
+      return false;
+    },
+
+    setWorkDaysPerWeek(days) {
+      if (this.profile) {
+        this.profile.workDaysPerWeek = days;
+        this.saveToStorage();
+      }
+    },
+
     addTask(taskData) {
       const newTask = {
         id: 'task-' + Date.now(),
@@ -567,6 +624,20 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         this.milestones[idx] = { ...this.milestones[idx], ...updates };
         this.saveToStorage();
       }
+    },
+
+    completeMilestoneWithEvaluation(milestoneId, { obstacle = '', evaluation = '', conclusion = '' } = {}) {
+      const m = this.milestones.find(item => item.id === milestoneId);
+      if (m) {
+        m.status = 'Done';
+        m.progressPercent = 100;
+        if (obstacle) m.obstacle = obstacle;
+        if (evaluation) m.evaluation = evaluation;
+        if (conclusion) m.conclusion = conclusion;
+        this.saveToStorage();
+        return true;
+      }
+      return false;
     },
 
     deleteMilestone(milestoneId) {

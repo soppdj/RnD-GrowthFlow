@@ -126,3 +126,56 @@ export const LOGFRAME_TYPES = {
     ring: 'ring-amber-400'
   }
 };
+
+/**
+ * Calculates week of the month (Minggu 1 - 5)
+ * Week 1: 1 - 7
+ * Week 2: 8 - 14
+ * Week 3: 15 - 21
+ * Week 4: 22 - 28
+ * Week 5: 29 - 31
+ */
+export function getWeekOfMonth(dateStr) {
+  if (!dateStr) return 1;
+  const d = new Date(dateStr);
+  const day = d.getDate();
+  if (isNaN(day)) return 1;
+  if (day <= 7) return 1;
+  if (day <= 14) return 2;
+  if (day <= 21) return 3;
+  if (day <= 28) return 4;
+  return 5;
+}
+
+/**
+ * Checks if a date falls on a working day according to daysPerWeek (5, 6, 7)
+ * 5 days: Monday (1) - Friday (5)
+ * 6 days: Monday (1) - Saturday (6)
+ * 7 days: Every day (0 - 6)
+ */
+export function isWorkDay(dateStr, daysPerWeek = 5) {
+  if (!dateStr) return true;
+  const d = new Date(dateStr);
+  const dayOfWeek = d.getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
+  if (daysPerWeek === 7) return true;
+  if (daysPerWeek === 6) return dayOfWeek !== 0; // Exclude Sunday
+  return dayOfWeek >= 1 && dayOfWeek <= 5; // Monday - Friday
+}
+
+/**
+ * Formats full journal date with weekday and week number
+ * e.g. "Senin, 26 Okt 2026 • Minggu 4"
+ */
+export function formatJournalDate(dateStr) {
+  if (!dateStr) return 'Hari ini';
+  const d = new Date(dateStr);
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const dayName = days[d.getDay()];
+  const dateNum = d.getDate();
+  const monthName = months[d.getMonth()];
+  const year = d.getFullYear();
+  const weekNum = getWeekOfMonth(dateStr);
+  return `${dayName}, ${dateNum} ${monthName} ${year} • Minggu ${weekNum}`;
+}
+

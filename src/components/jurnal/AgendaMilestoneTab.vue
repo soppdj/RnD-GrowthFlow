@@ -9,7 +9,7 @@
           </span>
         </h2>
         <p class="text-xs text-slate-500 mt-0.5">
-          Milestones jangka panjang mingguan, bulanan, dan kuartalan R&D Growth Hacking
+          Milestones jangka panjang mingguan, bulanan, dan kuartalan R&D Growth Hacking beserta evaluasi kendala
         </p>
       </div>
 
@@ -28,6 +28,7 @@
         v-for="item in sortedMilestones"
         :key="item.id"
         class="glass-card rounded-2xl p-5 border border-teal-100 shadow-soft flex flex-col justify-between hover:border-teal-300 transition-all duration-200"
+        :class="item.status === 'Done' ? 'bg-emerald-50/20 border-emerald-200/90' : ''"
       >
         <div>
           <!-- Header: Category & Type Badge + Deadline Countdown -->
@@ -81,6 +82,25 @@
               <ExternalLink class="w-3 h-3 text-teal-500 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
             </a>
           </div>
+
+          <!-- Evaluation Notes Box (Kendala, Evaluasi, Kesimpulan) -->
+          <div
+            v-if="item.obstacle || item.evaluation || item.conclusion"
+            class="mt-3 p-3 rounded-xl bg-slate-50/90 border border-slate-200 text-xs space-y-1.5"
+          >
+            <div v-if="item.obstacle" class="flex items-start gap-1.5 text-amber-800">
+              <AlertTriangle class="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+              <p><strong class="font-bold text-amber-900">Kendala:</strong> {{ item.obstacle }}</p>
+            </div>
+            <div v-if="item.evaluation" class="flex items-start gap-1.5 text-indigo-800">
+              <Search class="w-3.5 h-3.5 text-indigo-500 shrink-0 mt-0.5" />
+              <p><strong class="font-bold text-indigo-900">Evaluasi:</strong> {{ item.evaluation }}</p>
+            </div>
+            <div v-if="item.conclusion" class="flex items-start gap-1.5 text-emerald-800">
+              <CheckCircle2 class="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+              <p><strong class="font-bold text-emerald-900">Kesimpulan:</strong> {{ item.conclusion }}</p>
+            </div>
+          </div>
         </div>
 
         <!-- Progress Slider / Bar -->
@@ -93,7 +113,7 @@
                 min="0"
                 max="100"
                 v-model.number="item.progressPercent"
-                @change="store.saveToStorage()"
+                @change="handleProgressChange(item)"
                 class="w-14 px-1.5 py-0.5 rounded border border-slate-200 text-right text-xs font-bold text-teal-800"
               />
               <span class="font-bold text-teal-800">%</span>
@@ -108,16 +128,29 @@
           </div>
 
           <!-- Bottom Actions -->
-          <div class="flex items-center justify-between mt-3 text-xs">
+          <div class="flex items-center justify-between mt-3 text-xs flex-wrap gap-2">
             <button
-              @click="toggleMilestoneStatus(item)"
-              class="font-semibold px-2 py-0.5 rounded text-[11px] transition-colors"
-              :class="item.status === 'Done' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+              @click="handleStatusClick(item, $event)"
+              class="font-semibold px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer"
+              :class="item.status === 'Done' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
             >
               {{ item.status === 'Done' ? '✅ Selesai' : '⏳ In Progress' }}
             </button>
 
             <div class="flex items-center gap-1.5">
+              <!-- Evaluation Notes Button -->
+              <button
+                @click="openEvaluationModal(item)"
+                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-all border"
+                :class="(item.obstacle || item.evaluation || item.conclusion)
+                  ? 'text-indigo-700 bg-indigo-50 border-indigo-200 hover:bg-indigo-100'
+                  : 'text-slate-500 hover:text-indigo-700 hover:bg-slate-50 border-slate-200'"
+                title="Catat Kendala, Evaluasi & Kesimpulan"
+              >
+                <MessageSquare class="w-3 h-3 text-indigo-500" />
+                <span>{{ (item.obstacle || item.evaluation || item.conclusion) ? 'Catatan Evaluasi' : '+ Catatan' }}</span>
+              </button>
+
               <button
                 @click="openAttachModal(item)"
                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border"
@@ -144,7 +177,7 @@
 
     <!-- Create Milestone Modal -->
     <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
-      <div class="glass-panel rounded-2xl w-full max-w-md p-6 shadow-2xl border border-teal-100">
+      <div class="glass-panel rounded-2xl w-full max-w-md p-6 shadow-2xl border border-teal-100 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between pb-3 border-b border-teal-100">
           <h3 class="text-base font-bold text-slate-800">Tambah Target Milestone</h3>
           <button @click="isModalOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
@@ -261,14 +294,24 @@
       @close="closeAttachModal"
       @save="handleSaveAttachment"
     />
+
+    <!-- Complete / Evaluation Modal for Milestones -->
+    <CompleteMilestoneEvaluationModal
+      :is-open="isEvaluationModalOpen"
+      :milestone="targetEvaluationMilestone"
+      @close="closeEvaluationModal"
+      @complete="handleSaveEvaluation"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
+import { useConfetti } from '@/composables/useConfetti';
 import { formatDate, LOGFRAME_TYPES } from '@/utils/formatters';
 import AttachLinkModal from './AttachLinkModal.vue';
+import CompleteMilestoneEvaluationModal from './CompleteMilestoneEvaluationModal.vue';
 import {
   Calendar,
   Target,
@@ -277,14 +320,23 @@ import {
   X,
   Paperclip,
   Link as LinkIcon,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle,
+  Search,
+  CheckCircle2,
+  MessageSquare
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
+const { triggerConfetti } = useConfetti();
+
 const isModalOpen = ref(false);
 
 const isAttachModalOpen = ref(false);
 const targetAttachMilestone = ref(null);
+
+const isEvaluationModalOpen = ref(false);
+const targetEvaluationMilestone = ref(null);
 
 const newMilestone = ref({
   title: '',
@@ -332,6 +384,46 @@ function handleSaveAttachment({ id, payload }) {
   closeAttachModal();
 }
 
+function openEvaluationModal(item) {
+  targetEvaluationMilestone.value = { ...item };
+  isEvaluationModalOpen.value = true;
+}
+
+function closeEvaluationModal() {
+  isEvaluationModalOpen.value = false;
+  targetEvaluationMilestone.value = null;
+}
+
+function handleSaveEvaluation({ milestoneId, obstacle, evaluation, conclusion }) {
+  store.completeMilestoneWithEvaluation(milestoneId, { obstacle, evaluation, conclusion });
+  closeEvaluationModal();
+  triggerConfetti();
+}
+
+function handleProgressChange(item) {
+  if (item.progressPercent >= 100 && item.status !== 'Done') {
+    // Prompt evaluation modal before marking complete
+    openEvaluationModal(item);
+  } else {
+    if (item.progressPercent < 100 && item.status === 'Done') {
+      item.status = 'In Progress';
+    }
+    store.saveToStorage();
+  }
+}
+
+function handleStatusClick(item, event) {
+  if (item.status === 'Done') {
+    // Unmark to in-progress
+    item.status = 'In Progress';
+    if (item.progressPercent >= 100) item.progressPercent = 90;
+    store.saveToStorage();
+  } else {
+    // Open evaluation modal before completing
+    openEvaluationModal(item);
+  }
+}
+
 // Sort strictly by nearest deadline first
 const sortedMilestones = computed(() => {
   return [...store.milestones].sort((a, b) => {
@@ -361,14 +453,6 @@ function getDeadlineBadgeClass(dateStr) {
   if (diffDays < 0) return 'bg-rose-50 text-rose-700 border-rose-200';
   if (diffDays <= 7) return 'bg-amber-50 text-amber-700 border-amber-200';
   return 'bg-teal-50 text-teal-700 border-teal-200';
-}
-
-function toggleMilestoneStatus(item) {
-  item.status = item.status === 'Done' ? 'In Progress' : 'Done';
-  if (item.status === 'Done') {
-    item.progressPercent = 100;
-  }
-  store.saveToStorage();
 }
 
 function deleteMilestone(id) {

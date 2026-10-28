@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between pb-3 border-b border-teal-100">
         <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
           <CheckSquare class="w-5 h-5 text-teal-600" />
-          <span>{{ isEdit ? 'Edit Tugas LogFrame' : 'Tambah Tugas Baru' }}</span>
+          <span>{{ isEdit ? 'Edit Tugas Jurnal LogFrame' : 'Tambah Tugas Jurnal Baru' }}</span>
         </h3>
         <button
           @click="$emit('close')"
@@ -24,9 +24,52 @@
             v-model="form.title"
             type="text"
             required
-            placeholder="Contoh: A/B Testing Hook Video Santri Penghafal Quran..."
+            placeholder="Contoh: Audit Database Churn Rate Donatur Adik Asuh..."
             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm transition-all"
           />
+        </div>
+
+        <!-- Tanggal Jurnal & Priority & Hours -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Tanggal Jurnal
+            </label>
+            <input
+              v-model="form.date"
+              type="date"
+              required
+              class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-teal-500 outline-none text-xs font-semibold bg-white"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Prioritas
+            </label>
+            <select
+              v-model="form.priority"
+              class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-teal-500 outline-none text-xs font-semibold bg-white"
+            >
+              <option value="HIGH">Tinggi (High Impact)</option>
+              <option value="MEDIUM">Sedang (Normal)</option>
+              <option value="LOW">Rendah (Backlog)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Estimasi Jam
+            </label>
+            <input
+              v-model.number="form.estimatedHours"
+              type="number"
+              step="0.5"
+              min="0.5"
+              max="12"
+              class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-teal-500 outline-none text-xs font-semibold bg-white"
+            />
+          </div>
         </div>
 
         <!-- LogFrame Category -->
@@ -51,37 +94,6 @@
           </div>
         </div>
 
-        <!-- Priority & Hours -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Prioritas
-            </label>
-            <select
-              v-model="form.priority"
-              class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-teal-500 outline-none text-xs font-semibold"
-            >
-              <option value="HIGH">Tinggi (High Impact)</option>
-              <option value="MEDIUM">Sedang (Normal)</option>
-              <option value="LOW">Rendah (Backlog)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Estimasi Jam
-            </label>
-            <input
-              v-model.number="form.estimatedHours"
-              type="number"
-              step="0.5"
-              min="0.5"
-              max="12"
-              class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-teal-500 outline-none text-xs font-semibold"
-            />
-          </div>
-        </div>
-
         <!-- Notes / Experiment Hypotheses -->
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -95,6 +107,52 @@
           ></textarea>
         </div>
 
+        <!-- Evaluasi Hasil Kerja (Kendala, Evaluasi, Kesimpulan) -->
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+              Evaluasi &amp; Temuan Lapangan
+            </label>
+            <span class="text-[10px] text-teal-700 font-semibold">Dapat diisi saat checklist selesai</span>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">
+              ⚠️ Kendala yang Dihadapi
+            </label>
+            <textarea
+              v-model="form.obstacle"
+              rows="2"
+              placeholder="Contoh: Keterbatasan response time tim kreatif, adset sempat delay review..."
+              class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:border-teal-500 outline-none bg-white"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">
+              🔍 Evaluasi Hasil Kerja
+            </label>
+            <textarea
+              v-model="form.evaluation"
+              rows="2"
+              placeholder="Contoh: CTR video 3.8% jauh lebih tinggi dibanding target 2%, konversi meningkat..."
+              class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:border-teal-500 outline-none bg-white"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">
+              ✅ Kesimpulan &amp; Tindak Lanjut
+            </label>
+            <textarea
+              v-model="form.conclusion"
+              rows="2"
+              placeholder="Contoh: Lanjut scale-up ke adset 2, standarisasi alur form 1-step QRIS..."
+              class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:border-teal-500 outline-none bg-white"
+            ></textarea>
+          </div>
+        </div>
+
         <!-- Attach Link Hasil Kerja (Deliverables) -->
         <div class="p-3.5 rounded-xl bg-teal-50/60 border border-teal-100/90 space-y-2.5">
           <div class="flex items-center justify-between">
@@ -102,34 +160,22 @@
               <Paperclip class="w-3.5 h-3.5 text-teal-600" />
               <span>Lampirkan Link Hasil Kerja (Deliverable)</span>
             </label>
-            <span class="text-[10px] text-teal-700 font-semibold bg-teal-100/80 px-2 py-0.5 rounded">
-              Opsional
-            </span>
+            <span class="text-[10px] text-teal-700 font-semibold">Opsional</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
-                Keterangan / Judul Link
-              </label>
-              <input
-                v-model="form.workResultTitle"
-                type="text"
-                placeholder="Contoh: Draft Video 3 Hook Santri"
-                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 text-xs outline-none"
-              />
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-slate-600 uppercase mb-0.5">
-                URL / Link Hasil Kerja
-              </label>
-              <input
-                v-model="form.workResultUrl"
-                type="url"
-                placeholder="https://drive.google.com/... atau https://canva.com/..."
-                class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 text-xs font-mono outline-none"
-              />
-            </div>
+            <input
+              v-model="form.workResultTitle"
+              type="text"
+              placeholder="Label link (contoh: 📁 Google Drive)"
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 outline-none text-xs bg-white"
+            />
+            <input
+              v-model="form.workResultUrl"
+              type="text"
+              placeholder="https://..."
+              class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:border-teal-500 outline-none text-xs bg-white"
+            />
           </div>
 
           <!-- Quick presets -->
@@ -205,7 +251,11 @@ const form = ref({
   category: 'OUTPUT',
   priority: 'MEDIUM',
   estimatedHours: 1.5,
+  date: new Date().toISOString().split('T')[0],
   notes: '',
+  obstacle: '',
+  evaluation: '',
+  conclusion: '',
   workResultUrl: '',
   workResultTitle: '',
   attachments: [],
@@ -221,7 +271,11 @@ watch(
         category: val.category || 'OUTPUT',
         priority: val.priority || 'MEDIUM',
         estimatedHours: val.estimatedHours || 1.5,
+        date: val.date || new Date().toISOString().split('T')[0],
         notes: val.notes || '',
+        obstacle: val.obstacle || '',
+        evaluation: val.evaluation || '',
+        conclusion: val.conclusion || '',
         workResultUrl: val.workResultUrl || '',
         workResultTitle: val.workResultTitle || '',
         attachments: val.attachments ? [...val.attachments] : [],
@@ -233,7 +287,11 @@ watch(
         category: 'OUTPUT',
         priority: 'MEDIUM',
         estimatedHours: 1.5,
+        date: new Date().toISOString().split('T')[0],
         notes: '',
+        obstacle: '',
+        evaluation: '',
+        conclusion: '',
         workResultUrl: '',
         workResultTitle: '',
         attachments: [],
