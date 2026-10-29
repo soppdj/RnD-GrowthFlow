@@ -12,7 +12,7 @@
 
     <!-- Main Luxury Glass Card -->
     <div
-      class="relative w-full max-w-sm sm:max-w-md rounded-3xl bg-slate-900/90 border border-teal-500/30 p-6 sm:p-7 shadow-2xl backdrop-blur-2xl transition-all overflow-hidden"
+      class="relative w-full max-w-sm sm:max-w-md rounded-3xl bg-slate-900/90 border border-teal-500/30 p-6 sm:p-8 shadow-2xl backdrop-blur-2xl transition-all overflow-hidden"
       :class="isError ? 'animate-shake ring-2 ring-rose-500/70 border-rose-500/80' : isSuccess ? 'ring-2 ring-emerald-500/70 border-emerald-500/80' : ''"
     >
       <!-- Top Neon Gradient Bar -->
@@ -67,123 +67,68 @@
         </div>
       </div>
 
-      <!-- Hidden Native Input for Physical & Virtual Keyboard -->
-      <input
-        ref="hiddenPinInput"
-        type="password"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        maxlength="6"
-        v-model="pinInput"
-        @input="handleNativeInput"
-        @keydown="handleKeyDown"
-        class="opacity-0 absolute -z-10 w-0 h-0 pointer-events-none"
-        autocomplete="off"
-        autofocus
-      />
+      <!-- Login Form & PIN Input (UI Seperti Sebelumnya, Tanpa Keyboard Virtual di Layar) -->
+      <form @submit.prevent="handlePinSubmit" class="space-y-4 my-2">
+        <div>
+          <label class="block text-[11px] font-bold text-teal-200 uppercase tracking-wider mb-2 text-center">
+            Masukkan PIN Akses R&amp;D
+          </label>
 
-      <!-- 6-Digit PIN Boxes Visualizer -->
-      <div class="my-4">
-        <label class="block text-[11px] font-bold text-teal-200 uppercase tracking-wider mb-2.5 text-center">
-          Masukkan 6 Digit PIN Akses
-        </label>
-
-        <!-- Interactive Boxes: Click anywhere to focus input -->
-        <div
-          @click="focusInput"
-          class="flex items-center justify-center gap-2 sm:gap-2.5 cursor-pointer py-1"
-          title="Klik untuk memasukkan PIN"
-        >
-          <div
-            v-for="i in 6"
-            :key="i"
-            class="w-11 h-13 sm:w-12 sm:h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black transition-all duration-200 relative select-none"
-            :class="[
-              isError
-                ? 'border-2 border-rose-500 bg-rose-950/40 text-rose-300 ring-2 ring-rose-500/30'
+          <div class="relative">
+            <input
+              ref="pinInputRef"
+              v-model="pinInput"
+              :type="showPassword ? 'text' : 'password'"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="6"
+              placeholder="••••••"
+              class="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border text-center text-2xl font-mono font-black tracking-[0.35em] text-white outline-none transition-all shadow-inner focus:ring-4"
+              :class="isError
+                ? 'border-rose-500 text-rose-300 focus:ring-rose-500/30 ring-2 ring-rose-500/30'
                 : isSuccess
-                  ? 'border-2 border-emerald-400 bg-emerald-950/40 text-emerald-300 ring-2 ring-emerald-400/30'
-                  : pinInput.length === i - 1
-                    ? 'border-2 border-teal-400 bg-teal-950/50 ring-4 ring-teal-500/30 text-white shadow-lg shadow-teal-500/20 scale-105'
-                    : pinInput.length >= i
-                      ? 'border border-teal-500/60 bg-teal-900/40 text-teal-200'
-                      : 'border border-slate-700/60 bg-slate-950/60 text-slate-600'
-            ]"
-          >
-            <!-- Blinking cursor bar on active digit -->
-            <span
-              v-if="pinInput.length === i - 1 && !isError && !isSuccess"
-              class="w-2.5 h-0.5 bg-teal-400 rounded-full animate-pulse absolute bottom-2"
-            ></span>
+                  ? 'border-emerald-400 text-emerald-300 ring-2 ring-emerald-400/30'
+                  : 'border-teal-500/40 text-teal-100 focus:border-teal-400 focus:ring-teal-500/30'"
+              autocomplete="off"
+              autofocus
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer"
+              :title="showPassword ? 'Sembunyikan PIN' : 'Lihat PIN'"
+            >
+              <Eye v-if="!showPassword" class="w-4 h-4" />
+              <EyeOff v-else class="w-4 h-4 text-teal-300" />
+            </button>
+          </div>
 
-            <!-- Digit or Dot -->
-            <span v-if="pinInput.length >= i">
-              {{ showPassword ? pinInput[i - 1] : '●' }}
-            </span>
-            <span v-else class="text-slate-700 text-xs font-normal">
-              &bull;
-            </span>
+          <!-- Status & Feedback Alert -->
+          <div class="min-h-[22px] mt-2 flex items-center justify-center">
+            <p v-if="isError" class="text-xs text-rose-400 font-bold flex items-center gap-1.5 animate-bounce">
+              <AlertCircle class="w-3.5 h-3.5" />
+              <span>PIN salah! Silakan coba kembali.</span>
+            </p>
+            <p v-else-if="isSuccess" class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 animate-pulse">
+              <CheckCircle2 class="w-3.5 h-3.5" />
+              <span>Verifikasi Berhasil! Membuka Workspace...</span>
+            </p>
+            <p v-else class="text-[11px] text-slate-400">
+              Tekan Enter atau klik tombol di bawah untuk masuk
+            </p>
           </div>
         </div>
 
-        <!-- Status & Feedback Alert -->
-        <div class="min-h-[22px] mt-2.5 flex items-center justify-center">
-          <p v-if="isError" class="text-xs text-rose-400 font-bold flex items-center gap-1.5 animate-bounce">
-            <AlertCircle class="w-3.5 h-3.5" />
-            <span>PIN tidak cocok! Silakan coba kembali.</span>
-          </p>
-          <p v-else-if="isSuccess" class="text-xs text-emerald-400 font-bold flex items-center gap-1.5 animate-pulse">
-            <CheckCircle2 class="w-3.5 h-3.5" />
-            <span>Verifikasi Berhasil! Membuka Workspace...</span>
-          </p>
-          <p v-else class="text-[11px] text-slate-400">
-            Gunakan keyboard atau keypad angka di bawah
-          </p>
-        </div>
-      </div>
-
-      <!-- Touch / Click Numpad Grid -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-2.5 max-w-[280px] mx-auto mt-1 mb-2">
+        <!-- Submit Button (Buka Workspace R&D) -->
         <button
-          v-for="num in [1, 2, 3, 4, 5, 6, 7, 8, 9]"
-          :key="num"
-          type="button"
-          @click="appendDigit(String(num))"
-          class="h-11 sm:h-12 rounded-2xl bg-white/[0.06] hover:bg-teal-500/20 active:bg-teal-500/30 border border-white/10 hover:border-teal-500/40 text-lg font-bold text-white transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-micro"
+          type="submit"
+          :disabled="isSuccess"
+          class="w-full py-3 sm:py-3.5 rounded-2xl font-black text-sm text-white bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600 hover:from-teal-400 hover:to-emerald-400 shadow-lg shadow-teal-950/60 transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
         >
-          {{ num }}
+          <LockKeyholeOpen class="w-4 h-4" />
+          <span>Buka Workspace R&amp;D</span>
         </button>
-
-        <!-- Toggle Visibility Button -->
-        <button
-          type="button"
-          @click="showPassword = !showPassword"
-          class="h-11 sm:h-12 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 text-slate-400 hover:text-white transition-all active:scale-95 flex items-center justify-center cursor-pointer"
-          :title="showPassword ? 'Sembunyikan Angka PIN' : 'Lihat Angka PIN'"
-        >
-          <Eye v-if="!showPassword" class="w-4 h-4" />
-          <EyeOff v-else class="w-4 h-4 text-teal-300" />
-        </button>
-
-        <!-- Digit 0 -->
-        <button
-          type="button"
-          @click="appendDigit('0')"
-          class="h-11 sm:h-12 rounded-2xl bg-white/[0.06] hover:bg-teal-500/20 active:bg-teal-500/30 border border-white/10 hover:border-teal-500/40 text-lg font-bold text-white transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-micro"
-        >
-          0
-        </button>
-
-        <!-- Backspace Button -->
-        <button
-          type="button"
-          @click="deleteDigit"
-          class="h-11 sm:h-12 rounded-2xl bg-white/[0.03] hover:bg-rose-500/20 border border-white/5 text-slate-400 hover:text-rose-300 transition-all active:scale-95 flex items-center justify-center cursor-pointer"
-          title="Hapus Digit Terakhir"
-        >
-          <Delete class="w-4 h-4" />
-        </button>
-      </div>
+      </form>
 
       <!-- Security Notice Footer -->
       <div class="mt-4 pt-3 text-center border-t border-white/10 text-[10px] text-slate-500 flex items-center justify-center gap-1.5">
@@ -199,11 +144,11 @@ import { ref, onMounted, nextTick, watch } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import AppLogo from '@/components/common/AppLogo.vue';
 import {
+  LockKeyholeOpen,
   Eye,
   EyeOff,
   AlertCircle,
   CheckCircle2,
-  Delete,
   ShieldCheck
 } from 'lucide-vue-next';
 
@@ -222,54 +167,22 @@ const pinInput = ref('');
 const isError = ref(false);
 const isSuccess = ref(false);
 const showPassword = ref(false);
-const hiddenPinInput = ref(null);
+const pinInputRef = ref(null);
 
 // Daftar PIN yang diizinkan (Standard PIN R&D Yayasan)
 const VALID_PINS = ['000000', '2026', '1928', '261026', '281026', 'admin'];
 
 function focusInput() {
   nextTick(() => {
-    if (hiddenPinInput.value) {
-      hiddenPinInput.value.focus();
+    if (pinInputRef.value) {
+      pinInputRef.value.focus();
     }
   });
 }
 
-function appendDigit(digit) {
-  if (isError.value || isSuccess.value) return;
-  if (pinInput.value.length < 6) {
-    pinInput.value += digit;
-    if (pinInput.value.length === 6) {
-      validatePin();
-    }
-  }
-}
+function handlePinSubmit() {
+  if (isSuccess.value) return;
 
-function deleteDigit() {
-  if (isError.value || isSuccess.value) return;
-  if (pinInput.value.length > 0) {
-    pinInput.value = pinInput.value.slice(0, -1);
-  }
-}
-
-function handleNativeInput(e) {
-  // Hanya ambil digit numerik
-  const raw = e.target.value.replace(/\D/g, '').slice(0, 6);
-  pinInput.value = raw;
-  if (raw.length === 6) {
-    validatePin();
-  }
-}
-
-function handleKeyDown(e) {
-  if (e.key === 'Backspace') {
-    deleteDigit();
-  } else if (e.key === 'Enter') {
-    validatePin();
-  }
-}
-
-function validatePin() {
   const entered = pinInput.value.trim();
   const adminChatId = String(store.profile?.telegramAdminChatId || '').trim();
 
@@ -287,17 +200,17 @@ function validatePin() {
       emit('authenticated');
       isSuccess.value = false;
       pinInput.value = '';
-    }, 450);
+    }, 400);
   } else {
     isError.value = true;
     isSuccess.value = false;
 
-    // Reset otomatis setelah 1.2 detik agar user dapat langsung mengetik ulang
+    // Reset otomatis setelah 1.5 detik
     setTimeout(() => {
       isError.value = false;
       pinInput.value = '';
       focusInput();
-    }, 1200);
+    }, 1500);
   }
 }
 

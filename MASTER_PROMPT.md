@@ -40,16 +40,17 @@
    - Menggunakan estetika *luxury dark glassmorphism* (`bg-slate-900/90`, border neon teal `border-teal-500/30`, ambient neon glow orbs, dan subtle cyber grid).
    - Menampilkan kartu profil terverifikasi Lead R&D PIC (avatar dinamis, nama, role, dan lembaga) sebagai penanda identitas otoritas sistem.
 
-2. **Antarmuka 6-Digit PIN Boxes Visualizer & Virtual Keypad:**
-   - **6-Digit Interactive PIN Boxes:** Menggunakan 6 sel digit interaktif mono-spaced dengan border glow teal pada digit aktif, indikator kursor horizontal berkedip (*blinking cursor*), serta masking titik (`●`) yang aman.
-   - **Virtual Numpad 3x4:** Disediakan tombol keypad angka (1-9, 0), tombol sakelar lihat/sembunyikan PIN (*Eye / EyeOff*), dan tombol hapus digit (*Backspace / Delete*) dengan efek tactile klik responsif, optimal untuk perangkat mobile touchscreen maupun desktop.
-   - **Dukungan Dual-Input (Keyboard Fisik & Virtual):** Elemen input tersembunyi (*hidden native input* `type="password"`, `inputmode="numeric"`, `maxlength="6"`) otomatis aktif dan terfokus saat halaman dimuat, mendukung input mengetik langsung via keyboard PC/laptop maupun keypad visual.
+2. **Antarmuka Input PIN Ramping (Tanpa Keyboard Virtual di Layar):**
+   - Menggunakan kolom input PIN numerik elegan dan bersih (*clean mono-spaced password input* `placeholder="••••••"`, `maxlength="6"`, `inputmode="numeric"`) tanpa tombol virtual keypad / numpad di layar sehingga antarmuka tetap lapang dan tidak memakan ruang vertikal.
+   - Dilengkapi tombol ikon mata (*Eye / EyeOff*) untuk melihat atau menyembunyikan angka PIN.
+   - Otomatis mendapatkan fokus (*auto-focus*) saat modal terbuka, dan membuka keyboard numerik bawaan secara alami pada perangkat smartphone/tablet.
 
-3. **Validasi Instan Otomatis (Auto-Submit):**
-   - Sistem mendeteksi otomatis saat digit ke-6 selesai dimasukkan dan langsung menjalankan proses validasi seketika tanpa perlu menekan tombol submit tambahan.
+3. **Verifikasi & Tombol Eksekusi:**
+   - Disediakan tombol aksi utama **"Buka Workspace R&D"** dengan ikon gembok terbuka (`LockKeyholeOpen`) dan efek visual gradien teal-emerald.
+   - Pengguna dapat mengeksekusi login secara instan dengan menekan tombol `Enter` pada keyboard atau mengklik tombol submit.
    - **Feedback Animasi Responsif:**
-     - *Jika Salah:* Kartu login bergetar (*horizontal shake animation*), border dan ring menyala merah rose (`ring-rose-500`), pesan peringatan kesalahan muncul, dan input otomatis di-reset bersih setelah 1.2 detik dengan kursor kembali ke kotak pertama.
-     - *Jika Benar:* Border dan ring menyala hijau emerald (`ring-emerald-500`), pesan sukses verifikasi muncul, status otentikasi disimpan ke `localStorage` (`rnd_growthflow_authenticated`), dan modal transisi mulus membuka workspace R&D.
+     - *Jika Salah:* Kartu login bergetar (*horizontal shake animation*), border dan ring menyala merah rose (`ring-rose-500`), teks peringatan kesalahan muncul, dan kolom input otomatis bersih kembali (*auto-reset*) setelah 1.5 detik dengan fokus dikembalikan.
+     - *Jika Benar:* Border dan ring menyala hijau emerald (`ring-emerald-500`), teks alert verifikasi sukses muncul, status otentikasi disimpan ke `localStorage` (`rnd_growthflow_authenticated`), dan modal transisi mulus membuka workspace R&D.
 
 4. **Kebijakan Nol Kebocoran Kredensial (Zero Plaintext Leak):**
    - Menghapus seluruh teks bocoran PIN publik (seperti "PIN Akses: 000000") dan tombol bypass instan publik dari antarmuka login guna menjamin keamanan dan kerahasiaan operasional riset yayasan.
