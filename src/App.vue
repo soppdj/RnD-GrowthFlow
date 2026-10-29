@@ -1,15 +1,14 @@
 <template>
   <div class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-teal-50/20 to-emerald-50/30 text-slate-800">
-    <!-- Top Header (Hanya tampil jika sudah login) -->
+    <!-- Top Header -->
     <AppHeader
-      v-if="isAuthenticated"
       @toggle-mobile-menu="isMobileDrawerOpen = !isMobileDrawerOpen"
       @quick-add-task="isGlobalTaskModalOpen = true"
       @open-login="handleLockSession"
     />
 
-    <!-- Main Body Layout (Hanya tampil jika sudah login) -->
-    <div v-if="isAuthenticated" class="flex-1 max-w-7xl w-full mx-auto flex">
+    <!-- Main Body Layout -->
+    <div class="flex-1 max-w-7xl w-full mx-auto flex">
       <!-- Desktop Sidebar -->
       <AppSidebar />
 
@@ -122,8 +121,8 @@
       </div>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar (Hanya saat login) -->
-    <MobileBottomNav v-if="isAuthenticated" />
+    <!-- Mobile Bottom Navigation Bar -->
+    <MobileBottomNav />
 
     <!-- Global Quick Add Task Modal -->
     <TaskModal
@@ -134,7 +133,7 @@
       @save="handleSaveGlobalTask"
     />
 
-    <!-- Dedicated R&D Login Gateway (Selalu aktif saat link dibuka) -->
+    <!-- Dedicated R&D Login Gateway (Aktif jika belum login) -->
     <RdLoginModal
       :is-open="!isAuthenticated"
       @authenticated="handleAuthenticated"
@@ -196,14 +195,15 @@ const isGlobalTaskModalOpen = ref(false);
 const jurnalSubTab = ref('daily');
 
 // R&D Auth & Welcoming States
-// Saat link aplikasi diklik/dibuka, selalu mulai dengan isAuthenticated = false agar tidak bisa diakses sembarang orang
-const isAuthenticated = ref(false);
+// Ingat status autentikasi dari localStorage agar pengguna tidak terblokir berulang kali
+const isAuthenticated = ref(localStorage.getItem('rnd_growthflow_authenticated') === 'true');
 const isWelcomingModalOpen = ref(false);
 
 onMounted(() => {
-  // Bersihkan token cache lama agar setiap kunjungan baru wajib memasukkan PIN
-  localStorage.removeItem('rnd_growthflow_authenticated');
-  isAuthenticated.value = false;
+  // Verifikasi status sesi tersimpan
+  if (localStorage.getItem('rnd_growthflow_authenticated') === 'true') {
+    isAuthenticated.value = true;
+  }
 
   // Inisialisasi sinkronisasi live & realtime listener dari database Supabase
   store.syncWithSupabase();
@@ -212,6 +212,7 @@ onMounted(() => {
 
 function handleAuthenticated() {
   isAuthenticated.value = true;
+  localStorage.setItem('rnd_growthflow_authenticated', 'true');
   store.syncWithSupabase();
   store.setupRealtimeSubscription();
   if (localStorage.getItem('rnd_always_show_welcome') !== 'false') {

@@ -11,16 +11,20 @@ export const useAdLabStore = defineStore('adLab', () => {
   const fetchExperiments = async () => {
     isLoading.value = true
     try {
+      if (!supabase) return
       const { data, error } = await supabase
         .from('ad_lab_experiments')
         .select('*')
-        .order('created_at', { ascending: false }) // Urutkan dari yang terbaru
+        .order('created_at', { ascending: false })
 
-      if (error) throw error
-      experiments.value = data
+      if (error) {
+        console.warn("Notice Ad Lab Supabase:", error.message)
+        return
+      }
+      experiments.value = data || []
     } catch (error) {
       errorMessage.value = error.message
-      console.error("Gagal mengambil data Ad Lab:", error.message)
+      console.warn("Notice Ad Lab:", error.message)
     } finally {
       isLoading.value = false
     }

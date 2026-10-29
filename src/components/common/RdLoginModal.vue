@@ -92,8 +92,20 @@
           </div>
 
           <p v-if="isError" class="text-[11px] text-rose-400 font-semibold mt-1.5 text-center">
-            ⚠️ PIN salah! Masukkan 6 digit PIN akses.
+            ⚠️ PIN salah! Masukkan 6 digit PIN akses (Default: 000000).
           </p>
+
+          <!-- Quick Access Helper Link -->
+          <div class="flex items-center justify-between text-[11px] pt-1">
+            <span class="text-teal-300/70">PIN Akses: <strong class="text-teal-200">000000</strong></span>
+            <button
+              type="button"
+              @click="quickUnlock"
+              class="text-xs font-bold text-teal-400 hover:text-teal-300 underline cursor-pointer"
+            >
+              Masuk Cepat &rarr;
+            </button>
+          </div>
         </div>
 
         <!-- Quick Access Button -->
@@ -156,8 +168,14 @@ function handlePinSubmit() {
   }
 }
 
+function quickUnlock() {
+  pinInput.value = '000000';
+  unlockSuccess();
+}
+
 function unlockSuccess() {
   isError.value = false;
+  localStorage.setItem('rnd_growthflow_authenticated', 'true');
   localStorage.setItem('rnd_growthflow_last_login', new Date().toISOString());
   emit('authenticated');
 }
