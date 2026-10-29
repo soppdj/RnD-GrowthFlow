@@ -11,6 +11,7 @@ import {
 } from '@/utils/mockData';
 import { calculateROI, calculateCPR } from '@/utils/formatters';
 import { createClient } from '@supabase/supabase-js';
+import { supabase as defaultSupabase } from '@/supabase';
 
 const STORAGE_KEY = 'rnd_growthflow_v1';
 
@@ -402,14 +403,14 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
 
   actions: {
     getSupabaseClient() {
-      if (this.profile.supabaseUrl && this.profile.supabaseAnonKey) {
+      if (this.profile?.supabaseUrl && this.profile?.supabaseAnonKey) {
         try {
           return createClient(this.profile.supabaseUrl, this.profile.supabaseAnonKey);
         } catch (e) {
-          console.error('Failed to create Supabase client:', e);
+          console.error('Failed to create custom Supabase client:', e);
         }
       }
-      return null;
+      return defaultSupabase;
     },
 
     saveToStorage() {
@@ -435,7 +436,30 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       if (!client) return;
 
       try {
-        // Fetch tasks
+        // 1. Fetch Profile
+        const { data: dbProfile } = await client.from('profiles').select('*').limit(1).maybeSingle();
+        if (dbProfile) {
+          this.profile = {
+            ...this.profile,
+            fullName: dbProfile.full_name || this.profile.fullName,
+            role: dbProfile.role || this.profile.role,
+            organization: dbProfile.organization || this.profile.organization,
+            tagline: dbProfile.tagline || this.profile.tagline,
+            quarterTarget: Number(dbProfile.quarter_target) || this.profile.quarterTarget,
+            workDaysPerWeek: Number(dbProfile.work_days_per_week) || this.profile.workDaysPerWeek,
+            workCapacityHoursPerDay: Number(dbProfile.work_capacity_hours_per_day) || this.profile.workCapacityHoursPerDay,
+            telegramBotToken: dbProfile.telegram_bot_token || this.profile.telegramBotToken,
+            telegramAdminChatId: dbProfile.telegram_admin_chat_id || this.profile.telegramAdminChatId,
+            rdProductPrice: Number(dbProfile.rd_product_price) || this.profile.rdProductPrice,
+            foundationAddress: dbProfile.foundation_address || this.profile.foundationAddress,
+            avatarUrl: dbProfile.avatar_url || this.profile.avatarUrl,
+            avatarZoom: dbProfile.avatar_zoom || this.profile.avatarZoom,
+            avatarX: dbProfile.avatar_x || this.profile.avatarX,
+            avatarY: dbProfile.avatar_y || this.profile.avatarY
+          };
+        }
+
+        // 2. Fetch Tasks
         const { data: dbTasks, error: taskErr } = await client.from('tasks').select('*');
         if (!taskErr && dbTasks && dbTasks.length > 0) {
           this.tasks = dbTasks.map(t => ({
@@ -446,11 +470,17 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
             estimatedHours: Number(t.estimated_hours) || 1.0,
             priority: t.priority,
             date: t.date,
-            notes: t.notes
+            notes: t.notes,
+            obstacle: t.obstacle,
+            evaluation: t.evaluation,
+            conclusion: t.conclusion,
+            workResultUrl: t.work_result_url,
+            workResultTitle: t.work_result_title,
+            attachments: Array.isArray(t.attachments) ? t.attachments : []
           }));
         }
 
-        // Fetch campaigns
+        // 3. Fetch Campaigns
         const { data: dbCampaigns, error: campErr } = await client.from('campaigns').select('*');
         if (!campErr && dbCampaigns && dbCampaigns.length > 0) {
           this.campaigns = dbCampaigns.map(c => ({
@@ -468,25 +498,88 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           }));
         }
 
-        // Fetch donation programs
-        const { data: dbPrograms, error: progErr } = await client.from('donation_programs').select('*');
+        // 4. Fetch Donation Programs
+        const { data: dbPrograms, error: progErr } = await client.from('donation_programs').select('*').order('created_at', { ascending: false });
         if (!progErr && dbPrograms && dbPrograms.length > 0) {
           this.donationPrograms = dbPrograms.map(p => ({
             id: p.id,
             name: p.name,
-            category: p.category,
+            category: p.category || 'Wakaf',
             targetAmount: Number(p.target_amount) || 0,
             realizedAmount: Number(p.realized_amount) || 0,
             adSpend: Number(p.ad_spend) || 0,
             newDonors: Number(p.new_donors) || 0,
-            status: p.status,
-            description: p.description
+            status: p.status || 'Active',
+            description: p.description || ''
           }));
         }
 
         this.saveToStorage();
       } catch (e) {
         console.error('Error syncing with Supabase:', e);
+      }
+    },
+
+    setupRealtimeSubscription() {
+      const client = this.getSupabaseClient();
+      if (!client || this._realtimeSubscribed) return;
+
+      try {
+        client
+          .channel('realtime:rnd-growthflow')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'donation_programs' },
+            (payload) => {
+              console.log('⚡ Realtime donation_programs update:', payload.eventType, payload.new);
+              if (payload.eventType === 'INSERT') {
+                const newP = payload.new;
+                const mapped = {
+                  id: newP.id,
+                  name: newP.name,
+                  category: newP.category || 'Wakaf',
+                  targetAmount: Number(newP.target_amount) || 0,
+                  realizedAmount: Number(newP.realized_amount) || 0,
+                  adSpend: Number(newP.ad_spend) || 0,
+                  newDonors: Number(newP.new_donors) || 0,
+                  status: newP.status || 'Active',
+                  description: newP.description || ''
+                };
+                const exists = this.donationPrograms.some(p => p.id === mapped.id);
+                if (!exists) {
+                  this.donationPrograms.unshift(mapped);
+                  this.saveToStorage();
+                }
+              } else if (payload.eventType === 'UPDATE') {
+                const updated = payload.new;
+                const idx = this.donationPrograms.findIndex(p => p.id === updated.id);
+                if (idx !== -1) {
+                  this.donationPrograms[idx] = {
+                    ...this.donationPrograms[idx],
+                    name: updated.name,
+                    category: updated.category || this.donationPrograms[idx].category,
+                    targetAmount: Number(updated.target_amount) || this.donationPrograms[idx].targetAmount,
+                    realizedAmount: Number(updated.realized_amount) || 0,
+                    adSpend: Number(updated.ad_spend) || 0,
+                    newDonors: Number(updated.new_donors) || 0,
+                    status: updated.status || 'Active',
+                    description: updated.description || ''
+                  };
+                  this.saveToStorage();
+                } else {
+                  this.syncWithSupabase();
+                }
+              } else if (payload.eventType === 'DELETE') {
+                this.donationPrograms = this.donationPrograms.filter(p => p.id !== payload.old.id);
+                this.saveToStorage();
+              }
+            }
+          )
+          .subscribe();
+
+        this._realtimeSubscribed = true;
+      } catch (e) {
+        console.error('Failed to setup realtime subscription:', e);
       }
     },
 

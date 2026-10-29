@@ -204,10 +204,16 @@ onMounted(() => {
   // Bersihkan token cache lama agar setiap kunjungan baru wajib memasukkan PIN
   localStorage.removeItem('rnd_growthflow_authenticated');
   isAuthenticated.value = false;
+
+  // Inisialisasi sinkronisasi live & realtime listener dari database Supabase
+  store.syncWithSupabase();
+  store.setupRealtimeSubscription();
 });
 
 function handleAuthenticated() {
   isAuthenticated.value = true;
+  store.syncWithSupabase();
+  store.setupRealtimeSubscription();
   if (localStorage.getItem('rnd_always_show_welcome') !== 'false') {
     isWelcomingModalOpen.value = true;
   }

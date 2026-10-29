@@ -3,32 +3,54 @@
  * Standalone Long-Polling Telegram Bot for Donasi Management
  * 
  * Cara Menjalankan:
- * 1. Set environment variable:
+ * 1. Otomatis membaca token dari tabel profiles Supabase, atau set:
  *    - TELEGRAM_BOT_TOKEN
- *    - NEXT_PUBLIC_SUPABASE_URL
- *    - NEXT_PUBLIC_ANON_KEY
+ *    - VITE_SUPABASE_URL
+ *    - VITE_SUPABASE_ANON_KEY
  * 2. Jalankan:
- *    node scripts/telegram-bot.js
+ *    npm run bot (atau node scripts/telegram-bot.js)
  */
 
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rsnjmllhuucyophursng.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJzbmptbGxodXVjeW9waHVyc25nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzQ0MTAsImV4cCI6MjEwNzcxMDQxMH0.nVLriES26tvWFXLbkeD0irZs7AXZvsFq7Zdue7jKClI';
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const ALLOWED_CHAT_IDS = (process.env.TELEGRAM_ALLOWED_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
-
-if (!TELEGRAM_TOKEN) {
-  console.error('❌ Error: TELEGRAM_BOT_TOKEN belum diset.');
-  console.log('Jalankan dengan: $env:TELEGRAM_BOT_TOKEN="token_anda"; node scripts/telegram-bot.js');
-  process.exit(1);
-}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+let ALLOWED_CHAT_IDS = (process.env.TELEGRAM_ALLOWED_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
 let offset = 0;
 
-console.log('🤖 R&D GrowthFlow Telegram Bot sedang berjalan (Long-Polling)...');
-console.log('Supabase URL:', SUPABASE_URL);
+async function initBot() {
+  // If token not provided in env, fetch from Supabase profiles
+  if (!TELEGRAM_TOKEN) {
+    try {
+      const { data: profile } = await supabase.from('profiles').select('telegram_bot_token, telegram_admin_chat_id').limit(1).maybeSingle();
+      if (profile?.telegram_bot_token) {
+        TELEGRAM_TOKEN = profile.telegram_bot_token.trim();
+        console.log('✅ Token Bot berhasil dimuat secara otomatis dari Supabase profiles.');
+      }
+      if (profile?.telegram_admin_chat_id && ALLOWED_CHAT_IDS.length === 0) {
+        ALLOWED_CHAT_IDS = [String(profile.telegram_admin_chat_id).trim()];
+        console.log('✅ Admin Chat ID berhasil dimuat dari Supabase profiles:', ALLOWED_CHAT_IDS);
+      }
+    } catch (e) {
+      console.warn('Gagal membaca token dari Supabase:', e.message);
+    }
+  }
+
+  if (!TELEGRAM_TOKEN) {
+    console.error('❌ Error: TELEGRAM_BOT_TOKEN belum diset di .env maupun di database Supabase profiles.');
+    console.log('Silakan masukkan token di menu Pengaturan Web R&D GrowthFlow atau set environment variable.');
+    process.exit(1);
+  }
+
+  console.log('🤖 R&D GrowthFlow Telegram Bot sedang berjalan (Long-Polling Mode)...');
+  console.log('Supabase URL:', SUPABASE_URL);
+
+  pollUpdates();
+}
 
 async function pollUpdates() {
   while (true) {
@@ -59,7 +81,7 @@ async function handleMessage(message) {
   console.log(`[${new Date().toLocaleTimeString()}] Pesan dari ${senderName} (${chatId}): ${text}`);
 
   if (ALLOWED_CHAT_IDS.length > 0 && !ALLOWED_CHAT_IDS.includes(String(chatId))) {
-    await sendReply(chatId, `⛔ *Akses Ditolak*\nID Telegram Anda (\`${chatId}\`) belum didaftarkan sebagai Admin.`);
+    await sendReply(chatId, `⛔ *Akses Ditolak*\nID Telegram Anda (\`${chatId}\`) belum didaftarkan sebagai Admin R&D GrowthFlow.`);
     return;
   }
 
@@ -71,14 +93,15 @@ async function handleMessage(message) {
     if (command === '/start' || command === '/help') {
       await sendReply(chatId, `🤖 *Assalamu'alaikum, ${senderName}!*
 Selamat datang di *R&D GrowthFlow Bot*
-_Yayasan Khoirur Rooziqiin • Bandung_
+_Yayasan Khoirur Rooziqiin • Bandung Barat_
+━━━━━━━━━━━━━━━━━━━━
 
 Gunakan perintah berikut:
-📊 */donasi* atau */list* : Rekap program & capaian
+📊 */donasi* atau */list* : Rekap program donasi & capaian live
 ➕ */tambah [Nama] | [Target] | [Realisasi] | [AdSpend] | [Donatur]*
-   _Contoh:_ \`/tambah Wakaf Sumur Bor | 50jt | 15jt | 2jt | 95\`
+   _Contoh:_ \`/tambah Wakaf Ambulans | 150jt | 30jt | 4jt | 150\`
 ✏️ */edit [Nama/ID] | [Realisasi] | [AdSpend] | [Donatur]*
-   _Contoh:_ \`/edit Wakaf Sumur Bor | 35jt | 4.5jt | 210\`
+   _Contoh:_ \`/edit Wakaf Ambulans | 45jt | 6jt | 250\`
 🎯 */kpi* : Ringkasan KPI ZISWAF R&D
 🔍 */cari [nama]* : Cari program tertentu`);
     } else if (command === '/donasi' || command === '/list') {
@@ -100,7 +123,14 @@ Gunakan perintah berikut:
       });
       await sendReply(chatId, out);
     } else if (command === '/tambah') {
-      const segments = argsText.split('|').map(s => s.trim());
+      let segments = [];
+      if (argsText.includes('|')) segments = argsText.split('|').map(s => s.trim());
+      else if (argsText.includes(',')) segments = argsText.split(',').map(s => s.trim());
+      else {
+        await sendReply(chatId, '⚠️ Gunakan tanda pemisah pipa `|` atau koma `,`:\n`/tambah Nama | Target | Realisasi | AdSpend | Donatur`');
+        return;
+      }
+
       const name = segments[0];
       const target = parseCurrencyString(segments[1] || '0');
       const realized = parseCurrencyString(segments[2] || '0');
@@ -129,11 +159,30 @@ Gunakan perintah berikut:
         await sendReply(chatId, `✅ *Program Donasi Berhasil Ditambahkan!*\n📌 *Nama:* ${name}\n🎯 *Target:* ${formatRupiah(target)}\n💰 *Realisasi:* ${formatRupiah(realized)}\n⚡ Data otomatis tersinkronisasi live di web.`);
       }
     } else if (command === '/edit') {
-      const segments = argsText.split('|').map(s => s.trim());
+      let segments = [];
+      if (argsText.includes('|')) segments = argsText.split('|').map(s => s.trim());
+      else if (argsText.includes(',')) segments = argsText.split(',').map(s => s.trim());
+      else {
+        await sendReply(chatId, '⚠️ Gunakan tanda pemisah pipa `|` atau koma `,`:\n`/edit Nama | Realisasi | AdSpend | Donatur`');
+        return;
+      }
+
       const query = segments[0];
-      const realized = parseCurrencyString(segments[1] || '0');
-      const adSpend = parseCurrencyString(segments[2] || '0');
-      const donors = parseInt(segments[3] || '0', 10);
+      let target = null;
+      let realized = 0;
+      let adSpend = 0;
+      let donors = 0;
+
+      if (segments.length >= 5) {
+        target = parseCurrencyString(segments[1] || '0');
+        realized = parseCurrencyString(segments[2] || '0');
+        adSpend = parseCurrencyString(segments[3] || '0');
+        donors = parseInt(segments[4] || '0', 10);
+      } else {
+        realized = parseCurrencyString(segments[1] || '0');
+        adSpend = parseCurrencyString(segments[2] || '0');
+        donors = parseInt(segments[3] || '0', 10);
+      }
 
       const { data: existing } = await supabase.from('donation_programs').select('*').or(`id.eq.${query},name.ilike.%${query}%`).limit(1);
       if (!existing || existing.length === 0) {
@@ -141,11 +190,14 @@ Gunakan perintah berikut:
         return;
       }
       const prog = existing[0];
-      const { error } = await supabase.from('donation_programs').update({
+      const updates = {
         realized_amount: realized,
         ad_spend: adSpend,
         new_donors: donors
-      }).eq('id', prog.id);
+      };
+      if (target !== null && target > 0) updates.target_amount = target;
+
+      const { error } = await supabase.from('donation_programs').update(updates).eq('id', prog.id);
 
       if (error) {
         await sendReply(chatId, `❌ Gagal mengupdate: ${error.message}`);
@@ -175,13 +227,28 @@ Gunakan perintah berikut:
 
 async function sendReply(chatId, text) {
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: 'Markdown'
+      })
     });
+    const resJson = await res.json();
+    if (!resJson.ok && resJson.description && resJson.description.includes('entity')) {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text.replace(/[*_`\[\]]/g, '')
+        })
+      });
+    }
   } catch (e) {
-    console.error('Send reply error:', e.message);
+    console.error('Gagal kirim balasan:', e.message);
   }
 }
 
@@ -189,10 +256,16 @@ function parseCurrencyString(val) {
   if (typeof val === 'number') return val;
   if (!val) return 0;
   let str = String(val).trim().toLowerCase().replace(/rp\.?/g, '').trim();
-  const jt = str.match(/^([\d.,]+)\s*(jt|juta|m)$/);
-  if (jt) return Math.round(parseFloat(jt[1].replace(',', '.')) * 1000000);
-  const rb = str.match(/^([\d.,]+)\s*(rb|ribu|k)$/);
-  if (rb) return Math.round(parseFloat(rb[1].replace(',', '.')) * 1000);
+
+  const jtMatch = str.match(/^([\d.,]+)\s*(jt|juta|m)$/);
+  if (jtMatch) return Math.round(parseFloat(jtMatch[1].replace(',', '.')) * 1000000);
+
+  const rbMatch = str.match(/^([\d.,]+)\s*(rb|ribu|k)$/);
+  if (rbMatch) return Math.round(parseFloat(rbMatch[1].replace(',', '.')) * 1000);
+
+  const milMatch = str.match(/^([\d.,]+)\s*(milyar|mil|b)$/);
+  if (milMatch) return Math.round(parseFloat(milMatch[1].replace(',', '.')) * 1000000000);
+
   return parseInt(str.replace(/[^\d]/g, ''), 10) || 0;
 }
 
@@ -200,4 +273,4 @@ function formatRupiah(num) {
   return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
 }
 
-pollUpdates();
+initBot();

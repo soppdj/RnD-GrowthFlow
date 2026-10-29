@@ -121,10 +121,14 @@
   - **IV. Catatan Evaluasi Eksperimen & Temuan Lapangan:** Ringkasan temuan jurnal validasi riset.
 - **Blok Pengesahan & Tanda Tangan:** Ditempatkan rapi di sisi kanan bawah dokumen.
 
-### F. Profil & Pengaturan Teknis
+### F. Profil, Pengaturan Teknis & Integrasi Bot Telegram
 - Pengaturan identitas PIC, alamat, kontak, dan nominal target kuartal.
 - Pengaturan foto profil interaktif: kontrol pembesaran (*zoom* 50% - 200%), geser horizontal (X), dan geser vertikal (Y).
-- Integrasi notifikasi Telegram Bot Webhook.
+- **Infrastruktur Bot Telegram Dua Arah (Input & Edit Donasi):**
+  - Bot membaca token dan admin chat ID secara dinamis dari tabel `profiles` Supabase tanpa perlu konfigurasi environment manual di Vercel.
+  - Perintah didukung: `/tambah`, `/edit`, `/donasi`, `/list`, `/kpi`, `/cari`, `/hapus`, `/help`.
+  - Format input fleksibel mendukung pemisah pipa (`|`) maupun koma (`,`), serta penulisan singkatan nominal (`150jt`, `2.5jt`, `500rb`).
+  - **Sinkronisasi Realtime Supabase:** Setiap input atau perubahan donasi dari chat Telegram langsung memicu PostgreSQL CDC (Change Data Capture) dan otomatis mengupdate tampilan web secara seketika (*real-time*) tanpa perlu refresh.
 - Uji koneksi live database Supabase (*Test Connection*).
 
 ---

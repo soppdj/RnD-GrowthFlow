@@ -619,7 +619,7 @@ const telegramStatusMessage = ref('');
 const telegramStatusSuccess = ref(false);
 
 const currentWebhookUrl = computed(() => {
-  if (typeof window !== 'undefined' && window.location.origin) {
+  if (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
     return `${window.location.origin}/api/telegram-webhook`;
   }
   return 'https://rnd-growthflow.vercel.app/api/telegram-webhook';
@@ -775,11 +775,41 @@ function onAvatarError(e) {
   e.target.src = `https://ui-avatars.com/api/?name=${encodedName}&background=0d9488&color=fff&bold=true`;
 }
 
-function saveProfile() {
+async function saveProfile() {
   store.updateProfile({ ...profileForm.value });
   if (profileForm.value.supabaseUrl && profileForm.value.supabaseAnonKey) {
     initClient(profileForm.value.supabaseUrl, profileForm.value.supabaseAnonKey);
   }
+
+  // Sinkronkan ke database Supabase agar webhook serverless dapat membaca token & chat ID
+  const client = store.getSupabaseClient();
+  if (client) {
+    try {
+      await client.from('profiles').upsert({
+        id: 'default-user',
+        full_name: profileForm.value.fullName || 'Sopianto Djahar',
+        role: profileForm.value.role || 'R&D Digital Marketing',
+        organization: profileForm.value.organization || 'Yayasan Khoirur Rooziqiin',
+        tagline: profileForm.value.tagline || '',
+        quarter_target: Number(profileForm.value.quarterTarget) || 450000000,
+        work_days_per_week: Number(profileForm.value.workDaysPerWeek) || 3,
+        work_capacity_hours_per_day: Number(profileForm.value.workCapacityHoursPerDay) || 8,
+        foundation_address: profileForm.value.foundationAddress || '',
+        foundation_contact: profileForm.value.foundationContact || '',
+        telegram_bot_token: profileForm.value.telegramBotToken ? profileForm.value.telegramBotToken.trim() : '',
+        telegram_admin_chat_id: profileForm.value.telegramAdminChatId ? String(profileForm.value.telegramAdminChatId).trim() : '',
+        avatar_url: profileForm.value.avatarUrl || '',
+        avatar_zoom: Number(profileForm.value.avatarZoom) || 100,
+        avatar_x: Number(profileForm.value.avatarX) ?? 50,
+        avatar_y: Number(profileForm.value.avatarY) ?? 50,
+        updated_at: new Date().toISOString()
+      });
+      console.log('✅ Profil & kredensial Telegram berhasil disimpan ke Supabase');
+    } catch (e) {
+      console.warn('Gagal simpan profil ke Supabase:', e.message);
+    }
+  }
+
   profileSavedToast.value = true;
   setTimeout(() => {
     profileSavedToast.value = false;
@@ -798,15 +828,18 @@ async function setupTelegramWebhook() {
   telegramStatusMessage.value = '';
 
   try {
-    const url = `https://api.telegram.org/bot${profileForm.value.telegramBotToken.trim()}/setWebhook?url=${encodeURIComponent(currentWebhookUrl.value)}`;
+    // 1. Simpan token & chat ID ke Supabase terlebih dahulu agar webhook serverless langsung memiliki akses
+    await saveProfile();
+
+    const targetUrl = currentWebhookUrl.value;
+    const url = `https://api.telegram.org/bot${profileForm.value.telegramBotToken.trim()}/setWebhook?url=${encodeURIComponent(targetUrl)}`;
     const response = await fetch(url);
     const data = await response.json();
 
     isSettingWebhook.value = false;
     if (data.ok) {
       telegramStatusSuccess.value = true;
-      telegramStatusMessage.value = `✅ Webhook berhasil diaktifkan ke: ${currentWebhookUrl.value}. Bot siap menerima perintah!`;
-      saveProfile();
+      telegramStatusMessage.value = `✅ Webhook berhasil diaktifkan ke: ${targetUrl}. Bot siap menerima perintah /donasi, /tambah, /edit, dan /kpi!`;
     } else {
       telegramStatusSuccess.value = false;
       telegramStatusMessage.value = `❌ Gagal mengaktifkan webhook: ${data.description || 'Token tidak valid'}`;
