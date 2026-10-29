@@ -35,13 +35,31 @@
             v-for="tab in weekTabs"
             :key="tab.value"
             @click="selectedWeek = tab.value; customDateFilter = ''"
-            class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-micro whitespace-nowrap shrink-0"
-            :class="selectedWeek === tab.value && !customDateFilter
-              ? 'bg-teal-600 text-white shadow-sm ring-2 ring-teal-200'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'"
-            :title="`Filter ${tab.label}`"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-micro whitespace-nowrap shrink-0 flex items-center gap-1.5"
+            :class="[
+              selectedWeek === tab.value && !customDateFilter
+                ? 'bg-teal-600 text-white shadow-sm ring-2 ring-teal-200'
+                : tab.value === currentActiveWeek
+                  ? 'bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-800 border-2 border-emerald-400 font-extrabold ring-2 ring-emerald-300/60 shadow-soft hover:bg-emerald-100'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+            ]"
+            :title="tab.value === currentActiveWeek ? `${tab.label} (Minggu Berjalan Real-time)` : `Filter ${tab.label}`"
           >
-            {{ tab.label }}
+            <!-- Pulsing indicator for real-time active week -->
+            <span
+              v-if="tab.value === currentActiveWeek"
+              class="w-2 h-2 rounded-full inline-block animate-pulse shrink-0"
+              :class="selectedWeek === tab.value && !customDateFilter ? 'bg-amber-300' : 'bg-emerald-500'"
+            ></span>
+            <span>{{ tab.label }}</span>
+            <!-- Live Active Tag -->
+            <span
+              v-if="tab.value === currentActiveWeek"
+              class="text-[9px] px-1 py-0.2 rounded font-extrabold uppercase shrink-0"
+              :class="selectedWeek === tab.value && !customDateFilter ? 'bg-white/25 text-white' : 'bg-emerald-200/90 text-emerald-900'"
+            >
+              Live
+            </span>
           </button>
         </div>
 
@@ -513,6 +531,9 @@ const weekTabs = [
   { value: '4', label: 'Minggu 4' },
   { value: '5', label: 'Minggu 5' }
 ];
+
+// Indikator minggu berjalan real-time dinamis mengikuti tanggal kalender saat ini
+const currentActiveWeek = computed(() => String(getWeekOfMonth(new Date())));
 
 const newLog = ref({
   focus: '',

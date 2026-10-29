@@ -74,9 +74,10 @@
    - **OUTCOME:** Hasil perubahan perilaku dan akuisisi donatur baru.
    - **OUTPUT:** Deliverables fisik hasil riset (halaman landing, materi iklan, SOP).
    - **ACTIVITY:** Rincian aksi harian eksekusi operasional.
-2. **Filter Minggu & Pengaturan Hari Kerja:**
+2. **Filter Minggu, Real-Time Active Week Indicator & Pengaturan Hari Kerja:**
    - Filter minggu ramping 1 baris tanpa label teks "MINGGU:": `[Semua] [Minggu 1] [Minggu 2] [Minggu 3] [Minggu 4] [Minggu 5]`.
-   - Input hari kerja manual ringkas: `Hari Kerja: [ 3 ] Hari/Minggu` (1 - 7 hari).
+   - **Indikator Minggu Berjalan Real-Time:** Tab minggu kalender berjalan otomatis mendapatkan penanda visual aktif (border hijau emerald bercahaya, pulsing live dot, dan badge `LIVE`) yang berpindah dinamis mengikuti tanggal sistem hari ini.
+   - Input hari kerja manual ringkas: `Hari Kerja: [ 3 ] Hari/Minggu` (fleksibel 1 - 7 hari).
 3. **Modal Evaluasi Tugas (Complete Task Modal):**
    - Saat menandai tugas selesai, pengguna mengisi 5 poin refleksi riset: Temuan Lapangan, Kendala, Solusi, Tindak Lanjut, dan Tautan Bukti Kerja.
 4. **Agenda & Roadmap Milestone:** Pelacakan tenggat waktu target bertingkat Mingguan, Bulanan, dan Kuartalan.
@@ -110,15 +111,24 @@
 - Pemantauan program filantropi ZISWAF (Wakaf, Zakat, Infaq, Sedekah).
 - Analisis perbandingan antara realisasi donasi, target program, dan efisiensi biaya iklan.
 
-### E. Laporan Kinerja Resmi (Format Kertas A4 & PDF Export)
-- Desain tata letak berstandar lembar dokumen **Kertas A4 (210 x 297 mm)** dengan proteksi cetak CSS.
-- **Kop Surat Resmi Yayasan:** Menampilkan logo resmi di kiri, teks identitas legalitas lembaga di tengah.
-- **Metadata Dokumen 1 Baris:** `Laporan: R&D Digital Marketing • Periode: [Bulan] • Tanggal Rilis: [Tanggal]`.
+### E. Laporan Kinerja Resmi (Format Presisi 1 Lembar A4 & PDF Export)
+- **Desain Presisi 1 Lembar A4:** Seluruh susunan dokumen dioptimasi secara presisi agar muat sempurna dalam **1 halaman A4 portrait (210 x 297 mm)** tanpa tumpah ke halaman 2 saat di-print atau diekspor ke PDF.
+- **Kop Surat Resmi Yayasan:** Menampilkan logo resmi di kiri, teks identitas legalitas lembaga di tengah (NPYP, UPZ BAZNAS, alamat resmi).
+- **Metadata Dokumen 1 Baris:** `Laporan: R&D Digital Marketing • Periode: [Label Periode] • Tanggal Rilis: [Tanggal Rilis]`.
+- **Opsi Filter Periode Fleksibel:**
+  - Laporan Mingguan: Minggu 1 s/d Minggu 5 bulan berjalan.
+  - Laporan Bulanan: Oktober 2026, September 2026, Agustus 2026, Juli 2026.
+  - Kuartal IV & Semua Periode.
+  - Rentang Tanggal Kustom (*Custom Date Range* dengan pemilih tanggal awal & akhir).
 - **Sistematika Bab Dokumen:**
-  - **I. Capaian Matriks LogFrame:** 4 kotak capaian persentase (Goal, Outcome, Output, Activity).
-  - **II. Ringkasan Eksekutif KPI & Efisiensi Akuisisi:** Rincian metrik global dan Tabel Ramping Baku 9 Standar KPI Iklan.
-  - **III. Rekomendasi Scale-Up Ad Lab:** Tabel kampanye terurut berdasarkan **ROI aktual tertinggi (descending)** beserta arahan alokasi anggaran.
-  - **IV. Catatan Evaluasi Eksperimen & Temuan Lapangan:** Ringkasan temuan jurnal validasi riset.
+  - **I. Capaian Matriks LogFrame (Rata Tinggi Horizontal):** 4 kotak matriks (Goal, Outcome, Output, Activity) dengan tinggi identik merata secara horizontal, dan judul `OUTCOME (HASIL STRATEGIS)` terjaga dalam satu baris tanpa terpotong ke bawah.
+  - **II. Rekapitulasi Jurnal & Agenda Kinerja R&D:** Menggantikan tabel 9 metrik KPI iklan dengan tabel rekapitulasi agenda kerja R&D terurut secara hierarkis:
+    1. **Sudah Selesai (Selesai)**
+    2. **On Progress (In Progress)**
+    3. **Belum Selesai (Pending)**
+    Lengkap dengan kolom NO, Aktivitas Jurnal, Kategori LogFrame, Tanggal, Status, dan Temuan/Tindak Lanjut serta kartu ringkasan eksekutif donasi (Realisasi, Ad Spend, CPR, ROI).
+  - **III. Rekomendasi Scale-Up Ad Lab (Ringkas):** Tabel top kampanye terurut berdasarkan **ROI aktual tertinggi (descending)** beserta rekomendasi aksi anggaran.
+  - **IV. Catatan Evaluasi Eksperimen & Temuan Lapangan:** Ringkasan 2 temuan lapangan dan tindak lanjut terpenting.
 - **Blok Pengesahan & Tanda Tangan:** Ditempatkan rapi di sisi kanan bawah dokumen.
 
 ### F. Profil, Pengaturan Teknis & Integrasi Bot Telegram
