@@ -171,7 +171,7 @@ Menghapus program donasi dari sistem.
     const { data: programs, error } = await supabase
       .from('donation_programs')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
 
     if (error || !programs || programs.length === 0) {
       return `📭 Belum ada program donasi yang tercatat di database Supabase.\n\nKetik \`/tambah Nama | Target | Realisasi | AdSpend | Donatur\` untuk menambahkan.`;

@@ -33,6 +33,26 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
         let donationPrograms = parsed.donationPrograms;
         if (!donationPrograms || donationPrograms.length < 5 || (donationPrograms[0] && donationPrograms[0].name === 'Wakaf Sumur Air Bersih Pelosok')) {
           donationPrograms = [...initialDonationPrograms];
+        } else if (Array.isArray(donationPrograms)) {
+          // Pastikan program bawaan/lama selalu di atas dan program baru selalu berada di bagian paling bawah
+          const baseNames = ['zakat', 'wakaf', 'infaq & sedekah', 'wali asuh', 'program khusus (renovasi wudhu)'];
+          const baseIds = ['prog-1', 'prog-2', 'prog-3', 'prog-4', 'prog-5'];
+          const baseProgs = [];
+          const customProgs = [];
+
+          donationPrograms.forEach(p => {
+            const isBase = baseIds.includes(p.id) || baseNames.includes((p.name || '').trim().toLowerCase());
+            if (isBase) {
+              baseProgs.push(p);
+            } else {
+              customProgs.push(p);
+            }
+          });
+
+          // Satukan dengan program baru di bagian bawah
+          if (customProgs.length > 0) {
+            donationPrograms = [...baseProgs, ...customProgs];
+          }
         }
 
         // Backward compatibility: load updated week tasks if existing list is short
@@ -498,8 +518,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           }));
         }
 
-        // 4. Fetch Donation Programs
-        const { data: dbPrograms, error: progErr } = await client.from('donation_programs').select('*').order('created_at', { ascending: false });
+        // 4. Fetch Donation Programs (Urutan kronologis: Program lama di atas, program baru selalu di bagian bawah)
+        const { data: dbPrograms, error: progErr } = await client.from('donation_programs').select('*').order('created_at', { ascending: true });
         if (!progErr && dbPrograms && dbPrograms.length > 0) {
           this.donationPrograms = dbPrograms.map(p => ({
             id: p.id,
@@ -510,7 +530,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
             adSpend: Number(p.ad_spend) || 0,
             newDonors: Number(p.new_donors) || 0,
             status: p.status || 'Active',
-            description: p.description || ''
+            description: p.description || '',
+            createdAt: p.created_at
           }));
         }
 
@@ -547,7 +568,8 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
                 };
                 const exists = this.donationPrograms.some(p => p.id === mapped.id);
                 if (!exists) {
-                  this.donationPrograms.unshift(mapped);
+                  // Program baru selalu ditambahkan ke bagian paling bawah tabel
+                  this.donationPrograms.push(mapped);
                   this.saveToStorage();
                 }
               } else if (payload.eventType === 'UPDATE') {

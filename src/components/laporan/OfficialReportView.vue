@@ -12,7 +12,7 @@
         </p>
       </div>
 
-      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+      <div class="flex items-center gap-2.5 flex-wrap">
         <!-- Opsi Filter Periode: Mingguan (W1-W5), Bulanan, Custom Tanggal -->
         <select
           v-model="selectedPeriod"
@@ -61,7 +61,7 @@
           class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 cursor-pointer"
         >
           <Printer class="w-4 h-4" />
-          <span>Simpan PDF (1 Lembar A4)</span>
+          <span>Simpan PDF</span>
         </button>
       </div>
     </div>

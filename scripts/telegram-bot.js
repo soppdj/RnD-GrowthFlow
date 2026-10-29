@@ -105,7 +105,7 @@ Gunakan perintah berikut:
 🎯 */kpi* : Ringkasan KPI ZISWAF R&D
 🔍 */cari [nama]* : Cari program tertentu`);
     } else if (command === '/donasi' || command === '/list') {
-      const { data: programs } = await supabase.from('donation_programs').select('*').order('created_at', { ascending: false });
+      const { data: programs } = await supabase.from('donation_programs').select('*').order('created_at', { ascending: true });
       if (!programs || programs.length === 0) {
         await sendReply(chatId, 'Belum ada data program donasi di Supabase.');
         return;

@@ -203,6 +203,19 @@
                 </div>
               </td>
             </tr>
+            <!-- Baris Aksi Tambah Program di Bagian Bawah Tabel -->
+            <tr class="bg-teal-50/20 hover:bg-teal-50/50 transition-colors border-t border-dashed border-teal-200/80">
+              <td colspan="5" class="py-2.5 px-4 text-center">
+                <button
+                  @click="openCreateModal"
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-teal-700 hover:text-teal-900 transition-colors cursor-pointer py-1 px-3 rounded-lg hover:bg-teal-100/60"
+                  title="Tambah Program Donasi Baru di Bagian Bawah"
+                >
+                  <Plus class="w-3.5 h-3.5" />
+                  <span>+ Tambah Program Baru di Bawah Sini</span>
+                </button>
+              </td>
+            </tr>
           </tbody>
 
           <!-- Table Footer: TOTAL AKUMULASI -->

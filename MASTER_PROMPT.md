@@ -120,10 +120,16 @@
    - Nilai target aktual dihitung secara dinamis berdasarkan parameter harga acuan (`rdProductPrice`).
 
 ### D. Donasi & Metrik Akuisisi
-- Pemantauan program filantropi ZISWAF (Wakaf, Zakat, Infaq, Sedekah).
-- Analisis perbandingan antara realisasi donasi, target program, dan efisiensi biaya iklan.
+1. **Pemantauan Program Filantropi ZISWAF:**
+   - Monitoring realisasi pengumpulan donasi program Zakat, Wakaf, Infaq & Sedekah, Wali Asuh, dan Program Khusus lainnya.
+   - Analisis perbandingan antara target donasi, nominal terkumpul (*actual*), persentase capaian realisasi, belanja iklan (*ad spend*), donatur baru, CPR, dan ROI.
+2. **Aturan Urutan Program Donasi (Penambahan Selalu di Bagian Bawah):**
+   - Setiap kali ada penambahan program donasi baru (baik melalui modal UI di web, Bot Telegram, maupun sinkronisasi Supabase), program baru **wajib selalu berada di urutan paling bawah** (*bottom-appended*) di bawah program yang sudah ada sebelumnya, bukan di atas.
+   - Skema query database Supabase menggunakan `order('created_at', { ascending: true })` dan event realtime listener `INSERT` menggunakan metode `.push(mapped)` (bukan `.unshift`) agar urutan kronologis tetap konsisten terjaga.
+   - Tersedia tombol aksi cepat `+ Tambah Program Baru di Bawah Sini` pada baris akhir tabel donasi.
 
 ### E. Laporan Kinerja Resmi (Format Presisi 1 Lembar A4 & PDF Export)
+- **Tombol Cetak Ramping & Responsif:** Tombol ekspor dokumen menggunakan label ringkas **"Simpan PDF"** dengan ikon printer dan kontainer flex-wrap responsif, memastikan tombol tampil utuh tanpa terpotong (*clipped*) di semua ukuran layar.
 - **Desain Presisi 1 Lembar A4:** Seluruh susunan dokumen dioptimasi secara presisi agar muat sempurna dalam **1 halaman A4 portrait (210 x 297 mm)** tanpa tumpah ke halaman 2 saat di-print atau diekspor ke PDF.
 - **Kop Surat Resmi Yayasan:** Menampilkan logo resmi di kiri, teks identitas legalitas lembaga di tengah (NPYP, UPZ BAZNAS, alamat resmi).
 - **Metadata Dokumen 1 Baris:** `Laporan: R&D Digital Marketing • Periode: [Label Periode] • Tanggal Rilis: [Tanggal Rilis]`.
