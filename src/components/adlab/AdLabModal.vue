@@ -82,7 +82,7 @@
                 v-model.number="form.adSpend"
                 type="number"
                 min="0"
-                step="50000"
+                step="any"
                 class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-800"
               />
             </div>
@@ -92,6 +92,7 @@
                 v-model.number="form.newDonors"
                 type="number"
                 min="0"
+                step="any"
                 class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-800"
               />
             </div>
@@ -101,7 +102,7 @@
                 v-model.number="form.revenue"
                 type="number"
                 min="0"
-                step="100000"
+                step="any"
                 class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-emerald-700"
               />
             </div>

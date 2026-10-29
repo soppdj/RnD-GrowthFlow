@@ -129,7 +129,10 @@
    - Tersedia tombol aksi cepat `+ Tambah Program Baru di Bawah Sini` pada baris akhir tabel donasi.
 
 ### E. Laporan Kinerja Resmi (Format Presisi 1 Lembar A4 & PDF Export)
-- **Tombol Cetak Ramping & Responsif:** Tombol ekspor dokumen menggunakan label ringkas **"Simpan PDF"** dengan ikon printer dan kontainer flex-wrap responsif, memastikan tombol tampil utuh tanpa terpotong (*clipped*) di semua ukuran layar.
+- **Header Bersih & Kontrol Bersebelahan:**
+  - Judul modul diringkas menjadi **"Laporan Kinerja Resmi"** tanpa embel-embel tambahan agar header tetap rapi dan tidak memakan ruang vertikal.
+  - Opsi dropdown periode bulanan menampilkan nama bulan langsung (misal **"Oktober 2026"**), tanpa label "Bulan Berjalan" dan tanpa tanda kurung.
+  - Dropdown filter periode dan tombol **"Simpan PDF"** ditata sejajar bersebelahan (*side-by-side* / flex-nowrap) pada satu baris horizontal, tidak bertumpuk atas-bawah.
 - **Desain Presisi 1 Lembar A4:** Seluruh susunan dokumen dioptimasi secara presisi agar muat sempurna dalam **1 halaman A4 portrait (210 x 297 mm)** tanpa tumpah ke halaman 2 saat di-print atau diekspor ke PDF.
 - **Kop Surat Resmi Yayasan:** Menampilkan logo resmi di kiri, teks identitas legalitas lembaga di tengah (NPYP, UPZ BAZNAS, alamat resmi).
 - **Metadata Dokumen 1 Baris:** `Laporan: R&D Digital Marketing • Periode: [Label Periode] • Tanggal Rilis: [Tanggal Rilis]`.
@@ -150,7 +153,9 @@
 - **Blok Pengesahan & Tanda Tangan:** Ditempatkan rapi di sisi kanan bawah dokumen.
 
 ### F. Profil, Pengaturan Teknis & Integrasi Bot Telegram
-- Pengaturan identitas PIC, alamat, kontak, dan nominal target kuartal.
+- **Pengaturan Identitas & Target Fleksibel:**
+  - Pengaturan profil Lead PIC, kontak, alamat lembaga, kapasitas jam kerja, dan hari kerja efektif.
+  - **Input Target Kuartal Presisi Tanpa Pembulatan:** Kolom *Target Kuartal (Rp)* menggunakan atribut `step="any"` sehingga dapat menerima input angka riil berapa pun tanpa ada pembatasan kelipatan langkah (*step constraint*) dan tanpa pembulatan otomatis ke atas/ke bawah oleh browser.
 - Pengaturan foto profil interaktif: kontrol pembesaran (*zoom* 50% - 200%), geser horizontal (X), dan geser vertikal (Y).
 - **Infrastruktur Bot Telegram Dua Arah (Input & Edit Donasi):**
   - Bot membaca token dan admin chat ID secara dinamis dari tabel `profiles` Supabase tanpa perlu konfigurasi environment manual di Vercel.

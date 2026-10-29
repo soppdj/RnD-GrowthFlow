@@ -1,24 +1,21 @@
 <template>
   <div class="space-y-6">
     <!-- Non-print Control Bar -->
-    <div class="no-print glass-card rounded-2xl p-4 sm:p-5 border border-teal-100 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="no-print glass-card rounded-2xl p-4 sm:p-5 border border-teal-100 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
       <div>
-        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <FileText class="w-5 h-5 text-teal-600" />
-          <span>Laporan Kinerja Resmi (Format 1 Lembar A4)</span>
+        <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+          <FileText class="w-5 h-5 text-teal-600 shrink-0" />
+          <span>Laporan Kinerja Resmi</span>
         </h2>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Dokumen standar yayasan dengan Kop Surat, Rekapitulasi Jurnal &amp; Agenda terurut, dan Rekomendasi Scale-Up
-        </p>
       </div>
 
-      <div class="flex items-center gap-2.5 flex-wrap">
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-nowrap">
         <!-- Opsi Filter Periode: Mingguan (W1-W5), Bulanan, Custom Tanggal -->
         <select
           v-model="selectedPeriod"
-          class="px-3 py-2 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
+          class="px-3 py-2 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro shrink-0"
         >
-          <optgroup label="Laporan Mingguan (Bulan Berjalan)">
+          <optgroup label="Laporan Mingguan">
             <option value="w-1">Minggu 1 (01 - 02 Okt 2026)</option>
             <option value="w-2">Minggu 2 (05 - 09 Okt 2026)</option>
             <option value="w-3">Minggu 3 (12 - 16 Okt 2026)</option>
@@ -26,7 +23,7 @@
             <option value="w-5">Minggu 5 (26 - 30 Okt 2026)</option>
           </optgroup>
           <optgroup label="Laporan Bulanan">
-            <option value="oct-2026">Bulan Berjalan (Oktober 2026)</option>
+            <option value="oct-2026">Oktober 2026</option>
             <option value="sep-2026">September 2026</option>
             <option value="aug-2026">Agustus 2026</option>
             <option value="jul-2026">Juli 2026</option>
@@ -39,7 +36,7 @@
         </select>
 
         <!-- Input Rentang Tanggal Kustom (Jika memilih opsi custom) -->
-        <div v-if="selectedPeriod === 'custom'" class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-teal-200 shadow-micro">
+        <div v-if="selectedPeriod === 'custom'" class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-teal-200 shadow-micro shrink-0">
           <span class="text-[11px] font-bold text-slate-500">Dari:</span>
           <input
             type="date"
@@ -58,7 +55,7 @@
         <!-- Print PDF Button -->
         <button
           @click="printDocument"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 cursor-pointer"
+          class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 whitespace-nowrap cursor-pointer"
         >
           <Printer class="w-4 h-4" />
           <span>Simpan PDF</span>

@@ -183,7 +183,8 @@
             <input
               v-model.number="profileForm.quarterTarget"
               type="number"
-              step="10000000"
+              min="0"
+              step="any"
               required
               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-teal-500 text-sm font-bold text-teal-800 outline-none"
             />

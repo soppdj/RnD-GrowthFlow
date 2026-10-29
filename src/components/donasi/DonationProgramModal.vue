@@ -55,7 +55,7 @@
               v-model.number="form.targetAmount"
               type="number"
               min="0"
-              step="1000000"
+              step="any"
               required
               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800"
             />
@@ -67,7 +67,7 @@
               v-model.number="form.realizedAmount"
               type="number"
               min="0"
-              step="500000"
+              step="any"
               required
               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-emerald-700"
             />
@@ -82,7 +82,7 @@
               v-model.number="form.adSpend"
               type="number"
               min="0"
-              step="100000"
+              step="any"
               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800"
             />
           </div>
