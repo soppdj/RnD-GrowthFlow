@@ -35,16 +35,28 @@
 ---
 
 ## 3. KEAMANAN & PROTOKOL AKSES (SECURITY GATEWAY)
-1. **Wajib Login Setiap Link Dibuka:**
-   - Setiap kali link aplikasi dibuka di browser, di-refresh, atau diakses melalui sesi baru, sistem **selalu** mengarahkan pengguna ke UI Login (`RdLoginModal.vue`).
-   - Seluruh konten dashboard dan menu kerja dilindungi secara ketat dengan `v-if="isAuthenticated"` sehingga data sensitif R&D tidak akan pernah dirender ke layar sebelum otentikasi berhasil.
-2. **Input PIN Terproteksi:**
-   - Menggunakan input numerik 6 digit dengan visual mono-spaced tracking (`placeholder="••••••"`, `maxlength="6"`).
-   - Kredensial PIN dikelola melalui konfigurasi rahasia internal (`[CONFIGURED_6_DIGIT_PIN]`).
-   - Kolom PIN otomatis mendapatkan fokus (*auto-focus*) saat halaman dimuat, serta dapat dieksekusi instan dengan tombol `Enter`.
-   - Tidak menyediakan tombol bypass / verifikasi kilat publik di antarmuka.
-3. **Kunci Sesi Instan:**
-   - Tersedia tombol gembok (*Lock Session*) pada Header dan halaman Profil untuk langsung mengunci sesi kerja kapan saja.
+1. **Gerbang Keamanan Akses Eksklusif R&D:**
+   - Setiap pengguna yang belum terotentikasi otomatis dihadang oleh gerbang login layar penuh (*full-screen security gateway*) melalui komponen `RdLoginModal.vue`.
+   - Menggunakan estetika *luxury dark glassmorphism* (`bg-slate-900/90`, border neon teal `border-teal-500/30`, ambient neon glow orbs, dan subtle cyber grid).
+   - Menampilkan kartu profil terverifikasi Lead R&D PIC (avatar dinamis, nama, role, dan lembaga) sebagai penanda identitas otoritas sistem.
+
+2. **Antarmuka 6-Digit PIN Boxes Visualizer & Virtual Keypad:**
+   - **6-Digit Interactive PIN Boxes:** Menggunakan 6 sel digit interaktif mono-spaced dengan border glow teal pada digit aktif, indikator kursor horizontal berkedip (*blinking cursor*), serta masking titik (`●`) yang aman.
+   - **Virtual Numpad 3x4:** Disediakan tombol keypad angka (1-9, 0), tombol sakelar lihat/sembunyikan PIN (*Eye / EyeOff*), dan tombol hapus digit (*Backspace / Delete*) dengan efek tactile klik responsif, optimal untuk perangkat mobile touchscreen maupun desktop.
+   - **Dukungan Dual-Input (Keyboard Fisik & Virtual):** Elemen input tersembunyi (*hidden native input* `type="password"`, `inputmode="numeric"`, `maxlength="6"`) otomatis aktif dan terfokus saat halaman dimuat, mendukung input mengetik langsung via keyboard PC/laptop maupun keypad visual.
+
+3. **Validasi Instan Otomatis (Auto-Submit):**
+   - Sistem mendeteksi otomatis saat digit ke-6 selesai dimasukkan dan langsung menjalankan proses validasi seketika tanpa perlu menekan tombol submit tambahan.
+   - **Feedback Animasi Responsif:**
+     - *Jika Salah:* Kartu login bergetar (*horizontal shake animation*), border dan ring menyala merah rose (`ring-rose-500`), pesan peringatan kesalahan muncul, dan input otomatis di-reset bersih setelah 1.2 detik dengan kursor kembali ke kotak pertama.
+     - *Jika Benar:* Border dan ring menyala hijau emerald (`ring-emerald-500`), pesan sukses verifikasi muncul, status otentikasi disimpan ke `localStorage` (`rnd_growthflow_authenticated`), dan modal transisi mulus membuka workspace R&D.
+
+4. **Kebijakan Nol Kebocoran Kredensial (Zero Plaintext Leak):**
+   - Menghapus seluruh teks bocoran PIN publik (seperti "PIN Akses: 000000") dan tombol bypass instan publik dari antarmuka login guna menjamin keamanan dan kerahasiaan operasional riset yayasan.
+   - Kredensial PIN dikelola secara tertutup melalui konfigurasi internal terenkripsi dan nomor identitas chat admin resmi.
+
+5. **Kunci Sesi Instan (Lock Session):**
+   - Tombol gembok (*Lock Session*) pada Header dan halaman Profil memungkinkan pengguna mengunci sesi kerja kapan saja dengan menghapus token lokal dan langsung mengembalikan tampilan ke UI Login.
 
 ---
 
