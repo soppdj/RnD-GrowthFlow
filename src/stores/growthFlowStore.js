@@ -15,6 +15,25 @@ import { supabase as defaultSupabase } from '@/supabase';
 
 const STORAGE_KEY = 'rnd_growthflow_v1';
 
+/**
+ * Mengurutkan daftar task/jurnal secara kronologis dari tanggal 1 hingga 30/31 (Ascending).
+ * Memastikan data tersusun rapi per tanggal kalender dan tidak acak-acakan.
+ */
+export function sortTasksChronologically(taskList) {
+  if (!Array.isArray(taskList)) return [];
+  return [...taskList].sort((a, b) => {
+    const rawDateA = a.date || a.due_date || '';
+    const rawDateB = b.date || b.due_date || '';
+    const dateA = String(rawDateA).split('T')[0];
+    const dateB = String(rawDateB).split('T')[0];
+    if (dateA !== dateB) {
+      return dateA.localeCompare(dateB);
+    }
+    // Jika tanggal sama, urutkan stabil berdasarkan ID
+    return String(a.id || '').localeCompare(String(b.id || ''));
+  });
+}
+
 export const useGrowthFlowStore = defineStore('growthFlow', {
   state: () => {
     // Try to load cached data or fallback to rich mock data
@@ -55,28 +74,28 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           }
         }
 
-        // Backward compatibility: load updated week tasks if existing list is short
-        let tasks = parsed.tasks || initialTasks;
-        if (!Array.isArray(tasks) || tasks.length < 8) {
-          tasks = [...initialTasks];
+        // Pastikan seluruh data tugas/jurnal yang sudah diinput pengguna tidak berubah atau ter-reset
+        let tasks = parsed.tasks;
+        if (Array.isArray(tasks) && tasks.length > 0) {
+          tasks = tasks.map(t => ({
+            id: t.id || ('task-' + Date.now()),
+            title: t.title || '',
+            category: (t.category || 'OUTPUT').toUpperCase(),
+            completed: Boolean(t.completed !== undefined ? t.completed : t.is_completed),
+            estimatedHours: Number(t.estimatedHours || t.estimated_hours) || 1.0,
+            priority: (t.priority || 'MEDIUM').toUpperCase(),
+            date: t.date || t.due_date || new Date().toISOString().split('T')[0],
+            notes: t.notes !== undefined ? t.notes : (t.description || ''),
+            obstacle: t.obstacle !== undefined ? t.obstacle : '',
+            evaluation: t.evaluation !== undefined ? t.evaluation : '',
+            conclusion: t.conclusion !== undefined ? t.conclusion : '',
+            workResultUrl: t.workResultUrl || t.work_result_url || '',
+            workResultTitle: t.workResultTitle || t.work_result_title || '',
+            attachments: Array.isArray(t.attachments) ? t.attachments : []
+          }));
+          tasks = sortTasksChronologically(tasks);
         } else {
-          tasks = tasks.map(t => {
-            const init = initialTasks.find(it => it.id === t.id);
-            if (init) {
-              return {
-                ...init,
-                ...t,
-                date: t.date || init.date,
-                obstacle: t.obstacle !== undefined ? t.obstacle : init.obstacle,
-                evaluation: t.evaluation !== undefined ? t.evaluation : init.evaluation,
-                conclusion: t.conclusion !== undefined ? t.conclusion : init.conclusion,
-                workResultUrl: t.workResultUrl || init.workResultUrl,
-                workResultTitle: t.workResultTitle || init.workResultTitle,
-                attachments: t.attachments || init.attachments
-              };
-            }
-            return t;
-          });
+          tasks = sortTasksChronologically(initialTasks);
         }
 
         let milestones = parsed.milestones || initialMilestones;
@@ -479,25 +498,39 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           };
         }
 
-        // 2. Fetch Tasks
+        // 2. Fetch Tasks (Merge aman tanpa menimpa data lokal pengguna)
         const { data: dbTasks, error: taskErr } = await client.from('tasks').select('*');
         if (!taskErr && dbTasks && dbTasks.length > 0) {
-          this.tasks = dbTasks.map(t => ({
-            id: t.id,
-            title: t.title,
-            category: t.category,
-            completed: t.completed,
-            estimatedHours: Number(t.estimated_hours) || 1.0,
-            priority: t.priority,
-            date: t.date,
-            notes: t.notes,
-            obstacle: t.obstacle,
-            evaluation: t.evaluation,
-            conclusion: t.conclusion,
-            workResultUrl: t.work_result_url,
-            workResultTitle: t.work_result_title,
-            attachments: Array.isArray(t.attachments) ? t.attachments : []
-          }));
+          const localTasks = Array.isArray(this.tasks) ? [...this.tasks] : [];
+          let hasNewFromDb = false;
+
+          dbTasks.forEach(dbT => {
+            const existsLocally = localTasks.find(lt => lt.id === dbT.id);
+            if (!existsLocally) {
+              localTasks.push({
+                id: dbT.id,
+                title: dbT.title || '',
+                category: (dbT.category || 'OUTPUT').toUpperCase(),
+                completed: Boolean(dbT.is_completed !== undefined ? dbT.is_completed : dbT.completed),
+                estimatedHours: Number(dbT.estimated_hours) || 1.0,
+                priority: (dbT.priority || 'MEDIUM').toUpperCase(),
+                date: dbT.due_date || dbT.date || new Date().toISOString().split('T')[0],
+                notes: dbT.description !== undefined ? dbT.description : (dbT.notes || ''),
+                obstacle: dbT.obstacle || '',
+                evaluation: dbT.evaluation || '',
+                conclusion: dbT.conclusion || '',
+                workResultUrl: dbT.work_result_url || '',
+                workResultTitle: dbT.work_result_title || '',
+                attachments: Array.isArray(dbT.attachments) ? dbT.attachments : []
+              });
+              hasNewFromDb = true;
+            }
+          });
+
+          this.tasks = sortTasksChronologically(localTasks);
+          if (hasNewFromDb) {
+            this.saveToStorage();
+          }
         }
 
         // 3. Fetch Campaigns
@@ -615,12 +648,13 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       const task = this.tasks.find(t => t.id === taskId);
       if (task) {
         task.completed = !task.completed;
+        this.tasks = sortTasksChronologically(this.tasks);
         this.saveToStorage();
 
         // Sync to Supabase if connected
         const client = this.getSupabaseClient();
         if (client) {
-          client.from('tasks').update({ completed: task.completed }).eq('id', taskId).then();
+          client.from('tasks').update({ is_completed: task.completed }).eq('id', taskId).then();
         }
 
         return task.completed;
@@ -628,23 +662,30 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       return false;
     },
 
-    completeTaskWithEvaluation(taskId, { obstacle = '', evaluation = '', conclusion = '' } = {}) {
+    completeTaskWithEvaluation(taskId, { obstacle = '', evaluation = '', conclusion = '', workResultUrl = '', workResultTitle = '', attachments = null } = {}) {
       const task = this.tasks.find(t => t.id === taskId);
       if (task) {
         task.completed = true;
-        if (obstacle) task.obstacle = obstacle;
-        if (evaluation) task.evaluation = evaluation;
-        if (conclusion) task.conclusion = conclusion;
+        if (obstacle !== undefined && obstacle !== null) task.obstacle = obstacle;
+        if (evaluation !== undefined && evaluation !== null) task.evaluation = evaluation;
+        if (conclusion !== undefined && conclusion !== null) task.conclusion = conclusion;
+        if (workResultUrl) task.workResultUrl = workResultUrl;
+        if (workResultTitle) task.workResultTitle = workResultTitle;
+        if (attachments && Array.isArray(attachments)) task.attachments = attachments;
+        this.tasks = sortTasksChronologically(this.tasks);
         this.saveToStorage();
 
         // Sync to Supabase if connected
         const client = this.getSupabaseClient();
         if (client) {
           client.from('tasks').update({
-            completed: true,
+            is_completed: true,
             obstacle: task.obstacle || null,
             evaluation: task.evaluation || null,
-            conclusion: task.conclusion || null
+            conclusion: task.conclusion || null,
+            work_result_url: task.workResultUrl || null,
+            work_result_title: task.workResultTitle || null,
+            attachments: Array.isArray(task.attachments) ? task.attachments : []
           }).eq('id', taskId).then();
         }
 
@@ -663,28 +704,42 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
     addTask(taskData) {
       const newTask = {
         id: 'task-' + Date.now(),
-        date: new Date().toISOString().split('T')[0],
+        date: taskData.date || new Date().toISOString().split('T')[0],
         completed: false,
         estimatedHours: 1.0,
         priority: 'MEDIUM',
         category: 'OUTPUT',
         notes: '',
+        obstacle: '',
+        evaluation: '',
+        conclusion: '',
+        workResultUrl: '',
+        workResultTitle: '',
+        attachments: [],
         ...taskData
       };
-      this.tasks.unshift(newTask);
+      this.tasks.push(newTask);
+      this.tasks = sortTasksChronologically(this.tasks);
       this.saveToStorage();
 
       // Sync to Supabase if connected
       const client = this.getSupabaseClient();
       if (client) {
         client.from('tasks').insert({
+          id: newTask.id,
           title: newTask.title,
-          category: newTask.category,
-          completed: newTask.completed,
+          category: String(newTask.category).toLowerCase(),
+          is_completed: newTask.completed,
           estimated_hours: newTask.estimatedHours,
-          priority: newTask.priority,
-          date: newTask.date,
-          notes: newTask.notes
+          priority: String(newTask.priority).toLowerCase(),
+          due_date: newTask.date,
+          description: newTask.notes,
+          obstacle: newTask.obstacle || null,
+          evaluation: newTask.evaluation || null,
+          conclusion: newTask.conclusion || null,
+          work_result_url: newTask.workResultUrl || null,
+          work_result_title: newTask.workResultTitle || null,
+          attachments: Array.isArray(newTask.attachments) ? newTask.attachments : []
         }).then();
       }
 
@@ -694,18 +749,32 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
     updateTask(taskId, updates) {
       const idx = this.tasks.findIndex(t => t.id === taskId);
       if (idx !== -1) {
-        this.tasks[idx] = { ...this.tasks[idx], ...updates };
+        const existing = this.tasks[idx];
+        this.tasks[idx] = {
+          ...existing,
+          ...updates,
+          attachments: updates.attachments !== undefined ? updates.attachments : (existing.attachments || [])
+        };
+        this.tasks = sortTasksChronologically(this.tasks);
         this.saveToStorage();
 
         const client = this.getSupabaseClient();
         if (client) {
+          const t = this.tasks[idx];
           client.from('tasks').update({
-            title: this.tasks[idx].title,
-            category: this.tasks[idx].category,
-            completed: this.tasks[idx].completed,
-            estimated_hours: this.tasks[idx].estimatedHours,
-            priority: this.tasks[idx].priority,
-            notes: this.tasks[idx].notes
+            title: t.title,
+            category: String(t.category).toLowerCase(),
+            is_completed: Boolean(t.completed),
+            estimated_hours: t.estimatedHours,
+            priority: String(t.priority).toLowerCase(),
+            due_date: t.date,
+            description: t.notes,
+            obstacle: t.obstacle || null,
+            evaluation: t.evaluation || null,
+            conclusion: t.conclusion || null,
+            work_result_url: t.workResultUrl || null,
+            work_result_title: t.workResultTitle || null,
+            attachments: Array.isArray(t.attachments) ? t.attachments : []
           }).eq('id', taskId).then();
         }
       }

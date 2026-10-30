@@ -546,7 +546,7 @@ function handleWorkDaysChange() {
 }
 
 const filteredTasks = computed(() => {
-  return store.tasks.filter(t => {
+  const list = store.tasks.filter(t => {
     // 1. Filter Category
     if (selectedCategory.value !== 'ALL' && t.category !== selectedCategory.value) {
       return false;
@@ -566,6 +566,18 @@ const filteredTasks = computed(() => {
     }
 
     return true;
+  });
+
+  // Urutkan selalu secara kronologis dari tanggal 1 hingga 30/31 (Ascending)
+  return list.sort((a, b) => {
+    const rawDateA = a.date || a.due_date || '';
+    const rawDateB = b.date || b.due_date || '';
+    const dateA = String(rawDateA).split('T')[0];
+    const dateB = String(rawDateB).split('T')[0];
+    if (dateA !== dateB) {
+      return dateA.localeCompare(dateB);
+    }
+    return String(a.id || '').localeCompare(String(b.id || ''));
   });
 });
 

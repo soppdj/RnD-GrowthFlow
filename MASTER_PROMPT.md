@@ -94,6 +94,13 @@
 3. **Modal Evaluasi Tugas (Complete Task Modal):**
    - Saat menandai tugas selesai, pengguna mengisi 5 poin refleksi riset: Temuan Lapangan, Kendala, Solusi, Tindak Lanjut, dan Tautan Bukti Kerja.
 4. **Agenda & Roadmap Milestone:** Pelacakan tenggat waktu target bertingkat Mingguan, Bulanan, dan Kuartalan.
+5. **Urutan Kronologis Baku Jurnal (Tanggal 1 s/d 30/31):**
+   - Seluruh daftar tugas/jurnal disusun secara kronologis dari tanggal awal hingga akhir bulan (1 s/d 30/31) dalam urutan ascending, sehingga tampilan jurnal tersusun rapi dan tidak acak-acakan.
+   - Tugas tanggal yang lebih awal (misal 14 Okt) secara konsisten tampil sebelum tanggal berikutnya (misal 15 Okt), baik pada filter `Semua` maupun filter per minggu (`Minggu 1` s/d `Minggu 5`).
+6. **Integritas & Persistensi Data (Zero Data Loss on Update):**
+   - Data jurnal yang sudah ada di lokal (`localStorage`) dijamin tidak berubah, tidak ter-reset, dan tidak tertimpa oleh data contoh (*mockData*) saat aplikasi di-refresh atau diperbarui.
+   - Pembaruan tugas (*edit task*) mempertahankan seluruh catatan refleksi riset (kendala, evaluasi, kesimpulan, lampiran link/dokumen hasil kerja).
+   - Sinkronisasi dengan Supabase menggunakan mekanisme penggabungan (*merge*) aman yang memprioritaskan integritas data kerja pengguna.
 
 ### C. Ad Lab (Meta Ads Growth Hacking & Evaluator SOP)
 1. **Papan Kanban 3-Stage Pipeline:**
