@@ -131,21 +131,47 @@ export const LOGFRAME_TYPES = {
  * Calculates calendar week of the month according to explicit user rule:
  * Tanggal 1 (hari apapun itu) sampai hari Minggu (tanggal berapa pun) adalah Minggu 1,
  * dan seterusnya untuk Minggu 2 dan lainnya (Senin s/d Minggu berikutnya).
+ *
+ * Catatan penting: Jika tanggal 1 adalah hari Minggu (seperti November 2026),
+ * minggu 1 berlanjut hingga hari Minggu berikutnya (tanggal 8) agar minggu kerja
+ * pertama tetap memiliki hari kerja efektif, sehingga tanggal 2-8 (termasuk tanggal 5)
+ * tetap terhitung secara benar sebagai Minggu 1 (bukan prematur melompat ke Minggu 2).
  */
 export function getWeekOfMonth(dateStr) {
   if (!dateStr) return 1;
-  const d = new Date(dateStr);
-  const year = d.getFullYear();
-  const month = d.getMonth();
-  const day = d.getDate();
+  let year, month, day;
+  if (typeof dateStr === 'string') {
+    const parts = dateStr.split('T')[0].split('-');
+    if (parts.length >= 3) {
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10) - 1;
+      day = parseInt(parts[2], 10);
+    } else {
+      const d = new Date(dateStr);
+      year = d.getFullYear();
+      month = d.getMonth();
+      day = d.getDate();
+    }
+  } else if (dateStr instanceof Date) {
+    year = dateStr.getFullYear();
+    month = dateStr.getMonth();
+    day = dateStr.getDate();
+  } else {
+    const d = new Date(dateStr);
+    year = d.getFullYear();
+    month = d.getMonth();
+    day = d.getDate();
+  }
+
   if (isNaN(day)) return 1;
 
-  // Cari tanggal hari Minggu (Sunday, getDay() === 0) pertama di bulan tersebut
-  let firstSunday = 1;
+  // Cari tanggal hari Minggu pertama yang menutup siklus Minggu 1
+  let firstSunday = 7;
   for (let i = 1; i <= 7; i++) {
     const testD = new Date(year, month, i);
     if (testD.getDay() === 0) { // 0 = Minggu
-      firstSunday = i;
+      // Jika tanggal 1 itu sendiri hari Minggu, Minggu 1 berlanjut ke hari Minggu tanggal 8
+      firstSunday = (i === 1) ? 8 : i;
       break;
     }
   }

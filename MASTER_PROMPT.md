@@ -90,11 +90,14 @@
 2. **Logika Perhitungan Minggu Kalender (Aturan Baku):**
    - Perhitungan minggu kalender (`getWeekOfMonth`): **Tanggal 1 (hari apapun itu) sampai hari Minggu pertama (tanggal berapa pun) adalah Minggu 1.**
    - Hari Senin berikutnya sampai hari Minggu berikutnya adalah **Minggu 2**, dan seterusnya untuk **Minggu 3**, **Minggu 4**, dan **Minggu 5**.
-   - Contoh nyata: Jika tanggal 1 jatuh pada hari Kamis, maka tanggal 1 (Kamis) s/d 4 (Minggu) adalah Minggu 1; tanggal 5 (Senin) s/d 11 (Minggu) adalah Minggu 2; tanggal 12 (Senin) s/d 18 (Minggu) adalah Minggu 3; tanggal 19 (Senin) s/d 25 (Minggu) adalah Minggu 4; dan tanggal 26 s/d 31 adalah Minggu 5.
-3. **Filter Minggu, Real-Time Active Week Indicator & Pengaturan Hari Kerja:**
+   - **Ketentuan Awal Bulan Hari Minggu:** Jika tanggal 1 jatuh pada hari Minggu (seperti November 2026), siklus Minggu 1 berlanjut hingga hari Minggu berikutnya (tanggal 8) agar minggu kerja pertama memiliki hari kerja efektif, sehingga tanggal 2 s/d 8 (termasuk tanggal 5) terhitung secara akurat sebagai **Minggu 1** (tidak prematur melompat ke Minggu 2).
+   - Contoh nyata Oktober 2026: Tanggal 1 jatuh pada hari Kamis, maka tanggal 1 (Kamis) s/d 4 (Minggu) adalah Minggu 1; tanggal 5 (Senin) s/d 11 (Minggu) adalah Minggu 2; tanggal 12 (Senin) s/d 18 (Minggu) adalah Minggu 3; tanggal 19 (Senin) s/d 25 (Minggu) adalah Minggu 4; dan tanggal 26 s/d 31 adalah Minggu 5.
+3. **Pilihan Bulan Jurnal & Filter Minggu Kerja:**
+   - **Dropdown Pemilih Bulan Jurnal:** Disediakan dropdown pilihan bulan (`selectedJournalMonth`) tepat di samping tombol `+ Tambah Task Jurnal` (`Bulan Berjalan`, bulan spesifik, dan `Semua Bulan`). Counter capaian (`X/Y Selesai`) otomatis menyesuaikan dengan bulan yang dipilih.
    - Filter minggu ramping 1 baris tanpa label teks "MINGGU:": `[Semua] [Minggu 1] [Minggu 2] [Minggu 3] [Minggu 4] [Minggu 5]`.
    - **Indikator Minggu Berjalan Real-Time:** Tab minggu kalender berjalan otomatis mendapatkan penanda visual aktif (border hijau emerald bercahaya, pulsing live dot, dan badge `LIVE`) yang berpindah dinamis mengikuti tanggal sistem hari ini.
    - Input hari kerja manual ringkas: `Hari Kerja: [ 3 ] Hari/Minggu` (fleksibel 1 - 7 hari).
+   - Dilengkapi tampilan status kosong (*empty state*) yang informatif jika filter bulan/minggu belum memiliki daftar task.
 4. **Modal Evaluasi Tugas (Complete Task Modal):**
    - Saat menandai tugas selesai, pengguna mengisi 5 poin refleksi riset: Temuan Lapangan, Kendala, Solusi, Tindak Lanjut, dan Tautan Bukti Kerja.
 5. **Agenda & Roadmap Milestone (Pilihan Bulan & Penyembunyian Agenda Lampau):**

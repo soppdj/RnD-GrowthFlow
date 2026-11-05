@@ -14,7 +14,22 @@
         </p>
       </div>
 
-      <div class="flex items-center gap-2 flex-wrap">
+      <div class="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap sm:flex-nowrap">
+        <!-- Dropdown Pilihan Bulan Jurnal (Sesuai Referensi Gambar: "Isi dengan bulan") -->
+        <select
+          v-model="selectedJournalMonth"
+          class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-bold text-teal-900 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
+          title="Pilih Bulan Jurnal"
+        >
+          <option value="CURRENT">Bulan Berjalan ({{ currentMonthName }})</option>
+          <option value="2026-11">November 2026</option>
+          <option value="2026-10">Oktober 2026</option>
+          <option value="2026-09">September 2026</option>
+          <option value="2026-08">Agustus 2026</option>
+          <option value="2026-12">Desember 2026</option>
+          <option value="ALL">Semua Bulan</option>
+        </select>
+
         <button
           @click="openCreateModal"
           class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 cursor-pointer"
@@ -132,6 +147,18 @@
 
     <!-- Tasks Checklist Grid -->
     <div class="space-y-3">
+      <!-- Empty State if no tasks match selected month/week filter -->
+      <div
+        v-if="filteredTasks.length === 0"
+        class="glass-card rounded-2xl p-8 text-center border border-dashed border-teal-200 bg-white/80 shadow-micro space-y-2"
+      >
+        <Calendar class="w-8 h-8 text-teal-500 mx-auto opacity-70" />
+        <p class="text-sm font-bold text-slate-700">Tidak ada task jurnal untuk periode ini</p>
+        <p class="text-xs text-slate-500 max-w-md mx-auto">
+          Belum ada aktivitas yang dicatat pada filter bulan/minggu ini. Pilih filter bulan lain atau klik "+ Tambah Task Jurnal" untuk membuat task baru.
+        </p>
+      </div>
+
       <div
         v-for="task in filteredTasks"
         :key="task.id"
@@ -508,8 +535,18 @@ const { triggerConfetti } = useConfetti();
 
 const selectedCategory = ref('ALL');
 const selectedWeek = ref('ALL');
+const selectedJournalMonth = ref('CURRENT');
 const customDateFilter = ref('');
 const workDaysPerWeek = ref(store.profile?.workDaysPerWeek || 5);
+
+const monthNames = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+const currentMonthName = computed(() => {
+  const now = new Date();
+  return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+});
 
 const showPastLogs = ref(false);
 const logSavedToast = ref(false);
@@ -545,8 +582,27 @@ function handleWorkDaysChange() {
   store.setWorkDaysPerWeek(Number(workDaysPerWeek.value));
 }
 
+// Tasks yang termasuk dalam bulan yang dipilih
+const monthTasks = computed(() => {
+  return store.tasks.filter(t => {
+    const rawDate = t.date || t.due_date || '';
+    const taskDate = String(rawDate).split('T')[0];
+    if (selectedJournalMonth.value === 'CURRENT') {
+      const now = new Date();
+      const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      return taskDate.startsWith(currentYM);
+    } else if (selectedJournalMonth.value !== 'ALL') {
+      return taskDate.startsWith(selectedJournalMonth.value);
+    }
+    return true;
+  });
+});
+
 const filteredTasks = computed(() => {
-  const list = store.tasks.filter(t => {
+  const list = monthTasks.value.filter(t => {
+    const rawDate = t.date || t.due_date || '';
+    const taskDate = String(rawDate).split('T')[0];
+
     // 1. Filter Category
     if (selectedCategory.value !== 'ALL' && t.category !== selectedCategory.value) {
       return false;
@@ -554,12 +610,12 @@ const filteredTasks = computed(() => {
 
     // 2. Filter Custom Date if active
     if (customDateFilter.value) {
-      return t.date === customDateFilter.value;
+      return taskDate === customDateFilter.value;
     }
 
     // 3. Filter Week of Month
     if (selectedWeek.value !== 'ALL') {
-      const taskWeek = getWeekOfMonth(t.date);
+      const taskWeek = getWeekOfMonth(taskDate);
       if (String(taskWeek) !== String(selectedWeek.value)) {
         return false;
       }
@@ -581,8 +637,8 @@ const filteredTasks = computed(() => {
   });
 });
 
-const completedCount = computed(() => store.tasks.filter(t => t.completed).length);
-const totalCount = computed(() => store.tasks.length);
+const completedCount = computed(() => monthTasks.value.filter(t => t.completed).length);
+const totalCount = computed(() => monthTasks.value.length);
 
 function getLogFrameBadgeClass(category) {
   const info = LOGFRAME_TYPES[category] || LOGFRAME_TYPES.OUTPUT;
