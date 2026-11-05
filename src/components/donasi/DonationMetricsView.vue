@@ -14,13 +14,30 @@
         </p>
       </div>
 
-      <button
-        @click="openCreateModal"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 self-start sm:self-auto"
-      >
-        <Plus class="w-4 h-4" />
-        <span>Tambah Program Donasi</span>
-      </button>
+      <div class="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap sm:flex-nowrap">
+        <!-- Dropdown Pilihan Bulan Donasi -->
+        <select
+          v-model="store.selectedDonationMonth"
+          class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-bold text-teal-900 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
+          title="Pilih Bulan Monitoring Donasi"
+        >
+          <option value="current">Bulan Ini ({{ currentMonthName }})</option>
+          <option value="2026-11">November 2026</option>
+          <option value="2026-10">Oktober 2026</option>
+          <option value="2026-09">September 2026</option>
+          <option value="2026-08">Agustus 2026</option>
+          <option value="2026-12">Desember 2026</option>
+          <option value="all">Semua Bulan (Akumulasi)</option>
+        </select>
+
+        <button
+          @click="openCreateModal"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 cursor-pointer"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Tambah Program Donasi</span>
+        </button>
+      </div>
     </div>
 
     <!-- 4 RINGKASAN METRIK KARTU ATAS (PERSIS SEPERTI GAMBAR 1) -->
@@ -106,14 +123,17 @@
     <!-- RINCIAN TABEL PROGRES PENGHIMPUNAN DONASI (PERSIS SEPERTI GAMBAR 2) -->
     <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-soft border border-teal-100 bg-white/95 overflow-hidden">
       <!-- Table Header -->
-      <div class="flex items-center justify-between mb-4 pb-2 border-b border-teal-100/60">
-        <div class="flex items-center gap-2.5">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-teal-100/60 flex-wrap gap-2">
+        <div class="flex items-center gap-2.5 flex-wrap">
           <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-micro">
             <Receipt class="w-4 h-4 text-teal-700" />
           </div>
           <h3 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight">
             Rincian Tabel Progres Penghimpunan Donasi
           </h3>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold border border-teal-200 shadow-micro">
+            {{ store.donationMonthLabel }}
+          </span>
         </div>
 
         <span class="text-xs text-slate-400 font-medium hidden sm:inline-block">
@@ -270,6 +290,15 @@ import {
 } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
+
+const monthNames = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+const currentMonthName = computed(() => {
+  const now = new Date();
+  return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+});
 
 const isModalOpen = ref(false);
 const editingProgram = ref(null);

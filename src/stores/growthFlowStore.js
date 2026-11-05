@@ -168,6 +168,7 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
           activeTab: 'dashboard',
           currentDate: new Date().toISOString(),
           filterPeriod: 'q4-2026',
+          selectedDonationMonth: 'current',
           searchQuery: '',
           isOffline: !navigator.onLine
         };
@@ -188,12 +189,32 @@ export const useGrowthFlowStore = defineStore('growthFlow', {
       activeTab: 'dashboard',
       currentDate: new Date().toISOString(),
       filterPeriod: 'q4-2026',
+      selectedDonationMonth: 'current',
       searchQuery: '',
       isOffline: !navigator.onLine
     };
   },
 
   getters: {
+    donationMonthLabel: (state) => {
+      const now = new Date();
+      const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      if (!state.selectedDonationMonth || state.selectedDonationMonth === 'current') {
+        return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+      }
+      if (state.selectedDonationMonth === 'all') {
+        return 'Semua Bulan (Akumulasi)';
+      }
+      const [year, month] = state.selectedDonationMonth.split('-');
+      if (year && month) {
+        const mIdx = parseInt(month, 10) - 1;
+        return `${monthNames[mIdx] || month} ${year}`;
+      }
+      return state.selectedDonationMonth;
+    },
     // Overall KPI Summary
     kpiSummary(state) {
       const totalAdSpend = state.donationPrograms.reduce((sum, p) => sum + (Number(p.adSpend) || 0), 0);

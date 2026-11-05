@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
         <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-          <span>Agenda & Target Roadmap</span>
+          <span>Agenda &amp; Target Roadmap</span>
           <span class="text-xs px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 font-semibold border border-teal-200">
             Diurutkan Deadline Terdekat
           </span>
@@ -13,17 +13,45 @@
         </p>
       </div>
 
-      <button
-        @click="openModal"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 self-start sm:self-auto"
-      >
-        <Plus class="w-4 h-4" />
-        <span>Tambah Milestone</span>
-      </button>
+      <div class="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap sm:flex-nowrap">
+        <!-- Dropdown Keterangan Bulan Agenda & Roadmap -->
+        <select
+          v-model="selectedMilestoneMonth"
+          class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-bold text-teal-900 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
+          title="Pilih Keterangan Bulan Agenda"
+        >
+          <option value="CURRENT">Bulan Berjalan ({{ currentMonthName }})</option>
+          <option value="2026-11">November 2026</option>
+          <option value="2026-10">Oktober 2026</option>
+          <option value="2026-09">September 2026</option>
+          <option value="2026-12">Desember 2026</option>
+          <option value="ALL">Semua Bulan</option>
+        </select>
+
+        <button
+          @click="openModal"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-soft transition-all active:scale-95 shrink-0 cursor-pointer"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Tambah Milestone</span>
+        </button>
+      </div>
     </div>
 
     <!-- Milestones List Sorted by Nearest Deadline -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Empty State if no milestones match selected month filter -->
+      <div
+        v-if="sortedMilestones.length === 0"
+        class="col-span-full p-8 text-center rounded-2xl border border-dashed border-teal-200 bg-white/80 shadow-micro space-y-2"
+      >
+        <Calendar class="w-8 h-8 text-teal-500 mx-auto opacity-70" />
+        <p class="text-sm font-bold text-slate-700">Tidak ada agenda milestone untuk bulan ini</p>
+        <p class="text-xs text-slate-500 max-w-md mx-auto">
+          Agenda dari bulan yang sudah lewat tidak ditampilkan pada bulan berjalan. Pilih opsi "Semua Bulan" untuk melihat riwayat atau klik "+ Tambah Milestone" untuk membuat agenda baru.
+        </p>
+      </div>
+
       <div
         v-for="item in sortedMilestones"
         :key="item.id"
@@ -330,6 +358,17 @@ import {
 const store = useGrowthFlowStore();
 const { triggerConfetti } = useConfetti();
 
+const selectedMilestoneMonth = ref('CURRENT');
+
+const monthNames = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+const currentMonthName = computed(() => {
+  const now = new Date();
+  return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+});
+
 const isModalOpen = ref(false);
 
 const isAttachModalOpen = ref(false);
@@ -424,9 +463,33 @@ function handleStatusClick(item, event) {
   }
 }
 
-// Sort strictly by nearest deadline first
+// Sort strictly by nearest deadline first and filter out past months when viewing active month
 const sortedMilestones = computed(() => {
-  return [...store.milestones].sort((a, b) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-indexed
+
+  let list = [...store.milestones];
+
+  if (selectedMilestoneMonth.value === 'CURRENT') {
+    // "Jangan tampilkan Agenda bulan yang sudah lewat di Agenda bulan yang sedang berjalan"
+    list = list.filter(item => {
+      if (!item.deadline) return true;
+      const d = new Date(item.deadline);
+      const itemYear = d.getFullYear();
+      const itemMonth = d.getMonth();
+      if (itemYear < currentYear) return false;
+      if (itemYear === currentYear && itemMonth < currentMonth) return false;
+      return true;
+    });
+  } else if (selectedMilestoneMonth.value !== 'ALL') {
+    list = list.filter(item => {
+      if (!item.deadline) return false;
+      return item.deadline.startsWith(selectedMilestoneMonth.value);
+    });
+  }
+
+  return list.sort((a, b) => {
     return new Date(a.deadline) - new Date(b.deadline);
   });
 });

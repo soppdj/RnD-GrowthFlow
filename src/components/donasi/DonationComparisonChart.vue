@@ -3,13 +3,16 @@
     <!-- Chart Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-2">
       <!-- Title Badge -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2.5 flex-wrap">
         <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-micro">
           <BarChart2 class="w-4 h-4 text-teal-700" />
         </div>
         <h3 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight">
           Grafik Progres Penghimpunan Donasi
         </h3>
+        <span class="text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold border border-teal-200 shadow-micro">
+          {{ store.donationMonthLabel }}
+        </span>
       </div>
 
       <!-- Unit Info & Legend -->

@@ -87,17 +87,25 @@
    - **OUTCOME:** Hasil perubahan perilaku dan akuisisi donatur baru.
    - **OUTPUT:** Deliverables fisik hasil riset (halaman landing, materi iklan, SOP).
    - **ACTIVITY:** Rincian aksi harian eksekusi operasional.
-2. **Filter Minggu, Real-Time Active Week Indicator & Pengaturan Hari Kerja:**
+2. **Logika Perhitungan Minggu Kalender (Aturan Baku):**
+   - Perhitungan minggu kalender (`getWeekOfMonth`): **Tanggal 1 (hari apapun itu) sampai hari Minggu pertama (tanggal berapa pun) adalah Minggu 1.**
+   - Hari Senin berikutnya sampai hari Minggu berikutnya adalah **Minggu 2**, dan seterusnya untuk **Minggu 3**, **Minggu 4**, dan **Minggu 5**.
+   - Contoh nyata: Jika tanggal 1 jatuh pada hari Kamis, maka tanggal 1 (Kamis) s/d 4 (Minggu) adalah Minggu 1; tanggal 5 (Senin) s/d 11 (Minggu) adalah Minggu 2; tanggal 12 (Senin) s/d 18 (Minggu) adalah Minggu 3; tanggal 19 (Senin) s/d 25 (Minggu) adalah Minggu 4; dan tanggal 26 s/d 31 adalah Minggu 5.
+3. **Filter Minggu, Real-Time Active Week Indicator & Pengaturan Hari Kerja:**
    - Filter minggu ramping 1 baris tanpa label teks "MINGGU:": `[Semua] [Minggu 1] [Minggu 2] [Minggu 3] [Minggu 4] [Minggu 5]`.
    - **Indikator Minggu Berjalan Real-Time:** Tab minggu kalender berjalan otomatis mendapatkan penanda visual aktif (border hijau emerald bercahaya, pulsing live dot, dan badge `LIVE`) yang berpindah dinamis mengikuti tanggal sistem hari ini.
    - Input hari kerja manual ringkas: `Hari Kerja: [ 3 ] Hari/Minggu` (fleksibel 1 - 7 hari).
-3. **Modal Evaluasi Tugas (Complete Task Modal):**
+4. **Modal Evaluasi Tugas (Complete Task Modal):**
    - Saat menandai tugas selesai, pengguna mengisi 5 poin refleksi riset: Temuan Lapangan, Kendala, Solusi, Tindak Lanjut, dan Tautan Bukti Kerja.
-4. **Agenda & Roadmap Milestone:** Pelacakan tenggat waktu target bertingkat Mingguan, Bulanan, dan Kuartalan.
-5. **Urutan Kronologis Baku Jurnal (Tanggal 1 s/d 30/31):**
+5. **Agenda & Roadmap Milestone (Pilihan Bulan & Penyembunyian Agenda Lampau):**
+   - **Dropdown Keterangan Bulan:** Disediakan pemilih bulan (`selectedMilestoneMonth`) tepat di sebelah tombol `+ Tambah Milestone`.
+   - **Aturan Penyembunyian Agenda Lampau:** Pada mode bulan berjalan (`CURRENT`), agenda/milestone yang tenggat waktunya telah lewat dari bulan sebelumnya **tidak ditampilkan** pada bulan berjalan (*"Jangan tampilkan Agenda bulan yang sudah lewat di Agenda bulan yang sedang berjalan"*).
+   - Pengguna tetap dapat memilih opsi bulan spesifik (misal `Oktober 2026`) atau `Semua Bulan` untuk meninjau riwayat agenda terdahulu.
+   - Dilengkapi tampilan status kosong (*empty state*) yang rapi jika seluruh agenda pada bulan tersebut telah selesai/berlalu.
+6. **Urutan Kronologis Baku Jurnal (Tanggal 1 s/d 30/31):**
    - Seluruh daftar tugas/jurnal disusun secara kronologis dari tanggal awal hingga akhir bulan (1 s/d 30/31) dalam urutan ascending, sehingga tampilan jurnal tersusun rapi dan tidak acak-acakan.
    - Tugas tanggal yang lebih awal (misal 14 Okt) secara konsisten tampil sebelum tanggal berikutnya (misal 15 Okt), baik pada filter `Semua` maupun filter per minggu (`Minggu 1` s/d `Minggu 5`).
-6. **Integritas & Persistensi Data (Zero Data Loss on Update):**
+7. **Integritas & Persistensi Data (Zero Data Loss on Update):**
    - Data jurnal yang sudah ada di lokal (`localStorage`) dijamin tidak berubah, tidak ter-reset, dan tidak tertimpa oleh data contoh (*mockData*) saat aplikasi di-refresh atau diperbarui.
    - Pembaruan tugas (*edit task*) mempertahankan seluruh catatan refleksi riset (kendala, evaluasi, kesimpulan, lampiran link/dokumen hasil kerja).
    - Sinkronisasi dengan Supabase menggunakan mekanisme penggabungan (*merge*) aman yang memprioritaskan integritas data kerja pengguna.
@@ -131,10 +139,14 @@
 1. **Pemantauan Program Filantropi ZISWAF:**
    - Monitoring realisasi pengumpulan donasi program Zakat, Wakaf, Infaq & Sedekah, Wali Asuh, dan Program Khusus lainnya.
    - Analisis perbandingan antara target donasi, nominal terkumpul (*actual*), persentase capaian realisasi, belanja iklan (*ad spend*), donatur baru, CPR, dan ROI.
-2. **Aturan Urutan Program Donasi (Penambahan Selalu di Bagian Bawah):**
+2. **Pilihan & Keterangan Bulan Donasi:**
+   - **Dropdown Pemilih Bulan:** Disediakan dropdown pilihan bulan di baris atas modul tepat di sebelah tombol `+ Tambah Program Donasi`.
+   - **Badge Keterangan Bulan pada Grafik & Tabel:** Ditambahkan label/badge keterangan bulan terpilih (`store.donationMonthLabel`) pada header kartu **"Grafik Progres Penghimpunan Donasi"** dan pada header kartu **"Rincian Tabel Progres Penghimpunan Donasi"** sehingga periode data terlihat jelas dan konsisten.
+3. **Aturan Urutan Program Donasi (Penambahan Selalu di Bagian Bawah):**
    - Setiap kali ada penambahan program donasi baru (baik melalui modal UI di web, Bot Telegram, maupun sinkronisasi Supabase), program baru **wajib selalu berada di urutan paling bawah** (*bottom-appended*) di bawah program yang sudah ada sebelumnya, bukan di atas.
    - Skema query database Supabase menggunakan `order('created_at', { ascending: true })` dan event realtime listener `INSERT` menggunakan metode `.push(mapped)` (bukan `.unshift`) agar urutan kronologis tetap konsisten terjaga.
    - Tersedia tombol aksi cepat `+ Tambah Program Baru di Bawah Sini` pada baris akhir tabel donasi.
+   - Tidak mengubah, mereset, atau menghapus nominal program donasi yang sudah diinput sebelumnya oleh pengguna.
 
 ### E. Laporan Kinerja Resmi (Format Presisi 1 Lembar A4 & PDF Export)
 - **Header Bersih & Kontrol Bersebelahan:**

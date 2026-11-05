@@ -128,8 +128,9 @@ export const LOGFRAME_TYPES = {
 };
 
 /**
- * Calculates work week of the month (Awal Minggu = Senin, Akhir Minggu = Jumat)
- * Sesuai arahan SOP: Setiap minggu kerja dimulai pada hari Senin dan berakhir pada hari Jumat.
+ * Calculates calendar week of the month according to explicit user rule:
+ * Tanggal 1 (hari apapun itu) sampai hari Minggu (tanggal berapa pun) adalah Minggu 1,
+ * dan seterusnya untuk Minggu 2 dan lainnya (Senin s/d Minggu berikutnya).
  */
 export function getWeekOfMonth(dateStr) {
   if (!dateStr) return 1;
@@ -139,24 +140,24 @@ export function getWeekOfMonth(dateStr) {
   const day = d.getDate();
   if (isNaN(day)) return 1;
 
-  // Cari tanggal hari Senin pertama dalam bulan tersebut
-  let firstMonday = 1;
+  // Cari tanggal hari Minggu (Sunday, getDay() === 0) pertama di bulan tersebut
+  let firstSunday = 1;
   for (let i = 1; i <= 7; i++) {
     const testD = new Date(year, month, i);
-    if (testD.getDay() === 1) { // 1 = Senin
-      firstMonday = i;
+    if (testD.getDay() === 0) { // 0 = Minggu
+      firstSunday = i;
       break;
     }
   }
 
-  // Jika tanggal berada sebelum Senin pertama (awal bulan partial)
-  if (day < firstMonday) {
+  // Tanggal 1 sampai hari Minggu pertama adalah Minggu 1
+  if (day <= firstSunday) {
     return 1;
   }
 
-  const daysSinceFirstMonday = day - firstMonday;
-  const weekOffset = firstMonday === 1 ? 1 : 2;
-  const weekNum = weekOffset + Math.floor(daysSinceFirstMonday / 7);
+  // Hari setelah hari Minggu pertama dibagi per 7 hari
+  const daysAfterFirstSunday = day - firstSunday;
+  const weekNum = 1 + Math.ceil(daysAfterFirstSunday / 7);
   return Math.min(weekNum, 5);
 }
 
