@@ -53,7 +53,7 @@
      - *Jika Benar:* Border dan ring menyala hijau emerald (`ring-emerald-500`), teks alert verifikasi sukses muncul, status otentikasi disimpan ke `localStorage` (`rnd_growthflow_authenticated`), dan modal transisi mulus membuka workspace R&D.
 
 4. **Kebijakan Nol Kebocoran Kredensial (Zero Plaintext Leak):**
-   - Menghapus seluruh teks bocoran PIN publik (seperti "PIN Akses: 000000") dan tombol bypass instan publik dari antarmuka login guna menjamin keamanan dan kerahasiaan operasional riset yayasan.
+   - Menghapus seluruh teks bocoran PIN publik (seperti "PIN Akses: XXXXXXX") dan tombol bypass instan publik dari antarmuka login guna menjamin keamanan dan kerahasiaan operasional riset yayasan.
    - Kredensial PIN dikelola secara tertutup melalui konfigurasi internal terenkripsi dan nomor identitas chat admin resmi.
 
 5. **Kunci Sesi Instan (Lock Session):**
@@ -89,7 +89,7 @@
    - **ACTIVITY:** Rincian aksi harian eksekusi operasional.
 2. **Logika Perhitungan Minggu Kalender (Aturan Baku):**
    - Perhitungan minggu kalender (`getWeekOfMonth`): **Tanggal 1 (hari apapun itu) sampai hari Minggu pertama (tanggal berapa pun) adalah Minggu 1.**
-   - Hari Senin berikutnya sampai hari Minggu berikutnya adalah **Minggu 2**, dan seterusnya untuk **Minggu 3**, **Minggu 4**, dan **Minggu 5**.
+   - Hari Senin berikutnya sampai hari Minggu adalah **Minggu 2**, dan seterusnya untuk **Minggu 3**, **Minggu 4**, dan **Minggu 5**.
    - **Ketentuan Awal Bulan Hari Minggu:** Jika tanggal 1 jatuh pada hari Minggu (seperti November 2026), siklus Minggu 1 berlanjut hingga hari Minggu berikutnya (tanggal 8) agar minggu kerja pertama memiliki hari kerja efektif, sehingga tanggal 2 s/d 8 (termasuk tanggal 5) terhitung secara akurat sebagai **Minggu 1** (tidak prematur melompat ke Minggu 2).
    - Contoh nyata Oktober 2026: Tanggal 1 jatuh pada hari Kamis, maka tanggal 1 (Kamis) s/d 4 (Minggu) adalah Minggu 1; tanggal 5 (Senin) s/d 11 (Minggu) adalah Minggu 2; tanggal 12 (Senin) s/d 18 (Minggu) adalah Minggu 3; tanggal 19 (Senin) s/d 25 (Minggu) adalah Minggu 4; dan tanggal 26 s/d 31 adalah Minggu 5.
 3. **Pilihan Bulan Jurnal & Filter Minggu Kerja:**
