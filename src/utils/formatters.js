@@ -224,3 +224,88 @@ export function formatJournalDate(dateStr) {
   return `${dayName}, ${dateNum} ${monthName} ${year} • Minggu ${weekNum}`;
 }
 
+export const INDONESIAN_MONTHS = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+
+export const INDONESIAN_MONTHS_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+];
+
+/**
+ * Menghitung rentang tanggal presisi untuk setiap minggu (Minggu 1 s/d Minggu 5)
+ * pada bulan dan tahun tertentu berdasarkan siklus kalender baku.
+ */
+export function getMonthWeekRanges(year, monthIndex) {
+  const y = Number(year) || new Date().getFullYear();
+  const m = Number(monthIndex); // 0-indexed
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+  // Cari hari Minggu pertama penutup minggu 1
+  let firstSunday = 7;
+  for (let i = 1; i <= 7; i++) {
+    const testD = new Date(y, m, i);
+    if (testD.getDay() === 0) { // 0 = Minggu
+      firstSunday = (i === 1) ? 8 : i;
+      break;
+    }
+  }
+
+  const weeks = [];
+  const mShort = INDONESIAN_MONTHS_SHORT[m] || 'Bln';
+  const mTwoDigits = String(m + 1).padStart(2, '0');
+
+  // Minggu 1
+  const w1End = Math.min(firstSunday, daysInMonth);
+  weeks.push({
+    weekNum: 1,
+    startDay: 1,
+    endDay: w1End,
+    startDate: `${y}-${mTwoDigits}-01`,
+    endDate: `${y}-${mTwoDigits}-${String(w1End).padStart(2, '0')}`,
+    label: `Minggu 1 (${String(1).padStart(2, '0')} - ${String(w1End).padStart(2, '0')} ${mShort} ${y})`
+  });
+
+  // Minggu 2..5
+  let currentStart = w1End + 1;
+  let weekIdx = 2;
+  while (currentStart <= daysInMonth && weekIdx <= 5) {
+    let currentEnd;
+    if (weekIdx === 5) {
+      currentEnd = daysInMonth;
+    } else {
+      currentEnd = Math.min(currentStart + 6, daysInMonth);
+    }
+
+    weeks.push({
+      weekNum: weekIdx,
+      startDay: currentStart,
+      endDay: currentEnd,
+      startDate: `${y}-${mTwoDigits}-${String(currentStart).padStart(2, '0')}`,
+      endDate: `${y}-${mTwoDigits}-${String(currentEnd).padStart(2, '0')}`,
+      label: `Minggu ${weekIdx} (${String(currentStart).padStart(2, '0')} - ${String(currentEnd).padStart(2, '0')} ${mShort} ${y})`
+    });
+
+    currentStart = currentEnd + 1;
+    weekIdx++;
+  }
+
+  return weeks;
+}
+
+/**
+ * Menghasilkan daftar opsi 12 bulan untuk tahun tertentu
+ */
+export function getYearMonths(year) {
+  const y = Number(year) || new Date().getFullYear();
+  return INDONESIAN_MONTHS.map((name, idx) => ({
+    value: `${y}-${String(idx + 1).padStart(2, '0')}`,
+    label: `${name} ${y}`,
+    year: y,
+    monthIndex: idx,
+    monthName: name
+  }));
+}
+

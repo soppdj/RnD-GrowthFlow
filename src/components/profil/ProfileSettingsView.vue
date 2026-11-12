@@ -20,7 +20,7 @@
         </h3>
       </div>
 
-      <form @submit.prevent="saveProfile" class="space-y-5">
+      <form @submit.prevent="saveProfile" novalidate class="space-y-5">
         <!-- 0. FOTO PROFIL (LANGSUNG ADJUST DI KOTAK FOTO) -->
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-4 rounded-2xl bg-teal-50/40 border border-teal-100">
           <!-- Kotak Foto Interaktif -->

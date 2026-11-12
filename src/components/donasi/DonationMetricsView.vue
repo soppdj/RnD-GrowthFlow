@@ -15,18 +15,16 @@
       </div>
 
       <div class="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap sm:flex-nowrap">
-        <!-- Dropdown Pilihan Bulan Donasi -->
+        <!-- Dropdown Pilihan Bulan Donasi (Dinamis Sesuai Kalender) -->
         <select
           v-model="store.selectedDonationMonth"
           class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-bold text-teal-900 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
           title="Pilih Bulan Monitoring Donasi"
         >
           <option value="current">Bulan Ini ({{ currentMonthName }})</option>
-          <option value="2026-11">November 2026</option>
-          <option value="2026-10">Oktober 2026</option>
-          <option value="2026-09">September 2026</option>
-          <option value="2026-08">Agustus 2026</option>
-          <option value="2026-12">Desember 2026</option>
+          <option v-for="m in calendarMonthOptions" :key="m.value" :value="m.value">
+            {{ m.label }}
+          </option>
           <option value="all">Semua Bulan (Akumulasi)</option>
         </select>
 
@@ -275,7 +273,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
-import { formatCurrency } from '@/utils/formatters';
+import { formatCurrency, INDONESIAN_MONTHS, getYearMonths } from '@/utils/formatters';
 import DonationComparisonChart from './DonationComparisonChart.vue';
 import DonationProgramModal from './DonationProgramModal.vue';
 import {
@@ -291,13 +289,26 @@ import {
 
 const store = useGrowthFlowStore();
 
-const monthNames = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-];
+const now = new Date();
 const currentMonthName = computed(() => {
-  const now = new Date();
-  return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  return `${INDONESIAN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+});
+
+// Opsi bulan kalender dinamis (12 bulan tahun berjalan +/- 1 tahun)
+const calendarMonthOptions = computed(() => {
+  const currentYear = now.getFullYear();
+  const years = [currentYear - 1, currentYear, currentYear + 1];
+  const list = [];
+  years.forEach(yr => {
+    const months = getYearMonths(yr);
+    months.forEach(m => {
+      list.push({
+        value: m.value,
+        label: m.label
+      });
+    });
+  });
+  return list;
 });
 
 const isModalOpen = ref(false);

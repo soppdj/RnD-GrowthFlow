@@ -14,19 +14,37 @@
       </div>
 
       <div class="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap sm:flex-nowrap">
-        <!-- Dropdown Keterangan Bulan Agenda & Roadmap -->
-        <select
-          v-model="selectedMilestoneMonth"
-          class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-bold text-teal-900 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
-          title="Pilih Keterangan Bulan Agenda"
-        >
-          <option value="CURRENT">Bulan Berjalan ({{ currentMonthName }})</option>
-          <option value="2026-11">November 2026</option>
-          <option value="2026-10">Oktober 2026</option>
-          <option value="2026-09">September 2026</option>
-          <option value="2026-12">Desember 2026</option>
-          <option value="ALL">Semua Bulan</option>
-        </select>
+        <!-- Kalender Cepat: Navigasi Bulan & Tahun Agenda (< [Bulan Tahun] >) -->
+        <div class="flex items-center bg-white border border-teal-200 rounded-xl shadow-micro overflow-hidden text-xs">
+          <button
+            @click="prevMonth"
+            type="button"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-r border-teal-100 font-bold"
+            title="Bulan Sebelumnya"
+          >
+            &larr;
+          </button>
+          
+          <select
+            v-model="selectedMilestoneMonth"
+            @change="handleMonthChange"
+            class="px-2.5 py-2 font-bold text-teal-900 bg-transparent outline-none cursor-pointer text-xs"
+            title="Pilih Keterangan Bulan Agenda"
+          >
+            <option v-for="m in calendarMonthOptions" :key="m.value" :value="m.value">
+              {{ m.label }}
+            </option>
+          </select>
+
+          <button
+            @click="nextMonth"
+            type="button"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-l border-teal-100 font-bold"
+            title="Bulan Berikutnya"
+          >
+            &rarr;
+          </button>
+        </div>
 
         <button
           @click="openModal"
@@ -337,7 +355,12 @@
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
 import { useConfetti } from '@/composables/useConfetti';
-import { formatDate, LOGFRAME_TYPES } from '@/utils/formatters';
+import {
+  formatDate,
+  LOGFRAME_TYPES,
+  INDONESIAN_MONTHS,
+  getYearMonths
+} from '@/utils/formatters';
 import AttachLinkModal from './AttachLinkModal.vue';
 import CompleteMilestoneEvaluationModal from './CompleteMilestoneEvaluationModal.vue';
 import {
@@ -358,16 +381,81 @@ import {
 const store = useGrowthFlowStore();
 const { triggerConfetti } = useConfetti();
 
+const now = new Date();
+const activeYear = ref(now.getFullYear());
+const activeMonth = ref(now.getMonth()); // 0-indexed
+
 const selectedMilestoneMonth = ref('CURRENT');
 
-const monthNames = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-];
 const currentMonthName = computed(() => {
-  const now = new Date();
-  return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  return `${INDONESIAN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 });
+
+// Opsi pilihan bulan kalender dinamis
+const calendarMonthOptions = computed(() => {
+  const options = [
+    { value: 'CURRENT', label: `Bulan Berjalan (${currentMonthName.value})` }
+  ];
+
+  const yearsToGenerate = [activeYear.value - 1, activeYear.value, activeYear.value + 1];
+  const uniqueYears = [...new Set(yearsToGenerate)].sort();
+
+  uniqueYears.forEach(yr => {
+    const months = getYearMonths(yr);
+    months.forEach(m => {
+      options.push({
+        value: m.value,
+        label: m.label
+      });
+    });
+  });
+
+  options.push({ value: 'ALL', label: 'Semua Bulan (Semua Tahun)' });
+  return options;
+});
+
+function syncSelectedMonth() {
+  if (activeYear.value === now.getFullYear() && activeMonth.value === now.getMonth()) {
+    selectedMilestoneMonth.value = 'CURRENT';
+  } else {
+    selectedMilestoneMonth.value = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}`;
+  }
+}
+
+function handleMonthChange() {
+  if (selectedMilestoneMonth.value === 'CURRENT') {
+    activeYear.value = now.getFullYear();
+    activeMonth.value = now.getMonth();
+  } else if (selectedMilestoneMonth.value === 'ALL') {
+    // Biarkan activeYear dan activeMonth
+  } else if (selectedMilestoneMonth.value) {
+    const parts = selectedMilestoneMonth.value.split('-');
+    if (parts.length >= 2) {
+      activeYear.value = parseInt(parts[0], 10);
+      activeMonth.value = parseInt(parts[1], 10) - 1;
+    }
+  }
+}
+
+function prevMonth() {
+  if (activeMonth.value === 0) {
+    activeMonth.value = 11;
+    activeYear.value -= 1;
+  } else {
+    activeMonth.value -= 1;
+  }
+  syncSelectedMonth();
+}
+
+function nextMonth() {
+  if (activeMonth.value === 11) {
+    activeMonth.value = 0;
+    activeYear.value += 1;
+  } else {
+    activeMonth.value += 1;
+  }
+  syncSelectedMonth();
+}
 
 const isModalOpen = ref(false);
 

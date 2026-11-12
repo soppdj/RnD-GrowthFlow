@@ -9,46 +9,76 @@
         </h2>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-nowrap">
-        <!-- Opsi Filter Periode: Mingguan (W1-W5), Bulanan, Custom Tanggal -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+        <!-- Kalender Cepat: Navigasi Bulan & Tahun (< [Bulan Tahun] >) -->
+        <div class="flex items-center bg-white border border-teal-200 rounded-xl shadow-micro overflow-hidden text-xs">
+          <button
+            @click="prevMonth"
+            type="button"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-r border-teal-100 font-bold"
+            title="Bulan Sebelumnya"
+          >
+            &larr;
+          </button>
+          
+          <select
+            v-model="activeMonthYearKey"
+            @change="handleMonthYearChange"
+            class="px-2.5 py-2 font-bold text-teal-900 bg-transparent outline-none cursor-pointer text-xs"
+            title="Pilih Bulan &amp; Tahun Kalender"
+          >
+            <option v-for="m in calendarMonthOptions" :key="m.value" :value="m.value">
+              {{ m.label }}
+            </option>
+          </select>
+
+          <button
+            @click="nextMonth"
+            type="button"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-l border-teal-100 font-bold"
+            title="Bulan Berikutnya"
+          >
+            &rarr;
+          </button>
+        </div>
+
+        <!-- Dropdown Filter Periode Laporan (Dinamis Sesuai Kalender) -->
         <select
           v-model="selectedPeriod"
           class="px-3 py-2 rounded-xl border border-teal-200 bg-white text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro shrink-0"
         >
-          <optgroup label="Laporan Mingguan">
-            <option value="w-1">Minggu 1 (01 - 02 Okt 2026)</option>
-            <option value="w-2">Minggu 2 (05 - 09 Okt 2026)</option>
-            <option value="w-3">Minggu 3 (12 - 16 Okt 2026)</option>
-            <option value="w-4">Minggu 4 (19 - 23 Okt 2026)</option>
-            <option value="w-5">Minggu 5 (26 - 30 Okt 2026)</option>
+          <optgroup :label="`Laporan Bulanan (${activeMonthName} ${activeYear})`">
+            <option value="month">Satu Bulan Penuh ({{ activeMonthName }} {{ activeYear }})</option>
           </optgroup>
-          <optgroup label="Laporan Bulanan">
-            <option value="oct-2026">Oktober 2026</option>
-            <option value="sep-2026">September 2026</option>
-            <option value="aug-2026">Agustus 2026</option>
-            <option value="jul-2026">Juli 2026</option>
+          <optgroup :label="`Laporan Mingguan (${activeMonthName} ${activeYear})`">
+            <option v-for="w in dynamicWeeks" :key="w.weekNum" :value="`w-${w.weekNum}`">
+              {{ w.label }}
+            </option>
           </optgroup>
-          <optgroup label="Kuartal & Rentang Kustom">
-            <option value="q4-2026">Kuartal IV (Okt - Des 2026)</option>
-            <option value="custom">Rentang Tanggal Kustom...</option>
-            <option value="all">Semua Periode (Tahun 2026)</option>
+          <optgroup label="Kuartal &amp; Rentang Kustom">
+            <option value="q1">Kuartal I (Jan - Mar {{ activeYear }})</option>
+            <option value="q2">Kuartal II (Apr - Jun {{ activeYear }})</option>
+            <option value="q3">Kuartal III (Jul - Sep {{ activeYear }})</option>
+            <option value="q4">Kuartal IV (Okt - Des {{ activeYear }})</option>
+            <option value="custom">📅 Rentang Tanggal Kustom (Pilih Kalender)...</option>
+            <option value="all">Semua Periode (Semua Waktu)</option>
           </optgroup>
         </select>
 
-        <!-- Input Rentang Tanggal Kustom (Jika memilih opsi custom) -->
+        <!-- Input Rentang Tanggal Kustom dengan Kalender -->
         <div v-if="selectedPeriod === 'custom'" class="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-xl border border-teal-200 shadow-micro shrink-0">
           <span class="text-[11px] font-bold text-slate-500">Dari:</span>
           <input
             type="date"
             v-model="customStartDate"
-            class="text-xs text-slate-700 font-semibold outline-none bg-transparent"
+            class="text-xs text-slate-700 font-semibold outline-none bg-transparent cursor-pointer"
           />
           <span class="text-[11px] font-bold text-slate-400">-</span>
           <span class="text-[11px] font-bold text-slate-500">S/d:</span>
           <input
             type="date"
             v-model="customEndDate"
-            class="text-xs text-slate-700 font-semibold outline-none bg-transparent"
+            class="text-xs text-slate-700 font-semibold outline-none bg-transparent cursor-pointer"
           />
         </div>
 
@@ -472,35 +502,101 @@ import {
   formatPercent,
   formatDate,
   getWeekOfMonth,
+  getMonthWeekRanges,
+  INDONESIAN_MONTHS,
   LOGFRAME_TYPES
 } from '@/utils/formatters';
 import { FileText, Printer } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
-const selectedPeriod = ref('oct-2026');
-const customStartDate = ref('2026-10-01');
-const customEndDate = ref('2026-10-31');
+
+// Inisialisasi kalender: default ke bulan & tahun saat ini (atau Oktober 2026 jika data banyak di Oktober)
+const now = new Date();
+const activeYear = ref(2026);
+const activeMonth = ref(now.getMonth() === 10 ? 10 : 9); // 10 = Nov, 9 = Okt
+const activeMonthYearKey = ref(`${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}`);
+
+const activeMonthName = computed(() => INDONESIAN_MONTHS[activeMonth.value] || 'November');
+
+// Daftar pilihan bulan kalender dinamis (2025 s/d 2027)
+const calendarMonthOptions = computed(() => {
+  const years = [2025, 2026, 2027];
+  const list = [];
+  years.forEach(y => {
+    INDONESIAN_MONTHS.forEach((mName, mIdx) => {
+      list.push({
+        value: `${y}-${String(mIdx + 1).padStart(2, '0')}`,
+        label: `${mName} ${y}`,
+        year: y,
+        monthIndex: mIdx
+      });
+    });
+  });
+  return list;
+});
+
+function handleMonthYearChange() {
+  const parts = activeMonthYearKey.value.split('-');
+  if (parts.length === 2) {
+    activeYear.value = parseInt(parts[0], 10);
+    activeMonth.value = parseInt(parts[1], 10) - 1;
+    const daysInM = new Date(activeYear.value, activeMonth.value + 1, 0).getDate();
+    customStartDate.value = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}-01`;
+    customEndDate.value = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}-${String(daysInM).padStart(2, '0')}`;
+  }
+}
+
+function prevMonth() {
+  if (activeMonth.value === 0) {
+    activeMonth.value = 11;
+    activeYear.value -= 1;
+  } else {
+    activeMonth.value -= 1;
+  }
+  activeMonthYearKey.value = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}`;
+  handleMonthYearChange();
+}
+
+function nextMonth() {
+  if (activeMonth.value === 11) {
+    activeMonth.value = 0;
+    activeYear.value += 1;
+  } else {
+    activeMonth.value += 1;
+  }
+  activeMonthYearKey.value = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}`;
+  handleMonthYearChange();
+}
+
+// 5 Minggu dinamis dengan tanggal nyata terhitung presisi untuk bulan/tahun terpilih
+const dynamicWeeks = computed(() => getMonthWeekRanges(activeYear.value, activeMonth.value));
+
+const selectedPeriod = ref('month');
+const customStartDate = ref(`${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}-01`);
+const customEndDate = ref(`${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}-${new Date(activeYear.value, activeMonth.value + 1, 0).getDate()}`);
 
 const periodLabel = computed(() => {
-  if (selectedPeriod.value === 'w-1') return 'Minggu 1 (01 - 02 Okt 2026)';
-  if (selectedPeriod.value === 'w-2') return 'Minggu 2 (05 - 09 Okt 2026)';
-  if (selectedPeriod.value === 'w-3') return 'Minggu 3 (12 - 16 Okt 2026)';
-  if (selectedPeriod.value === 'w-4') return 'Minggu 4 (19 - 23 Okt 2026)';
-  if (selectedPeriod.value === 'w-5') return 'Minggu 5 (26 - 30 Okt 2026)';
+  if (selectedPeriod.value.startsWith('w-')) {
+    const weekNum = parseInt(selectedPeriod.value.replace('w-', ''), 10);
+    const found = dynamicWeeks.value.find(w => w.weekNum === weekNum);
+    return found ? found.label : `Minggu ${weekNum} (${activeMonthName.value} ${activeYear.value})`;
+  }
+
+  if (selectedPeriod.value === 'month') {
+    return `${activeMonthName.value} ${activeYear.value}`;
+  }
 
   if (selectedPeriod.value === 'custom') {
     return `${formatDate(customStartDate.value)} s/d ${formatDate(customEndDate.value)}`;
   }
 
-  const map = {
-    'oct-2026': 'Oktober 2026',
-    'sep-2026': 'September 2026',
-    'aug-2026': 'Agustus 2026',
-    'jul-2026': 'Juli 2026',
-    'q4-2026': 'Kuartal IV (Okt - Des 2026)',
-    'all': 'Semua Periode 2026'
-  };
-  return map[selectedPeriod.value] || 'Oktober 2026';
+  if (selectedPeriod.value === 'q1') return `Kuartal I (Jan - Mar ${activeYear.value})`;
+  if (selectedPeriod.value === 'q2') return `Kuartal II (Apr - Jun ${activeYear.value})`;
+  if (selectedPeriod.value === 'q3') return `Kuartal III (Jul - Sep ${activeYear.value})`;
+  if (selectedPeriod.value === 'q4') return `Kuartal IV (Okt - Des ${activeYear.value})`;
+  if (selectedPeriod.value === 'all') return `Semua Periode (${activeYear.value})`;
+
+  return `${activeMonthName.value} ${activeYear.value}`;
 });
 
 function getLogFrameBadgeClass(category) {
@@ -563,27 +659,43 @@ const sortedReportJournalTasks = computed(() => {
   const filtered = tasks.filter(t => {
     if (!t.date) return true;
 
-    // Filter per minggu
+    const taskDate = String(t.date).split('T')[0];
+
+    // Filter per minggu dinamis (rentang tanggal presisi minggu tsb)
     if (selectedPeriod.value.startsWith('w-')) {
-      const targetWeek = selectedPeriod.value.replace('w-', '');
-      const taskWeek = getWeekOfMonth(t.date);
-      return String(taskWeek) === String(targetWeek);
+      const weekNum = parseInt(selectedPeriod.value.replace('w-', ''), 10);
+      const targetWeek = dynamicWeeks.value.find(w => w.weekNum === weekNum);
+      if (targetWeek) {
+        return taskDate >= targetWeek.startDate && taskDate <= targetWeek.endDate;
+      }
+      return false;
     }
 
-    // Filter Custom Range
+    // Filter Custom Range dari Kalender
     if (selectedPeriod.value === 'custom') {
-      if (customStartDate.value && t.date < customStartDate.value) return false;
-      if (customEndDate.value && t.date > customEndDate.value) return false;
+      if (customStartDate.value && taskDate < customStartDate.value) return false;
+      if (customEndDate.value && taskDate > customEndDate.value) return false;
       return true;
     }
 
-    // Filter Bulanan
-    if (selectedPeriod.value === 'oct-2026') return t.date.startsWith('2026-10');
-    if (selectedPeriod.value === 'sep-2026') return t.date.startsWith('2026-09');
-    if (selectedPeriod.value === 'aug-2026') return t.date.startsWith('2026-08');
-    if (selectedPeriod.value === 'jul-2026') return t.date.startsWith('2026-07');
-    if (selectedPeriod.value === 'q4-2026') {
-      return t.date.startsWith('2026-10') || t.date.startsWith('2026-11') || t.date.startsWith('2026-12');
+    // Filter Satu Bulan Penuh Kalender
+    if (selectedPeriod.value === 'month') {
+      const targetYM = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}`;
+      return taskDate.startsWith(targetYM);
+    }
+
+    // Filter Kuartal
+    if (selectedPeriod.value === 'q1') {
+      return taskDate.startsWith(`${activeYear.value}-01`) || taskDate.startsWith(`${activeYear.value}-02`) || taskDate.startsWith(`${activeYear.value}-03`);
+    }
+    if (selectedPeriod.value === 'q2') {
+      return taskDate.startsWith(`${activeYear.value}-04`) || taskDate.startsWith(`${activeYear.value}-05`) || taskDate.startsWith(`${activeYear.value}-06`);
+    }
+    if (selectedPeriod.value === 'q3') {
+      return taskDate.startsWith(`${activeYear.value}-07`) || taskDate.startsWith(`${activeYear.value}-08`) || taskDate.startsWith(`${activeYear.value}-09`);
+    }
+    if (selectedPeriod.value === 'q4') {
+      return taskDate.startsWith(`${activeYear.value}-10`) || taskDate.startsWith(`${activeYear.value}-11`) || taskDate.startsWith(`${activeYear.value}-12`);
     }
 
     return true; // 'all'

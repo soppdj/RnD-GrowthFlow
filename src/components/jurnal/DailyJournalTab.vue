@@ -15,20 +15,37 @@
       </div>
 
       <div class="flex items-center gap-2.5 shrink-0 self-start sm:self-auto flex-wrap sm:flex-nowrap">
-        <!-- Dropdown Pilihan Bulan Jurnal (Sesuai Referensi Gambar: "Isi dengan bulan") -->
-        <select
-          v-model="selectedJournalMonth"
-          class="px-3 py-1.5 rounded-xl border border-teal-200 bg-white text-xs font-bold text-teal-900 outline-none focus:ring-2 focus:ring-teal-400 cursor-pointer shadow-micro"
-          title="Pilih Bulan Jurnal"
-        >
-          <option value="CURRENT">Bulan Berjalan ({{ currentMonthName }})</option>
-          <option value="2026-11">November 2026</option>
-          <option value="2026-10">Oktober 2026</option>
-          <option value="2026-09">September 2026</option>
-          <option value="2026-08">Agustus 2026</option>
-          <option value="2026-12">Desember 2026</option>
-          <option value="ALL">Semua Bulan</option>
-        </select>
+        <!-- Kalender Cepat: Navigasi Bulan & Tahun (< [Bulan Tahun] >) -->
+        <div class="flex items-center bg-white border border-teal-200 rounded-xl shadow-micro overflow-hidden text-xs">
+          <button
+            @click="prevMonth"
+            type="button"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-r border-teal-100 font-bold"
+            title="Bulan Sebelumnya"
+          >
+            &larr;
+          </button>
+          
+          <select
+            v-model="selectedJournalMonth"
+            @change="handleMonthChange"
+            class="px-2.5 py-2 font-bold text-teal-900 bg-transparent outline-none cursor-pointer text-xs"
+            title="Pilih Bulan &amp; Tahun Kalender"
+          >
+            <option v-for="m in calendarMonthOptions" :key="m.value" :value="m.value">
+              {{ m.label }}
+            </option>
+          </select>
+
+          <button
+            @click="nextMonth"
+            type="button"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-l border-teal-100 font-bold"
+            title="Bulan Berikutnya"
+          >
+            &rarr;
+          </button>
+        </div>
 
         <button
           @click="openCreateModal"
@@ -44,7 +61,7 @@
     <div class="glass-card rounded-2xl p-4 sm:p-5 border border-teal-100 shadow-soft space-y-3.5">
       <!-- Row 1: Week Selector Tabs (Sesuai Referensi Gambar: 1 Baris Ramping) & Work Days Settings -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-teal-100/70">
-        <!-- Week Tabs (Semua, Minggu 1, Minggu 2, Minggu 3, Minggu 4, Minggu 5) -->
+        <!-- Week Tabs (Semua, Minggu 1, Minggu 2, Minggu 3, Minggu 4, Minggu 5) dengan Rentang Tanggal Kalender -->
         <div class="flex items-center gap-1.5 overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap">
           <button
             v-for="tab in weekTabs"
@@ -58,7 +75,7 @@
                   ? 'bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-800 border-2 border-emerald-400 font-extrabold ring-2 ring-emerald-300/60 shadow-soft hover:bg-emerald-100'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
             ]"
-            :title="tab.value === currentActiveWeek ? `${tab.label} (Minggu Berjalan Real-time)` : `Filter ${tab.label}`"
+            :title="tab.dateRange ? `${tab.label} (${tab.dateRange})` : tab.label"
           >
             <!-- Pulsing indicator for real-time active week -->
             <span
@@ -67,6 +84,9 @@
               :class="selectedWeek === tab.value && !customDateFilter ? 'bg-amber-300' : 'bg-emerald-500'"
             ></span>
             <span>{{ tab.label }}</span>
+            <span v-if="tab.dateRange" class="text-[10px] opacity-75 font-normal">
+              ({{ tab.dateRange }})
+            </span>
             <!-- Live Active Tag -->
             <span
               v-if="tab.value === currentActiveWeek"
@@ -98,7 +118,7 @@
         </div>
       </div>
 
-      <!-- Row 2: Custom Date Picker & Category Filter -->
+      <!-- Row 2: Custom Date Picker, Quick Buttons, & Category Filter -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div class="flex items-center gap-2 flex-wrap">
           <!-- Custom Date Input -->
@@ -107,15 +127,44 @@
             <input
               type="date"
               v-model="customDateFilter"
+              @change="handleCustomDateChange"
               class="text-xs font-semibold text-slate-700 outline-none bg-transparent cursor-pointer"
             />
             <button
               v-if="customDateFilter"
-              @click="customDateFilter = ''"
+              @click="clearCustomDate"
               class="p-0.5 rounded hover:bg-slate-100 text-slate-400 hover:text-rose-600"
               title="Reset Tanggal"
             >
               <X class="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <!-- Quick Navigation Buttons -->
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              @click="setQuickDate('today')"
+              class="px-2.5 py-1 rounded-lg border border-teal-200 bg-teal-50/70 hover:bg-teal-100 text-teal-800 font-bold text-[11px] transition-colors cursor-pointer shadow-micro"
+              title="Filter ke Hari Ini"
+            >
+              Hari Ini
+            </button>
+            <button
+              type="button"
+              @click="setQuickDate('yesterday')"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[11px] transition-colors cursor-pointer shadow-micro"
+              title="Filter ke Kemarin"
+            >
+              Kemarin
+            </button>
+            <button
+              type="button"
+              @click="setQuickDate('currentMonth')"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[11px] transition-colors cursor-pointer shadow-micro"
+              title="Reset ke Bulan Ini"
+            >
+              Bulan Ini
             </button>
           </div>
 
@@ -502,6 +551,10 @@ import {
   formatDate,
   formatJournalDate,
   getWeekOfMonth,
+  getMonthWeekRanges,
+  getYearMonths,
+  INDONESIAN_MONTHS,
+  INDONESIAN_MONTHS_SHORT,
   isWorkDay,
   LOGFRAME_TYPES
 } from '@/utils/formatters';
@@ -533,20 +586,120 @@ import {
 const store = useGrowthFlowStore();
 const { triggerConfetti } = useConfetti();
 
+const now = new Date();
+const activeYear = ref(now.getFullYear());
+const activeMonth = ref(now.getMonth()); // 0-indexed
+
 const selectedCategory = ref('ALL');
 const selectedWeek = ref('ALL');
 const selectedJournalMonth = ref('CURRENT');
 const customDateFilter = ref('');
 const workDaysPerWeek = ref(store.profile?.workDaysPerWeek || 5);
 
-const monthNames = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-];
 const currentMonthName = computed(() => {
-  const now = new Date();
-  return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  return `${INDONESIAN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 });
+
+// Opsi pilihan bulan kalender dinamis (12 bulan tahun berjalan +/- 1 tahun)
+const calendarMonthOptions = computed(() => {
+  const options = [
+    { value: 'CURRENT', label: `Bulan Berjalan (${currentMonthName.value})` }
+  ];
+
+  const yearsToGenerate = [activeYear.value - 1, activeYear.value, activeYear.value + 1];
+  const uniqueYears = [...new Set(yearsToGenerate)].sort();
+
+  uniqueYears.forEach(yr => {
+    const months = getYearMonths(yr);
+    months.forEach(m => {
+      options.push({
+        value: m.value,
+        label: m.label
+      });
+    });
+  });
+
+  options.push({ value: 'ALL', label: 'Semua Bulan (Semua Tahun)' });
+  return options;
+});
+
+function syncSelectedMonth() {
+  if (activeYear.value === now.getFullYear() && activeMonth.value === now.getMonth()) {
+    selectedJournalMonth.value = 'CURRENT';
+  } else {
+    selectedJournalMonth.value = `${activeYear.value}-${String(activeMonth.value + 1).padStart(2, '0')}`;
+  }
+}
+
+function handleMonthChange() {
+  if (selectedJournalMonth.value === 'CURRENT') {
+    activeYear.value = now.getFullYear();
+    activeMonth.value = now.getMonth();
+  } else if (selectedJournalMonth.value === 'ALL') {
+    // Biarkan activeYear dan activeMonth tetap
+  } else if (selectedJournalMonth.value) {
+    const parts = selectedJournalMonth.value.split('-');
+    if (parts.length >= 2) {
+      activeYear.value = parseInt(parts[0], 10);
+      activeMonth.value = parseInt(parts[1], 10) - 1;
+    }
+  }
+}
+
+function prevMonth() {
+  if (activeMonth.value === 0) {
+    activeMonth.value = 11;
+    activeYear.value -= 1;
+  } else {
+    activeMonth.value -= 1;
+  }
+  syncSelectedMonth();
+}
+
+function nextMonth() {
+  if (activeMonth.value === 11) {
+    activeMonth.value = 0;
+    activeYear.value += 1;
+  } else {
+    activeMonth.value += 1;
+  }
+  syncSelectedMonth();
+}
+
+function handleCustomDateChange() {
+  if (customDateFilter.value) {
+    const parts = customDateFilter.value.split('-');
+    if (parts.length >= 2) {
+      activeYear.value = parseInt(parts[0], 10);
+      activeMonth.value = parseInt(parts[1], 10) - 1;
+      syncSelectedMonth();
+    }
+  }
+}
+
+function clearCustomDate() {
+  customDateFilter.value = '';
+}
+
+function setQuickDate(type) {
+  if (type === 'today') {
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    customDateFilter.value = todayStr;
+    handleCustomDateChange();
+  } else if (type === 'yesterday') {
+    const yest = new Date(now);
+    yest.setDate(yest.getDate() - 1);
+    const yestStr = `${yest.getFullYear()}-${String(yest.getMonth() + 1).padStart(2, '0')}-${String(yest.getDate()).padStart(2, '0')}`;
+    customDateFilter.value = yestStr;
+    handleCustomDateChange();
+  } else if (type === 'currentMonth') {
+    customDateFilter.value = '';
+    activeYear.value = now.getFullYear();
+    activeMonth.value = now.getMonth();
+    selectedJournalMonth.value = 'CURRENT';
+    selectedWeek.value = 'ALL';
+  }
+}
 
 const showPastLogs = ref(false);
 const logSavedToast = ref(false);
@@ -560,14 +713,22 @@ const targetAttachTask = ref(null);
 const isEvaluationModalOpen = ref(false);
 const targetEvaluationTask = ref(null);
 
-const weekTabs = [
-  { value: 'ALL', label: 'Semua' },
-  { value: '1', label: 'Minggu 1' },
-  { value: '2', label: 'Minggu 2' },
-  { value: '3', label: 'Minggu 3' },
-  { value: '4', label: 'Minggu 4' },
-  { value: '5', label: 'Minggu 5' }
-];
+// Tab minggu dihitung secara dinamis dari siklus kalender presisi bulan aktif
+const weekTabs = computed(() => {
+  const ranges = getMonthWeekRanges(activeYear.value, activeMonth.value);
+  const tabs = [{ value: 'ALL', label: 'Semua', dateRange: '' }];
+  ranges.forEach(r => {
+    const mShort = INDONESIAN_MONTHS_SHORT[activeMonth.value] || 'Bln';
+    tabs.push({
+      value: String(r.weekNum),
+      label: `Minggu ${r.weekNum}`,
+      startDate: r.startDate,
+      endDate: r.endDate,
+      dateRange: `${String(r.startDay).padStart(2, '0')} - ${String(r.endDay).padStart(2, '0')} ${mShort}`
+    });
+  });
+  return tabs;
+});
 
 // Indikator minggu berjalan real-time dinamis mengikuti tanggal kalender saat ini
 const currentActiveWeek = computed(() => String(getWeekOfMonth(new Date())));
@@ -588,7 +749,6 @@ const monthTasks = computed(() => {
     const rawDate = t.date || t.due_date || '';
     const taskDate = String(rawDate).split('T')[0];
     if (selectedJournalMonth.value === 'CURRENT') {
-      const now = new Date();
       const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       return taskDate.startsWith(currentYM);
     } else if (selectedJournalMonth.value !== 'ALL') {
@@ -615,9 +775,16 @@ const filteredTasks = computed(() => {
 
     // 3. Filter Week of Month
     if (selectedWeek.value !== 'ALL') {
-      const taskWeek = getWeekOfMonth(taskDate);
-      if (String(taskWeek) !== String(selectedWeek.value)) {
-        return false;
+      const targetTab = weekTabs.value.find(tab => tab.value === selectedWeek.value);
+      if (targetTab && targetTab.startDate && targetTab.endDate) {
+        if (taskDate < targetTab.startDate || taskDate > targetTab.endDate) {
+          return false;
+        }
+      } else {
+        const taskWeek = getWeekOfMonth(taskDate);
+        if (String(taskWeek) !== String(selectedWeek.value)) {
+          return false;
+        }
       }
     }
 

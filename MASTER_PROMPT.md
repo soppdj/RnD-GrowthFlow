@@ -369,3 +369,25 @@ VITE_SUPABASE_URL=[SUPABASE_PROJECT_URL]
 VITE_SUPABASE_ANON_KEY=[SUPABASE_ANON_PUBLIC_KEY]
 ```
 *(Jangan pernah mempublikasikan nilai mentah kredensial di repositori publik).*
+
+---
+
+## 8. SISTEM PENANGGALAN KALENDER DINAMIS & KUSTOM (CUSTOM CALENDAR ENGINE)
+1. **Siklus 5 Minggu Kalender Dinamis:**
+   - Menghitung rentang tanggal presisi (`startDate`, `endDate`, dan label tanggal seperti `01 - 08 Nov`) untuk setiap minggu (Minggu 1 s/d Minggu 5) pada bulan dan tahun apa pun melalui helper `getMonthWeekRanges(year, monthIndex)`.
+   - Mengikuti aturan SOP: Tanggal 1 sampai hari Minggu pertama adalah Minggu 1; jika tanggal 1 adalah hari Minggu, siklus diperpanjang hingga Minggu tanggal 8 agar minggu pertama memiliki hari kerja efektif.
+   - Minggu 2 s/d 5 membagi sisa hari dalam bulan secara presisi hingga hari terakhir bulan (tanggal 30/31 atau 28/29).
+
+2. **Pengurutan Kronologis Runtut (Tanggal 1 s/d 30/31):**
+   - Seluruh daftar tugas jurnal harian (`DailyJournalTab.vue`) diurutkan secara kronologis menaik (*ascending*) berdasarkan tanggal pelaksanaan sehingga riwayat aktivitas tersusun rapi dan konsisten.
+
+3. **Kontrol Navigasi Kalender Cepat (`<` `[Bulan Tahun]` `>`):**
+   - Diterapkan pada modul **Laporan Kinerja Resmi**, **Checklist Jurnal Harian**, **Agenda & Target Roadmap**, serta penyelarasan dropdown pada modul **Donasi & Metrik**.
+   - Menyediakan tombol pintas kalender cepat (`Hari Ini`, `Kemarin`, `Bulan Ini`) dan date-picker kustom untuk penelusuran tanggal spesifik.
+
+4. **Filter Milestone Bulan Berjalan (Clean Roadmap Filter):**
+   - Pada mode *Bulan Berjalan (CURRENT)* di modul Agenda & Roadmap (`AgendaMilestoneTab.vue`), sistem secara otomatis menyaring dan menyembunyikan agenda/milestone yang telah lewat dari bulan-bulan sebelumnya agar pengguna dapat berfokus pada target aktif. Riwayat masa lalu dapat dibuka kapan saja melalui opsi *Semua Bulan*.
+
+5. **Input Angka Target Fleksibel Tanpa Batasan Kelipatan:**
+   - Kolom target kuartal pada pengaturan profil (`ProfileSettingsView.vue`) mendukung masukan angka berapapun secara presisi tanpa pembulatan ke atas maupun ke bawah (`step="any"`, form `novalidate`).
+
