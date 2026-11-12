@@ -381,8 +381,10 @@ VITE_SUPABASE_ANON_KEY=[SUPABASE_ANON_PUBLIC_KEY]
 2. **Pengurutan Kronologis Runtut (Tanggal 1 s/d 30/31):**
    - Seluruh daftar tugas jurnal harian (`DailyJournalTab.vue`) diurutkan secara kronologis menaik (*ascending*) berdasarkan tanggal pelaksanaan sehingga riwayat aktivitas tersusun rapi dan konsisten.
 
-3. **Kontrol Navigasi Kalender Cepat (`<` `[Bulan Tahun]` `>`):**
+3. **Kontrol Navigasi Kalender Cepat (`<` `[Bulan Tahun]` `>`) & Batas Awal Juli 2026:**
    - Diterapkan pada modul **Laporan Kinerja Resmi**, **Checklist Jurnal Harian**, **Agenda & Target Roadmap**, serta penyelarasan dropdown pada modul **Donasi & Metrik**.
+   - Seluruh opsi bulan kalender aplikasi secara ketat dimulai dari **Juli 2026** ke depan (tahun 2025 dan bulan sebelum Juli 2026 ditiadakan). Tombol navigasi mundur (`<`) secara otomatis dinonaktifkan jika telah mencapai batas awal Juli 2026.
+   - Tab minggu pada Checklist Jurnal diformat rapi dalam **1 baris ramping** (*single row without wrapping*) dengan label bersih: `Semua`, `Minggu 1`, `Minggu 2`, `Minggu 3`, `Minggu 4`, `Minggu 5`. Informasi rentang tanggal presisi tetap dapat dilihat melalui *tooltip* saat kursor diarahkan ke tombol.
    - Menyediakan tombol pintas kalender cepat (`Hari Ini`, `Kemarin`, `Bulan Ini`) dan date-picker kustom untuk penelusuran tanggal spesifik.
 
 4. **Filter Milestone Bulan Berjalan (Clean Roadmap Filter):**

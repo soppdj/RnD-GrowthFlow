@@ -14,9 +14,11 @@
         <div class="flex items-center bg-white border border-teal-200 rounded-xl shadow-micro overflow-hidden text-xs">
           <button
             @click="prevMonth"
+            :disabled="activeYear === 2026 && activeMonth <= 6"
             type="button"
-            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-r border-teal-100 font-bold"
-            title="Bulan Sebelumnya"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors border-r border-teal-100 font-bold"
+            :class="activeYear === 2026 && activeMonth <= 6 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'"
+            title="Bulan Sebelumnya (Mulai Juli 2026)"
           >
             &larr;
           </button>
@@ -503,6 +505,7 @@ import {
   formatDate,
   getWeekOfMonth,
   getMonthWeekRanges,
+  getCalendarMonthsStartingJuly2026,
   INDONESIAN_MONTHS,
   LOGFRAME_TYPES
 } from '@/utils/formatters';
@@ -510,7 +513,7 @@ import { FileText, Printer } from 'lucide-vue-next';
 
 const store = useGrowthFlowStore();
 
-// Inisialisasi kalender: default ke bulan & tahun saat ini (atau Oktober 2026 jika data banyak di Oktober)
+// Inisialisasi kalender: default ke bulan & tahun saat ini (mulai Juli 2026)
 const now = new Date();
 const activeYear = ref(2026);
 const activeMonth = ref(now.getMonth() === 10 ? 10 : 9); // 10 = Nov, 9 = Okt
@@ -518,21 +521,9 @@ const activeMonthYearKey = ref(`${activeYear.value}-${String(activeMonth.value +
 
 const activeMonthName = computed(() => INDONESIAN_MONTHS[activeMonth.value] || 'November');
 
-// Daftar pilihan bulan kalender dinamis (2025 s/d 2027)
+// Daftar pilihan bulan kalender dinamis (Mulai Juli 2026 ke depan)
 const calendarMonthOptions = computed(() => {
-  const years = [2025, 2026, 2027];
-  const list = [];
-  years.forEach(y => {
-    INDONESIAN_MONTHS.forEach((mName, mIdx) => {
-      list.push({
-        value: `${y}-${String(mIdx + 1).padStart(2, '0')}`,
-        label: `${mName} ${y}`,
-        year: y,
-        monthIndex: mIdx
-      });
-    });
-  });
-  return list;
+  return getCalendarMonthsStartingJuly2026(activeYear.value);
 });
 
 function handleMonthYearChange() {
@@ -547,6 +538,10 @@ function handleMonthYearChange() {
 }
 
 function prevMonth() {
+  // Batas minimal tanggal & kalender: Juli 2026
+  if (activeYear.value === 2026 && activeMonth.value <= 6) {
+    return;
+  }
   if (activeMonth.value === 0) {
     activeMonth.value = 11;
     activeYear.value -= 1;

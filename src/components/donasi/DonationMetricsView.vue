@@ -273,7 +273,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useGrowthFlowStore } from '@/stores/growthFlowStore';
-import { formatCurrency, INDONESIAN_MONTHS, getYearMonths } from '@/utils/formatters';
+import { formatCurrency, INDONESIAN_MONTHS, getCalendarMonthsStartingJuly2026 } from '@/utils/formatters';
 import DonationComparisonChart from './DonationComparisonChart.vue';
 import DonationProgramModal from './DonationProgramModal.vue';
 import {
@@ -294,21 +294,9 @@ const currentMonthName = computed(() => {
   return `${INDONESIAN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 });
 
-// Opsi bulan kalender dinamis (12 bulan tahun berjalan +/- 1 tahun)
+// Opsi bulan kalender dinamis (Mulai Juli 2026 ke depan)
 const calendarMonthOptions = computed(() => {
-  const currentYear = now.getFullYear();
-  const years = [currentYear - 1, currentYear, currentYear + 1];
-  const list = [];
-  years.forEach(yr => {
-    const months = getYearMonths(yr);
-    months.forEach(m => {
-      list.push({
-        value: m.value,
-        label: m.label
-      });
-    });
-  });
-  return list;
+  return getCalendarMonthsStartingJuly2026(now.getFullYear());
 });
 
 const isModalOpen = ref(false);

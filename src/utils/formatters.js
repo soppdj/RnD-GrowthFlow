@@ -309,3 +309,25 @@ export function getYearMonths(year) {
   }));
 }
 
+/**
+ * Menghasilkan daftar opsi bulan kalender aplikasi yang dimulai dari Juli 2026
+ * (Sesuai SOP & instruksi: riwayat data dan kalender dimulai dari Juli 2026 ke depan)
+ */
+export function getCalendarMonthsStartingJuly2026(targetYear = 2026) {
+  const maxYear = Math.max(2027, Number(targetYear) + 1);
+  const list = [];
+  for (let y = 2026; y <= maxYear; y++) {
+    const startM = (y === 2026) ? 6 : 0; // 6 = Juli (0-indexed)
+    for (let m = startM; m < 12; m++) {
+      list.push({
+        value: `${y}-${String(m + 1).padStart(2, '0')}`,
+        label: `${INDONESIAN_MONTHS[m]} ${y}`,
+        year: y,
+        monthIndex: m,
+        monthName: INDONESIAN_MONTHS[m]
+      });
+    }
+  }
+  return list;
+}
+

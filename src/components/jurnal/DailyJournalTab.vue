@@ -19,9 +19,11 @@
         <div class="flex items-center bg-white border border-teal-200 rounded-xl shadow-micro overflow-hidden text-xs">
           <button
             @click="prevMonth"
+            :disabled="activeYear === 2026 && activeMonth <= 6"
             type="button"
-            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-r border-teal-100 font-bold"
-            title="Bulan Sebelumnya"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors border-r border-teal-100 font-bold"
+            :class="activeYear === 2026 && activeMonth <= 6 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'"
+            title="Bulan Sebelumnya (Mulai Juli 2026)"
           >
             &larr;
           </button>
@@ -61,8 +63,8 @@
     <div class="glass-card rounded-2xl p-4 sm:p-5 border border-teal-100 shadow-soft space-y-3.5">
       <!-- Row 1: Week Selector Tabs (Sesuai Referensi Gambar: 1 Baris Ramping) & Work Days Settings -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-teal-100/70">
-        <!-- Week Tabs (Semua, Minggu 1, Minggu 2, Minggu 3, Minggu 4, Minggu 5) dengan Rentang Tanggal Kalender -->
-        <div class="flex items-center gap-1.5 overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap">
+        <!-- Week Tabs: 1 Baris Ramping (Semua, Minggu 1, Minggu 2, Minggu 3, Minggu 4, Minggu 5) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto flex-nowrap shrink-0">
           <button
             v-for="tab in weekTabs"
             :key="tab.value"
@@ -84,9 +86,6 @@
               :class="selectedWeek === tab.value && !customDateFilter ? 'bg-amber-300' : 'bg-emerald-500'"
             ></span>
             <span>{{ tab.label }}</span>
-            <span v-if="tab.dateRange" class="text-[10px] opacity-75 font-normal">
-              ({{ tab.dateRange }})
-            </span>
             <!-- Live Active Tag -->
             <span
               v-if="tab.value === currentActiveWeek"
@@ -552,7 +551,7 @@ import {
   formatJournalDate,
   getWeekOfMonth,
   getMonthWeekRanges,
-  getYearMonths,
+  getCalendarMonthsStartingJuly2026,
   INDONESIAN_MONTHS,
   INDONESIAN_MONTHS_SHORT,
   isWorkDay,
@@ -600,26 +599,21 @@ const currentMonthName = computed(() => {
   return `${INDONESIAN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 });
 
-// Opsi pilihan bulan kalender dinamis (12 bulan tahun berjalan +/- 1 tahun)
+// Opsi pilihan bulan kalender dinamis (Mulai Juli 2026 ke depan)
 const calendarMonthOptions = computed(() => {
   const options = [
     { value: 'CURRENT', label: `Bulan Berjalan (${currentMonthName.value})` }
   ];
 
-  const yearsToGenerate = [activeYear.value - 1, activeYear.value, activeYear.value + 1];
-  const uniqueYears = [...new Set(yearsToGenerate)].sort();
-
-  uniqueYears.forEach(yr => {
-    const months = getYearMonths(yr);
-    months.forEach(m => {
-      options.push({
-        value: m.value,
-        label: m.label
-      });
+  const months = getCalendarMonthsStartingJuly2026(activeYear.value);
+  months.forEach(m => {
+    options.push({
+      value: m.value,
+      label: m.label
     });
   });
 
-  options.push({ value: 'ALL', label: 'Semua Bulan (Semua Tahun)' });
+  options.push({ value: 'ALL', label: 'Semua Bulan (Mulai Juli 2026)' });
   return options;
 });
 
@@ -647,6 +641,10 @@ function handleMonthChange() {
 }
 
 function prevMonth() {
+  // Batas minimal tanggal & kalender: Juli 2026
+  if (activeYear.value === 2026 && activeMonth.value <= 6) {
+    return;
+  }
   if (activeMonth.value === 0) {
     activeMonth.value = 11;
     activeYear.value -= 1;

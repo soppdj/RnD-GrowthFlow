@@ -18,9 +18,11 @@
         <div class="flex items-center bg-white border border-teal-200 rounded-xl shadow-micro overflow-hidden text-xs">
           <button
             @click="prevMonth"
+            :disabled="activeYear === 2026 && activeMonth <= 6"
             type="button"
-            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors cursor-pointer border-r border-teal-100 font-bold"
-            title="Bulan Sebelumnya"
+            class="px-2.5 py-2 hover:bg-teal-50 text-slate-500 hover:text-teal-700 transition-colors border-r border-teal-100 font-bold"
+            :class="activeYear === 2026 && activeMonth <= 6 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'"
+            title="Bulan Sebelumnya (Mulai Juli 2026)"
           >
             &larr;
           </button>
@@ -359,7 +361,7 @@ import {
   formatDate,
   LOGFRAME_TYPES,
   INDONESIAN_MONTHS,
-  getYearMonths
+  getCalendarMonthsStartingJuly2026
 } from '@/utils/formatters';
 import AttachLinkModal from './AttachLinkModal.vue';
 import CompleteMilestoneEvaluationModal from './CompleteMilestoneEvaluationModal.vue';
@@ -391,26 +393,21 @@ const currentMonthName = computed(() => {
   return `${INDONESIAN_MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 });
 
-// Opsi pilihan bulan kalender dinamis
+// Opsi pilihan bulan kalender dinamis (Mulai Juli 2026 ke depan)
 const calendarMonthOptions = computed(() => {
   const options = [
     { value: 'CURRENT', label: `Bulan Berjalan (${currentMonthName.value})` }
   ];
 
-  const yearsToGenerate = [activeYear.value - 1, activeYear.value, activeYear.value + 1];
-  const uniqueYears = [...new Set(yearsToGenerate)].sort();
-
-  uniqueYears.forEach(yr => {
-    const months = getYearMonths(yr);
-    months.forEach(m => {
-      options.push({
-        value: m.value,
-        label: m.label
-      });
+  const months = getCalendarMonthsStartingJuly2026(activeYear.value);
+  months.forEach(m => {
+    options.push({
+      value: m.value,
+      label: m.label
     });
   });
 
-  options.push({ value: 'ALL', label: 'Semua Bulan (Semua Tahun)' });
+  options.push({ value: 'ALL', label: 'Semua Bulan (Mulai Juli 2026)' });
   return options;
 });
 
@@ -438,6 +435,10 @@ function handleMonthChange() {
 }
 
 function prevMonth() {
+  // Batas minimal: Juli 2026
+  if (activeYear.value === 2026 && activeMonth.value <= 6) {
+    return;
+  }
   if (activeMonth.value === 0) {
     activeMonth.value = 11;
     activeYear.value -= 1;
